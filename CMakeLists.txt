@@ -4,12 +4,12 @@ project(EvoSeg)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "https://www.slicer.org/wiki/Documentation/Nightly/Extensions/EvoSeg")
+set(EXTENSION_HOMEPAGE "https://github.com/DeepInsightData/EvoSeg")
 set(EXTENSION_CONTRIBUTORS "Longhao Cao (DeepInsightData)")
 set(EXTENSION_DESCRIPTION "Evolution Segmentation")
-set(EXTENSION_ICONURL "https://www.example.com/Slicer/Extensions/EvoSeg.png")
-set(EXTENSION_SCREENSHOTURLS "https://www.example.com/Slicer/Extensions/EvoSeg/Screenshots/1.png")
-set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
+set(EXTENSION_ICONURL "https://github.com/DeepInsightData/EvoSeg/main/EvoSeg.png")
+set(EXTENSION_SCREENSHOTURLS "https://github.com/DeepInsightData/EvoSeg/main/Screenshots/1.png")
+set(EXTENSION_DEPENDS "PyTorch") # Specified as a list or "NA" if no dependencies
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
