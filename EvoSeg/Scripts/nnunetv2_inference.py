@@ -8,8 +8,8 @@ from flask import Flask, request, jsonify
 import torch
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join
-from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
-from nnunetv2.imageio.natural_image_reader_writer import NaturalImage2DIO, SimpleITKIO
+from nnunetv2.imageio.simpleitk_reader_writer import SimpleITKIO
+
 import nrrd
 
 @torch.no_grad()
