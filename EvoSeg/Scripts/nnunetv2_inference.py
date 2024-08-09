@@ -9,6 +9,7 @@ import torch
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join
 from nnunetv2.imageio.simpleitk_reader_writer import SimpleITKIO
+from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
 
 import nrrd
 
@@ -29,7 +30,7 @@ def main(model_folder,
     if not os.path.isfile(image_file):
         raise ValueError(f"image_file {image_file} does not exist")
     
-    use_folds = (0, 1, 2, 3, 4)
+    use_folds = (1, )
     device = torch.device('cuda', 0)
     
     predictor = nnUNetPredictor(
@@ -68,8 +69,11 @@ def main(model_folder,
     
     # TODO:多模态分割结果保存
     # save result by copying all image metadata from the input, just replacing the voxel data
-    nrrd_header = nrrd.read_header(image_file)
-    nrrd.write(result_file, seg_results, nrrd_header)
+    # nrrd_header = nrrd.read_header(image_file)
+    # nrrd.write(result_file, seg_results, nrrd_header)
+
+    # load NIFTI header
+    SimpleITKIO().write_seg(seg_results, result_file, prop)
     timing_checkpoints.append(("Save", time.time()))
     
     # Print computation time log
