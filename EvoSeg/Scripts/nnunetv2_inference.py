@@ -10,8 +10,23 @@ import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join
 from nnunetv2.imageio.simpleitk_reader_writer import SimpleITKIO
 from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
+import SimpleITK as sitk
 
 import nrrd
+
+def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
+    assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
+    output_dimension = len(properties['sitk_stuff']['spacing'])
+    assert 1 < output_dimension < 4
+    if output_dimension == 2:
+        seg = seg[0]
+
+    itk_image = sitk.GetImageFromArray(seg.astype(np.float32, copy=False))
+    itk_image.SetSpacing(properties['sitk_stuff']['spacing'])
+    itk_image.SetOrigin(properties['sitk_stuff']['origin'])
+    itk_image.SetDirection(properties['sitk_stuff']['direction'])
+
+    sitk.WriteImage(itk_image, output_fname, True)
 
 @torch.no_grad()
 def main(model_folder,
@@ -64,7 +79,8 @@ def main(model_folder,
     #                                                 [prop],
     #                                                 None, 3, save_probabilities=False,
     #                                                 num_processes_segmentation_export=2)
-    seg_results = predictor.predict_single_npy_array(img, prop, None, None, False)
+    seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
+    # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
     
     # TODO:多模态分割结果保存
@@ -73,7 +89,16 @@ def main(model_folder,
     # nrrd.write(result_file, seg_results, nrrd_header)
 
     # load NIFTI header
-    SimpleITKIO().write_seg(seg_results, result_file, prop)
+    if save_prob_maps:
+        SimpleITKIO().write_seg(seg_results[0], result_file, prop)
+        prob_maps = seg_results[1][1]
+        # normalize prob_maps to 0-255
+        prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+        SimpleITKIO().write_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+        # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+
+    else:
+        SimpleITKIO().write_seg(seg_results, result_file, prop)
     timing_checkpoints.append(("Save", time.time()))
     
     # Print computation time log
