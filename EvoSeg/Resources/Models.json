@@ -1,0 +1,28 @@
+{
+  "models": [
+    {
+      "title": "Airway nnUnet",
+      "license": "EvoSeg",
+      "description": "......",
+      "subject": "human",
+      "imagingModality": "CT",
+      "sampleData": [ 
+        "CTLiver",
+        "CTACardio",
+        "CTMRBrain"
+      ],
+      "versions": [
+        {
+          "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
+        }
+      ],
+      "segmentationTimeSecGPU": 999,
+      "segmentationTimeSecCPU": 999,
+      "segmentNames": [
+        "...",
+        "...",
+        "..."
+      ]
+    }
+  ]
+}
