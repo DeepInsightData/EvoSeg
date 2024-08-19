@@ -1384,7 +1384,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         while True:
             try:
                 line = proc.stdout.readline()
-                print("debug:_line",line.rstrip())
                 if not line:
                     break
                 segmentationProcessInfo["procOutputQueue"].put(line.rstrip())
@@ -1416,7 +1415,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         outputQueue = segmentationProcessInfo["procOutputQueue"]
         while outputQueue:
             if segmentationProcessInfo.get("procReturnCode") != EvoSegLogic.EXIT_CODE_DID_NOT_RUN:
-                print("debug_queue:_",str(segmentationProcessInfo.get("procReturnCode")))
                 self.onSegmentationProcessCompleted(segmentationProcessInfo)
                 return
             try:
