@@ -16,7 +16,8 @@ from slicer.parameterNodeWrapper import (
 
 from slicer import vtkMRMLScalarVolumeNode
 
-
+from qt import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget
+        
 #
 # EvoSeg
 #
@@ -267,6 +268,67 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
 
+    ##
+    # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
+    # 
+    def translate(self, language="en-US"):
+        # 目前仅限于翻译中文
+        if language != "zh-CN":
+            return
+        en_zh={
+            "Advanced": "设置",
+            "Apply": "应用",
+            "<p>Start segmentation.</p>": "开始分割。",
+            "Open models cache folder": "打开模型缓存文件夹",
+            "<p>Open the folder that contains all downloaded files for models.</p>":"打开包含所有下载模型文件的文件夹。",
+            "<p>Use CPU, even if GPU is available. Useful if the GPU does not have enough memory.</p>": "即使有 GPU 可用，也使用 CPU。如果 GPU 内存不足，则此选项很有用。",
+            "<p>Higher value means stronger smoothing during closed surface representation conversion.</p>": "更高的值表示在闭合表面表示转换期间更强的平滑。",
+            "Clear cache": "清除缓存",
+            "<p>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</p>": "删除所有模型的所有下载文件。文件会根据需要自动重新下载。",
+            "Download": "下载",
+            "<p>Download sample data set for the current segmentation model</p>": "下载当前分割模型的示例数据集",
+            "Full text": "全文",
+            "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
+            "Input volume 1:": "输入体积 1：",
+            "Input volume 2:": "输入体积 2：",
+            "Input volume 3:": "输入体积 3：",
+            "Input volume 4:": "输入体积 4：",
+            "Inputs": "输入",
+            "Force to use CPU:": "强制使用 CPU：",
+            "Segmentation model:": "分割模型：",
+            "Show all models:": "显示所有模型：",
+            "Segmentation:": "分割：",
+            "Manage models:": "管理模型：",
+            "Use standard segment names:": "使用标准分割名称：",
+            "EVO Python package:": "EVO Python 包：",
+            "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
+            "Download model if not saved": "如果未保存则下载模型",
+            "<p>Copy it yourself.</p>": "请自行复制。",
+            "<p>This will store the segmentation result.</p>": "这将保存分割结果。",
+            "Outputs": "输出",
+            "Get Python package information": "获取 Python 包信息",
+            "<p>Get information on the installed EVO Python package</p>": "获取已安装的 EVO Python 包的信息",
+            "Force reinstall": "强制重新安装",
+            "<p>Force upgrade of EVO Python package to the version required by this module.</p>": "强制将 EVO Python 包升级到本模块所需的版本。",
+            "0.50": "0.50",
+            "Show 3D": "显示 3D",
+            '<p>Show all models in "Segmentation model" list, including old versions.</p>': "显示“分割模型”列表中的所有模型，包括旧版本。",
+            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。"
+        }
+
+        for name in dir(self.ui):
+            widget = getattr(self.ui, name)
+            try:
+                #print(widget.text)
+                widget.setText(en_zh[widget.text])
+            except:
+                pass
+            try:
+                #print(widget.toolTip)
+                widget.setToolTip(en_zh[widget.toolTip])
+            except:
+                pass
+
     def setup(self) -> None:
         """Called when the user opens the module the first time and the widget is initialized."""
         ScriptedLoadableModuleWidget.setup(self)
@@ -276,7 +338,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         uiWidget = slicer.util.loadUI(self.resourcePath("UI/EvoSeg.ui"))
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
-
+        
         import qt
         # 下载样本数据按钮设置icon
         self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg.png")))
@@ -335,7 +397,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Make the model search box in focus by default so users can just start typing to find the model they need
         qt.QTimer.singleShot(0, self.ui.modelSearchBox.setFocus)
 
+        self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
 
+    def tr_ui(self):
+        if self.ui.translate_ui.checked:
+            self.translate("zh-CN")
+            self.ui.translate_ui.setEnabled(False)
+        else:
+            self.translate()
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
