@@ -32,7 +32,7 @@ class EvoSeg(ScriptedLoadableModule):
         ScriptedLoadableModule.__init__(self, parent)
         self.parent.title = _("EvoSeg")  # TODO: make this more human readable by adding spaces
         # TODO: set categories (folders where the module shows up in the module selector)
-        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Examples")]
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Segmentation")]
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
         self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
         # TODO: update with short description of the module and a link to online module documentation
@@ -289,12 +289,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "<p>Download sample data set for the current segmentation model</p>": "下载当前分割模型的示例数据集",
             "Full text": "全文",
             "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
+            "Input volume:": "输入体积：",
             "Input volume 1:": "输入体积 1：",
             "Input volume 2:": "输入体积 2：",
             "Input volume 3:": "输入体积 3：",
             "Input volume 4:": "输入体积 4：",
             "Inputs": "输入",
-            "Force to use CPU:": "强制使用 CPU：",
+            "Force to use CPU: ": "强制使用 CPU：",
             "Segmentation model:": "分割模型：",
             "Show all models:": "显示所有模型：",
             "Segmentation:": "分割：",
@@ -341,7 +342,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         import qt
         # 下载样本数据按钮设置icon
-        self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg.png")))
+        self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/radiology.svg")))
 
         self.inputNodeSelectors = [self.ui.inputNodeSelector0, self.ui.inputNodeSelector1, self.ui.inputNodeSelector2, self.ui.inputNodeSelector3]
         self.inputNodeLabels = [self.ui.inputNodeLabel0, self.ui.inputNodeLabel1, self.ui.inputNodeLabel2, self.ui.inputNodeLabel3]
