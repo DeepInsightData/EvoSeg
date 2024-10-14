@@ -271,10 +271,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._updatingGUIFromParameterNode = False
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
+        
 
         with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
             app_config = json.load(file)
         self.ui_language = app_config["language"]
+        
+        self.logic = EvoSegLogic(self.ui_language)
 
     ##
     # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
@@ -296,7 +299,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Full text": "全文",
             "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
             "Search...": "搜索...",
-            "Input volume:": "输入体积：",
+            "Input volume:": "输入体积:",
             "Input volume 1:": "输入体积 1：",
             "Input volume 2:": "输入体积 2：",
             "Input volume 3:": "输入体积 3：",
@@ -323,7 +326,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "0.50": "0.50",
             "Show 3D": "显示 3D",
             '<p>Show all models in "Segmentation model" list, including old versions.</p>': "显示“分割模型”列表中的所有模型，包括旧版本。",
-            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。"
+            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。",
+            "<p>Create new segmentation on Apply</p>":"<p>创建新分割</p>",
         }
 
         if language == "zh-CN":
@@ -360,6 +364,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "language": "zh-CN"
             }
         save_data["language"] = self.ui_language
+        self.logic.ui_language =self.ui_language
 
         with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'w') as file:
             json.dump(save_data, file, indent=4) 
@@ -395,12 +400,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
         # EvoSegLogic()直接copy EvoSegLogic()
-        self.logic = EvoSegLogic()
         self.logic.logCallback = self.addLog
         self.logic.processingCompletedCallback = self.onProcessingCompleted
         self.logic.startResultImportCallback = self.onProcessImportStarted
         self.logic.endResultImportCallback = self.onProcessImportEnded
-        self.logic.ui_language = self.ui_language
 
         # Connections
 
@@ -856,7 +859,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             return
 
         inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
+        #print(inputNodes)
         for inputIndex, inputNode in enumerate(inputNodes):
+            #print(inputIndex, inputNode)
             if inputNode:
                 self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
 
@@ -906,7 +911,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     EXIT_CODE_USER_CANCELLED = 1001
     EXIT_CODE_DID_NOT_RUN = 1002
     
-    def __init__(self) -> None:
+    def __init__(self,the_ui_language) -> None:
         """Called when the logic class is instantiated. Can be used for initializing member variables."""
         ScriptedLoadableModuleLogic.__init__(self)
         from collections import OrderedDict
@@ -922,7 +927,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.startResultImportCallback = None
         self.endResultImportCallback = None
         self.useStandardSegmentNames = True
-        self.ui_language = None
+        self.ui_language = the_ui_language
 
         # List of property type codes that are specified by in the EvoSeg terminology.
         #
@@ -984,7 +989,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         version = match.group("version")
                     else:
                         if model['license'] == "EvoSeg": # TODO: 上下文约束了url格式，这里临时修改，此外在models.json中暂时用license区分自己添加进去的模型
-                            filename = "EvoSeg"
+                            filename = model["title"]
                             version = "1"
                         else:
                             logging.error(f"Failed to extract model id and version from url: {url} ")
@@ -992,9 +997,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         # Contains a list of dict. One dict for each input.
                         # Currently, only "title" (user-displayable name) and "namePattern" of the input are specified.
                         # In the future, inputs could have additional properties, such as name, type, optional, ...
+                        #print(self.ui_language,"<<<<<")
                         inputs = model["inputs"]
                     else:
                         # Inputs are not defined, use default (single input volume)
+                        #print(self.ui_language,"<<<<<")
+                        # 暂不好翻译
                         inputs = [{"title": "Input volume"}] if self.ui_language=="en-US" else [{"title": "输入体积"}]
                     segmentNames = model.get('segmentNames')
                     if not segmentNames:
