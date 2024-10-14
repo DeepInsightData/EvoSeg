@@ -1,15 +1,35 @@
 {
   "models": [
     {
-      "title": "Airway nnUnet",
+      "title": "Airway nnUnet(artery)",
       "license": "EvoSeg",
       "description": "......",
       "subject": "human",
       "imagingModality": "CT",
       "sampleData": [ 
-        "CTLiver",
-        "CTACardio",
-        "CTMRBrain"
+        "CTLiver"
+      ],
+      "versions": [
+        {
+          "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
+        }
+      ],
+      "segmentationTimeSecGPU": 999,
+      "segmentationTimeSecCPU": 999,
+      "segmentNames": [
+        "...",
+        "...",
+        "..."
+      ]
+    },
+    {
+      "title": "Airway nnUnet(trachea)",
+      "license": "EvoSeg",
+      "description": "......",
+      "subject": "human",
+      "imagingModality": "CT",
+      "sampleData": [ 
+        "CTChest"
       ],
       "versions": [
         {

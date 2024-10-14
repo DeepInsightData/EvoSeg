@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 from typing import Annotated, Optional
 
@@ -16,8 +17,9 @@ from slicer.parameterNodeWrapper import (
 
 from slicer import vtkMRMLScalarVolumeNode
 
-from qt import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget
-        
+from qt import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog
+
+import subprocess
 #
 # EvoSeg
 #
@@ -60,6 +62,7 @@ and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR0132
         tlogic = slicer.modules.terminologies.logic()
         self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
         self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
+
 
     def registerSampleData(self):
         """
@@ -152,6 +155,7 @@ and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR0132
                 if not filenamesWithChecksum:
                     continue
                 checksum, filename = filenamesWithChecksum.split(" *")
+                # NOTE:是否需要？
                 uris.append(f"https://github.com/lassoan/SlicerMONAIAuto3DSeg/releases/download/TestingData/{filename}")
                 filenames.append(filename)
                 nodeNames.append(filename.split(".")[0])
@@ -268,13 +272,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
 
+        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
+            app_config = json.load(file)
+        self.ui_language = app_config["language"]
+
     ##
     # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
     # 
     def translate(self, language="en-US"):
-        # 目前仅限于翻译中文
-        if language != "zh-CN":
-            return
+        # 翻译
         en_zh={
             "Advanced": "设置",
             "Apply": "应用",
@@ -286,20 +292,23 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Clear cache": "清除缓存",
             "<p>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</p>": "删除所有模型的所有下载文件。文件会根据需要自动重新下载。",
             "Download": "下载",
-            "<p>Download sample data set for the current segmentation model</p>": "下载当前分割模型的示例数据集",
+            "<p>Download sample data and model set for the current segmentation model</p>": "<p>下载当前分割模型和示例数据集</p>",
             "Full text": "全文",
             "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
+            "Search...": "搜索...",
             "Input volume:": "输入体积：",
             "Input volume 1:": "输入体积 1：",
             "Input volume 2:": "输入体积 2：",
             "Input volume 3:": "输入体积 3：",
             "Input volume 4:": "输入体积 4：",
             "Inputs": "输入",
+            "<p>Translate to chinese</p>": "<p>切换成英文</p>",
             "Force to use CPU: ": "强制使用 CPU：",
             "Segmentation model:": "分割模型：",
             "Show all models:": "显示所有模型：",
             "Segmentation:": "分割：",
             "Manage models:": "管理模型：",
+            "Copy to folder":"一键导入",
             "Use standard segment names:": "使用标准分割名称：",
             "EVO Python package:": "EVO Python 包：",
             "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
@@ -317,18 +326,45 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。"
         }
 
-        for name in dir(self.ui):
-            widget = getattr(self.ui, name)
-            try:
-                #print(widget.text)
-                widget.setText(en_zh[widget.text])
-            except:
-                pass
-            try:
-                #print(widget.toolTip)
-                widget.setToolTip(en_zh[widget.toolTip])
-            except:
-                pass
+        if language == "zh-CN":
+            for name in dir(self.ui):
+                widget = getattr(self.ui, name)
+                try:
+                    #print(widget.text)
+                    widget.setText(en_zh[widget.text])
+                except:
+                    pass
+                try:
+                    #print(widget.toolTip)
+                    widget.setToolTip(en_zh[widget.toolTip])
+                except:
+                    pass
+            self.ui_language="zh-CN"
+        else:
+            for name in dir(self.ui):
+                widget = getattr(self.ui, name)
+                try:
+                    #print(widget.text)
+                    widget.setText([k for k, v in en_zh.items() if v == widget.text][0])
+                except:
+                    pass
+                try:
+                    #print(widget.toolTip)
+                    widget.setToolTip([k for k, v in en_zh.items() if v ==widget.toolTip][0])
+                except:
+                    pass
+            self.ui_language="en-US"
+        
+        save_data={  
+            "Name": "EvoSeg",
+            "language": "zh-CN"
+            }
+        save_data["language"] = self.ui_language
+
+        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'w') as file:
+            json.dump(save_data, file, indent=4) 
+        #print
+        # 非官方翻译最后一个版本
 
     def setup(self) -> None:
         """Called when the user opens the module the first time and the widget is initialized."""
@@ -343,6 +379,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         import qt
         # 下载样本数据按钮设置icon
         self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/radiology.svg")))
+        self.ui.TranslateToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/translate.svg")))
+        self.ui.ImportModelToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/import_model.svg")))
+        self.ui.ImportModelToolButton.hide() # 进一步明确模型描述信息后启用
 
         self.inputNodeSelectors = [self.ui.inputNodeSelector0, self.ui.inputNodeSelector1, self.ui.inputNodeSelector2, self.ui.inputNodeSelector3]
         self.inputNodeLabels = [self.ui.inputNodeLabel0, self.ui.inputNodeLabel1, self.ui.inputNodeLabel2, self.ui.inputNodeLabel3]
@@ -361,6 +400,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.processingCompletedCallback = self.onProcessingCompleted
         self.logic.startResultImportCallback = self.onProcessImportStarted
         self.logic.endResultImportCallback = self.onProcessImportEnded
+        self.logic.ui_language = self.ui_language
 
         # Connections
 
@@ -373,7 +413,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         for inputNodeSelector in self.inputNodeSelectors:
             inputNodeSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.fullTextSearchCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
-        self.ui.cpuCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
+        # NOTE:已隐藏暂时没有用的选项
+        # self.ui.cpuCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.showAllModelsCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.useStandardSegmentNamesCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 
@@ -384,6 +425,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Buttons
         self.ui.downloadSampleDataToolButton.connect("clicked(bool)", self.onDownloadSampleData)
+        self.ui.TranslateToolButton.connect("clicked(bool)", self.tr_ui)
+        self.ui.ImportModelToolButton.connect("clicked(bool)", self.onInputLocalModel)
+        self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
         self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
         self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
         self.ui.applyButton.connect("clicked(bool)", self.onApplyButton)
@@ -398,14 +442,53 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Make the model search box in focus by default so users can just start typing to find the model they need
         qt.QTimer.singleShot(0, self.ui.modelSearchBox.setFocus)
 
-        self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
+        # NOTE: 弃用
+        # self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
+
+        # if cn , language set
+        if(self.ui_language=="zh-CN"):
+            self.translate("zh-CN")
+
+    def onCopyModel(self):
+        
+        from qt import QMessageBox 
+        if os.path.exists(os.path.join(self.logic.modelsPath(),"EvoSeg-v1")):
+            QMessageBox.warning(None, "不可导入", f"模型EvoSeg-v1路径已存在!\n清除缓存再试")
+            return
+        import qt
+        copy2dir= os.path.join(self.logic.modelsPath())
+        print(self.logic.modelsPath())
+        if not os.path.exists(copy2dir):
+            os.makedirs(copy2dir)
+            
+        select_file = QFileDialog.getOpenFileNames(None, "选择文件", "", "File (*.7z)")
+        
+        
+
+        self.logic.extract_7z(select_file[0],copy2dir)
+        print("ok?")
+        
+
+    def onInputLocalModel(self):
+        print("input local model")
+        # file_name, _ = QFileDialog.getOpenFileName(None, "选择文件", "", "File (*.7z)")
+        # if file_name:
+            # text, ok = QInputDialog.getText(None, "输入对话框", "当前版本不允许自定义模型导入:",text="Airway nnUnet(artery)")
+            # if ok and text:
+            #     print(f"你输入了: {text}")
+            # else:
+            #     print("你取消了输入")
+        # else:
+        #     return
 
     def tr_ui(self):
-        if self.ui.translate_ui.checked:
+        #if self.ui.translate_ui.checked:
+        if self.ui_language=="en-US":
             self.translate("zh-CN")
-            self.ui.translate_ui.setEnabled(False)
+            #self.ui.translate_ui.setEnabled(False)
         else:
             self.translate()
+
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
@@ -544,14 +627,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.downloadSampleDataToolButton.visible = sampleDataAvailable
 
             self.ui.fullTextSearchCheckBox.checked = fullTextSearch
-            self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
+            #self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
             self.ui.showAllModelsCheckBox.checked = showAllModels
             self.ui.useStandardSegmentNamesCheckBox.checked = self._parameterNode.GetParameter("UseStandardSegmentNames") == "true"
             self.ui.outputSegmentationSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputSegmentation"))
 
             state = self._processingState
             if state == EvoSegWidget.PROCESSING_IDLE:
-                self.ui.applyButton.text = "Apply"
+                self.ui.applyButton.text = "Apply" if self.ui_language=="en-US" else "应用"
                 inputErrorMessages = []  # it will contain text if the inputs are not valid
                 if modelId:
                     modelInputs = self.logic.model(modelId)["inputs"]
@@ -585,24 +668,24 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     self.ui.applyButton.toolTip = "\n".join(inputErrorMessages)
                     self.ui.applyButton.enabled = False
                 else:
-                    self.ui.applyButton.toolTip = "Start segmentation"
+                    self.ui.applyButton.toolTip = "Start segmentation" if self.ui_language=="en-US" else "开始分割"
                     self.ui.applyButton.enabled = True
 
             elif state == EvoSegWidget.PROCESSING_STARTING:
-                self.ui.applyButton.text = "Starting..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation is being initialized"
+                self.ui.applyButton.text = "Starting..." if self.ui_language=="en-US" else "启动中..."
+                self.ui.applyButton.toolTip = "Please wait while the segmentation is being initialized" if self.ui_language=="en-US" else "请稍等，分割正在初始化"
                 self.ui.applyButton.enabled = False
             elif state == EvoSegWidget.PROCESSING_IN_PROGRESS:
-                self.ui.applyButton.text = "Cancel"
-                self.ui.applyButton.toolTip = "Cancel in-progress segmentation"
+                self.ui.applyButton.text = "Cancel" if self.ui_language=="en-US" else "取消"
+                self.ui.applyButton.toolTip = "Cancel in-progress segmentation" if self.ui_language=="en-US" else "停止分割进程"
                 self.ui.applyButton.enabled = True
             elif state == EvoSegWidget.PROCESSING_IMPORT_RESULTS:
-                self.ui.applyButton.text = "Importing results..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation result is being imported"
+                self.ui.applyButton.text = "Importing results..." if self.ui_language=="en-US" else "载入结果..."
+                self.ui.applyButton.toolTip = "Please wait while the segmentation result is being imported" if self.ui_language=="en-US" else "请稍等，分割结果正在载入"
                 self.ui.applyButton.enabled = False
             elif state == EvoSegWidget.PROCESSING_CANCEL_REQUESTED:
-                self.ui.applyButton.text = "Cancelling..."
-                self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled"
+                self.ui.applyButton.text = "Cancelling..." if self.ui_language=="en-US" else "正在取消..."
+                self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled" if self.ui_language=="en-US" else "请等待分割进程退出"
                 self.ui.applyButton.enabled = False
 
         finally:
@@ -631,7 +714,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # Only save model ID if valid, otherwise it is temporarily filtered out in the selector
                 self._parameterNode.SetParameter("Model", modelId)
             self._parameterNode.SetParameter("FullTextSearch", "true" if self.ui.fullTextSearchCheckBox.checked else "false")
-            self._parameterNode.SetParameter("CPU", "true" if self.ui.cpuCheckBox.checked else "false")
+            #self._parameterNode.SetParameter("CPU", "true" if self.ui.cpuCheckBox.checked else "false")
             self._parameterNode.SetParameter("ShowAllModels", "true" if self.ui.showAllModelsCheckBox.checked else "false")
             self._parameterNode.SetParameter("UseStandardSegmentNames", "true" if self.ui.useStandardSegmentNamesCheckBox.checked else "false")
             self._parameterNode.SetNodeReferenceID("OutputSegmentation", self.ui.outputSegmentationSelector.currentNodeID)
@@ -705,9 +788,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 for inputNodeSelector in self.inputNodeSelectors:
                     if inputNodeSelector.visible:
                         inputNodes.append(inputNodeSelector.currentNode())
+                # self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
+                #     self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
                 self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
-                    self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
-
+                    self._currentModelId(), False, False, waitForCompletion=False)
                 self.setProcessingState(EvoSegWidget.PROCESSING_IN_PROGRESS)
 
         except Exception as e:
@@ -838,6 +922,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.startResultImportCallback = None
         self.endResultImportCallback = None
         self.useStandardSegmentNames = True
+        self.ui_language = None
 
         # List of property type codes that are specified by in the EvoSeg terminology.
         #
@@ -910,7 +995,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         inputs = model["inputs"]
                     else:
                         # Inputs are not defined, use default (single input volume)
-                        inputs = [{"title": "Input volume"}]
+                        inputs = [{"title": "Input volume"}] if self.ui_language=="en-US" else [{"title": "输入体积"}]
                     segmentNames = model.get('segmentNames')
                     if not segmentNames:
                         segmentNames = "N/A"
@@ -980,6 +1065,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if self.modelsPath().exists():
             import shutil
             shutil.rmtree(self.modelsPath())
+
+    def extract_7z(self, archive, destination):
+        try:
+            subprocess.run(['7z', 'x', archive, f'-o{destination}'], check=True)
+            print(f"Successfully extracted {archive} to {destination}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error during extraction: {e}")
 
     def downloadModel(self, modelName, withDownload):
 
