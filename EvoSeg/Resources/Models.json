@@ -1,7 +1,7 @@
 {
   "models": [
     {
-      "title": "Airway nnUnet(artery)",
+      "title": "Airway_nnUnet(artery)",
       "license": "EvoSeg",
       "description": "......",
       "subject": "human",
@@ -14,12 +14,10 @@
           "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
         }
       ],
-      "segmentationTimeSecGPU": 999,
-      "segmentationTimeSecCPU": 999,
       "segmentNames": []
     },
     {
-      "title": "Airway nnUnet(trachea)",
+      "title": "Airway_nnUnet(trachea)",
       "license": "EvoSeg",
       "description": "......",
       "subject": "human",
@@ -32,8 +30,6 @@
           "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
         }
       ],
-      "segmentationTimeSecGPU": 999,
-      "segmentationTimeSecCPU": 999,
       "segmentNames": []
     }
   ]
