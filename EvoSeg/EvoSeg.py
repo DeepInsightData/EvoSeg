@@ -57,11 +57,11 @@ and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR0132
 
     def configureDefaultTerminology(self):
         moduleDir = os.path.dirname(self.parent.path)
-        terminologyFilePath = os.path.join(moduleDir, "Resources", "SegmentationCategoryTypeModifier-EvoSeg.term.json")
-        anatomicContextFilePath = os.path.join(moduleDir, "Resources", "AnatomicRegionAndModifier-EvoSeg.term.json")
+        #terminologyFilePath = os.path.join(moduleDir, "Resources", "SegmentationCategoryTypeModifier-EvoSeg.term.json")
+        #anatomicContextFilePath = os.path.join(moduleDir, "Resources", "AnatomicRegionAndModifier-EvoSeg.term.json")
         tlogic = slicer.modules.terminologies.logic()
-        self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
-        self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
+        #self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
+        #self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
 
 
     def registerSampleData(self):
@@ -455,8 +455,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def onCopyModel(self):
         
         from qt import QMessageBox 
-        if os.path.exists(os.path.join(self.logic.modelsPath(),"EvoSeg-v1")):
-            QMessageBox.warning(None, "不可导入", f"模型EvoSeg-v1路径已存在!\n清除缓存再试")
+        if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
+            QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
             return
         import qt
         copy2dir= os.path.join(self.logic.modelsPath())
@@ -938,7 +938,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # otherwise the DICOM terminology will be used. This is necessary because the DICOM terminology
         # does not contain all the necessary items and some items are incomplete (e.g., don't have color or 3D Slicer label).
         #
-        self.EvoSegTerminologyPropertyTypes = self._EvoSegTerminologyPropertyTypes()
+        
+        #self.EvoSegTerminologyPropertyTypes = self._EvoSegTerminologyPropertyTypes()
 
         # List of anatomic regions that are specified by EvoSeg.
         self.EvoSegAnatomicRegions = self._EvoSegAnatomicRegions()
@@ -1008,7 +1009,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     if not segmentNames:
                         segmentNames = "N/A"
                     models.append({
-                        "id": f"{filename}-v{version}",
+                        "id": f"{filename}",#-v{version}",
                         "title": model['title'],
                         "version": version,
                         "inputs": inputs,
@@ -1019,8 +1020,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         "details":
                             f"<p><b>Model:</b> {model['title']} (v{version})"
                             f"<p><b>Description:</b> {model['description']}\n"
-                            f"<p><b>Computation time on GPU:</b> {EvoSegLogic.humanReadableTimeFromSec(model.get('segmentationTimeSecGPU'))}\n"
-                            f"<br><b>Computation time on CPU:</b> {EvoSegLogic.humanReadableTimeFromSec(model.get('segmentationTimeSecCPU'))}\n"
                             f"<p><b>Imaging modality:</b> {model['imagingModality']}\n"
                             f"<p><b>Subject:</b> {model['subject']}\n"
                             f"<p><b>Segments:</b> {', '.join(segmentNames)}",
@@ -1366,9 +1365,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"
-        EVOInstallString = "EVO[fire,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm]>=1.3"
+        EVOInstallString = "EVO[fire,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm]>=1.3"
         if upgrade:
             EVOInstallString += " --upgrade"
+        if self.ui_language=="zh-CN":
+            EVOInstallString += " -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+        
         slicer.util.pip_install(EVOInstallString)
 
         self.dependenciesInstalled = True
@@ -1742,7 +1744,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             title = model["title"]
             for modelTestResult in modelsTestResults:
                 if modelTestResult["title"] == title:
-                    for fieldName in ["segmentationTimeSecGPU", "segmentationTimeSecCPU", "segmentNames"]:
+                    for fieldName in ["segmentNames"]:
                         fieldValue = modelTestResult.get(fieldName)
                         if fieldValue:
                             model[fieldName] = fieldValue
@@ -1771,9 +1773,9 @@ class EvoSegTest(ScriptedLoadableModuleTest):
     def runTest(self):
         """Run as few or as many tests as needed here."""
         self.setUp()
-        self.test_EvoSeg1()
+        self.test_EvoSeg()
 
-    def test_EvoSeg1(self):
+    def test_EvoSeg(self):
         """Ideally you should have several levels of tests.  At the lowest level
         tests should exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -1785,242 +1787,242 @@ class EvoSegTest(ScriptedLoadableModuleTest):
         your test should break so they know that the feature is needed.
         """
 
-        self.delayDisplay("Starting the test")
+        self.delayDisplay("Test is space and Done!")
 
-        # Logic testing is disabled by default to not overload automatic build machines (pytorch is a huge package and computation
-        # on CPU takes 5-10 minutes). Set testLogic to True to enable testing.
-        testLogic = True
+    #     # Logic testing is disabled by default to not overload automatic build machines (pytorch is a huge package and computation
+    #     # on CPU takes 5-10 minutes). Set testLogic to True to enable testing.
+    #     testLogic = True
 
-        if not testLogic:
-            self.delayDisplay("Logic testing is disabled. Set testLogic to True to enable it.")
-            return
+    #     if not testLogic:
+    #         self.delayDisplay("Logic testing is disabled. Set testLogic to True to enable it.")
+    #         return
 
-        logic = EvoSegLogic()
-        logic.logCallback = self._mylog
+    #     logic = EvoSegLogic()
+    #     logic.logCallback = self._mylog
 
-        self.delayDisplay("Set up required Python packages")
-        logic.setupPythonRequirements()
+    #     self.delayDisplay("Set up required Python packages")
+    #     logic.setupPythonRequirements()
 
-        testResultsPath = logic.fileCachePath.joinpath("ModelsTestResults")
-        if not os.path.exists(testResultsPath):
-            os.makedirs(testResultsPath)
+    #     testResultsPath = logic.fileCachePath.joinpath("ModelsTestResults")
+    #     if not os.path.exists(testResultsPath):
+    #         os.makedirs(testResultsPath)
 
-        import json
-        modelsTestResultsJsonFilePath = os.path.join(testResultsPath.joinpath("ModelsTestResults.json"))
-        if os.path.exists(modelsTestResultsJsonFilePath):
-            # resume testing
-            with open(modelsTestResultsJsonFilePath) as f:
-              models = json.load(f)
-        else:
-            # start testing from scratch
-            models = logic.models
+    #     import json
+    #     modelsTestResultsJsonFilePath = os.path.join(testResultsPath.joinpath("ModelsTestResults.json"))
+    #     if os.path.exists(modelsTestResultsJsonFilePath):
+    #         # resume testing
+    #         with open(modelsTestResultsJsonFilePath) as f:
+    #           models = json.load(f)
+    #     else:
+    #         # start testing from scratch
+    #         models = logic.models
 
-        import PyTorchUtils
-        pytorchLogic = PyTorchUtils.PyTorchUtilsLogic()
-        if pytorchLogic.cuda:
-            # CUDA is available, test on both CPU and GPU
-            configurations = [{"forceUseCPU": False}, {"forceUseCPU": True}]
-        else:
-            # CUDA is not available, only test on CPU
-            configurations = [{"forceUseCPU": True}]
+    #     import PyTorchUtils
+    #     pytorchLogic = PyTorchUtils.PyTorchUtilsLogic()
+    #     if pytorchLogic.cuda:
+    #         # CUDA is available, test on both CPU and GPU
+    #         configurations = [{"forceUseCPU": False}, {"forceUseCPU": True}]
+    #     else:
+    #         # CUDA is not available, only test on CPU
+    #         configurations = [{"forceUseCPU": True}]
 
-        for configurationIndex, configuration in enumerate(configurations):
-            forceUseCpu = configuration["forceUseCPU"]
-            configurationName = "CPU" if forceUseCpu else "GPU"
+    #     for configurationIndex, configuration in enumerate(configurations):
+    #         forceUseCpu = configuration["forceUseCPU"]
+    #         configurationName = "CPU" if forceUseCpu else "GPU"
 
-            for modelIndex, model in enumerate(models):
-                if model.get("deprecated"):
-                    # Do not teset deprecated models
-                    continue
+    #         for modelIndex, model in enumerate(models):
+    #             if model.get("deprecated"):
+    #                 # Do not teset deprecated models
+    #                 continue
 
-                segmentationTimePropertyName = "segmentationTimeSec"+configurationName
-                if segmentationTimePropertyName in models[modelIndex]:
-                    # Skip already tested models
-                    continue
+    #             segmentationTimePropertyName = "segmentationTimeSec"+configurationName
+    #             if segmentationTimePropertyName in models[modelIndex]:
+    #                 # Skip already tested models
+    #                 continue
 
-                self.delayDisplay(f"Testing {model['title']} (v{model['version']})")
-                slicer.mrmlScene.Clear()
+    #             self.delayDisplay(f"Testing {model['title']} (v{model['version']})")
+    #             slicer.mrmlScene.Clear()
 
-                # Download sample data for model input
+    #             # Download sample data for model input
 
-                sampleDataName = model.get("sampleData")
-                if not sampleDataName:
-                    self.delayDisplay(f"Sample data not available for {model['title']}")
-                    continue
+    #             sampleDataName = model.get("sampleData")
+    #             if not sampleDataName:
+    #                 self.delayDisplay(f"Sample data not available for {model['title']}")
+    #                 continue
 
-                if type(sampleDataName) == list:
-                    # For now, always just use the first data set if multiple data sets are provided
-                    sampleDataName = sampleDataName[0]
+    #             if type(sampleDataName) == list:
+    #                 # For now, always just use the first data set if multiple data sets are provided
+    #                 sampleDataName = sampleDataName[0]
 
-                import SampleData
-                loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
-                if not loadedSampleNodes:
-                    raise RuntimeError(f"Failed to load sample data set '{sampleDataName}'.")
+    #             import SampleData
+    #             loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
+    #             if not loadedSampleNodes:
+    #                 raise RuntimeError(f"Failed to load sample data set '{sampleDataName}'.")
 
-                # Set model inputs
+    #             # Set model inputs
 
-                inputNodes = []
-                inputs = model.get("inputs")
-                inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
+    #             inputNodes = []
+    #             inputs = model.get("inputs")
+    #             inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
 
-                outputSegmentation = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentationNode")
+    #             outputSegmentation = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentationNode")
 
-                # Run the segmentation
+    #             # Run the segmentation
 
-                self.delayDisplay(f"Running segmentation for {model['title']}...")
-                import time
-                startTime = time.time()
-                logic.process(inputNodes, outputSegmentation, model["id"], forceUseCpu)
-                segmentationTimeSec = time.time() - startTime
+    #             self.delayDisplay(f"Running segmentation for {model['title']}...")
+    #             import time
+    #             startTime = time.time()
+    #             logic.process(inputNodes, outputSegmentation, model["id"], forceUseCpu)
+    #             segmentationTimeSec = time.time() - startTime
 
-                # Save segmentation time (rounded to 0.1 sec) into model description
-                models[modelIndex][segmentationTimePropertyName] = round(segmentationTimeSec * 10) / 10
+    #             # Save segmentation time (rounded to 0.1 sec) into model description
+    #             models[modelIndex][segmentationTimePropertyName] = round(segmentationTimeSec * 10) / 10
 
-                # Save all segment names into model description
-                labelDescriptions = logic.labelDescriptions(model["id"])
-                segmentNames = []
-                for terminology in labelDescriptions.values():
-                    contextName, category, typeStr, typeModifier, anatomicContext, region, regionModifier = terminology["terminology"].split("~")
-                    typeName = typeStr.split("^")[2]
-                    typeModifierName = typeModifier.split("^")[2]
-                    if typeModifierName:
-                        typeName = f"{typeModifierName} {typeName}"
-                    regionName = region.split("^")[2]
-                    regionModifierName = regionModifier.split("^")[2]
-                    if regionModifierName:
-                        regionName = f"{regionModifierName} {regionName}"
-                    name = f"{typeName} in {regionName}" if regionName else typeName
-                    segmentNames.append(name)
-                models[modelIndex]["segmentNames"] = segmentNames
+    #             # Save all segment names into model description
+    #             labelDescriptions = logic.labelDescriptions(model["id"])
+    #             segmentNames = []
+    #             for terminology in labelDescriptions.values():
+    #                 contextName, category, typeStr, typeModifier, anatomicContext, region, regionModifier = terminology["terminology"].split("~")
+    #                 typeName = typeStr.split("^")[2]
+    #                 typeModifierName = typeModifier.split("^")[2]
+    #                 if typeModifierName:
+    #                     typeName = f"{typeModifierName} {typeName}"
+    #                 regionName = region.split("^")[2]
+    #                 regionModifierName = regionModifier.split("^")[2]
+    #                 if regionModifierName:
+    #                     regionName = f"{regionModifierName} {regionName}"
+    #                 name = f"{typeName} in {regionName}" if regionName else typeName
+    #                 segmentNames.append(name)
+    #             models[modelIndex]["segmentNames"] = segmentNames
 
-                sliceScreenshotFilename, rotate3dScreenshotFilename = self._writeScreenshots(outputSegmentation, testResultsPath, model["id"]+"-"+configurationName)
-                if configurationIndex == 0:
-                    # Use screenshot computed during the first configuration
-                    models[modelIndex]["segmentationResultsScreenshot2D"] = sliceScreenshotFilename.name
-                    models[modelIndex]["segmentationResultsScreenshot3D"] = rotate3dScreenshotFilename.name
+    #             sliceScreenshotFilename, rotate3dScreenshotFilename = self._writeScreenshots(outputSegmentation, testResultsPath, model["id"]+"-"+configurationName)
+    #             if configurationIndex == 0:
+    #                 # Use screenshot computed during the first configuration
+    #                 models[modelIndex]["segmentationResultsScreenshot2D"] = sliceScreenshotFilename.name
+    #                 models[modelIndex]["segmentationResultsScreenshot3D"] = rotate3dScreenshotFilename.name
 
-                # Write results to file (to allow accessing the results before all tests complete)
-                with open(modelsTestResultsJsonFilePath, 'w') as f:
-                    json.dump(models, f, indent=2)
+    #             # Write results to file (to allow accessing the results before all tests complete)
+    #             with open(modelsTestResultsJsonFilePath, 'w') as f:
+    #                 json.dump(models, f, indent=2)
 
-        logic.updateModelsDescriptionJsonFilePathFromTestResults(modelsTestResultsJsonFilePath)
-        self._writeTestResultsToMarkdown(modelsTestResultsJsonFilePath)
+    #     logic.updateModelsDescriptionJsonFilePathFromTestResults(modelsTestResultsJsonFilePath)
+    #     self._writeTestResultsToMarkdown(modelsTestResultsJsonFilePath)
 
-        self.delayDisplay("Test passed")
+    #     self.delayDisplay("Test passed")
 
-    def _mylog(self,text):
-        print(text)
+    # def _mylog(self,text):
+    #     print(text)
 
-    def _writeScreenshots(self, segmentationNode, outputPath, baseName, numberOfImages=25, lightboxColumns=5, numberOfVideoFrames=50):
-        import ScreenCapture
-        cap = ScreenCapture.ScreenCaptureLogic()
+    # def _writeScreenshots(self, segmentationNode, outputPath, baseName, numberOfImages=25, lightboxColumns=5, numberOfVideoFrames=50):
+    #     import ScreenCapture
+    #     cap = ScreenCapture.ScreenCaptureLogic()
 
-        sliceScreenshotFilename = outputPath.joinpath(f"{baseName}-slices.png")
-        rotate3dScreenshotFilename = outputPath.joinpath(f"{baseName}-rotate3d.gif")  # gif, mp4, png
-        videoLengthSec = 5
+    #     sliceScreenshotFilename = outputPath.joinpath(f"{baseName}-slices.png")
+    #     rotate3dScreenshotFilename = outputPath.joinpath(f"{baseName}-rotate3d.gif")  # gif, mp4, png
+    #     videoLengthSec = 5
 
-        # Capture slice sweep
-        sliceScreenshotsFilenamePattern = outputPath.joinpath("slices_%04d.png")
-        cap.showViewControllers(False)
-        slicer.app.layoutManager().resetSliceViews()
-        sliceNode = slicer.util.getNode("vtkMRMLSliceNodeRed")
-        sliceOffsetMin, sliceOffsetMax = cap.getSliceOffsetRange(sliceNode)
-        sliceOffsetStart = sliceOffsetMin + (sliceOffsetMax - sliceOffsetMin) * 0.05
-        sliceOffsetEnd = sliceOffsetMax - (sliceOffsetMax - sliceOffsetMin) * 0.05
-        cap.captureSliceSweep(
-            sliceNode, sliceOffsetStart, sliceOffsetEnd, numberOfImages,
-            sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name,
-            captureAllViews=None, transparentBackground=False)
-        cap.showViewControllers(True)
+    #     # Capture slice sweep
+    #     sliceScreenshotsFilenamePattern = outputPath.joinpath("slices_%04d.png")
+    #     cap.showViewControllers(False)
+    #     slicer.app.layoutManager().resetSliceViews()
+    #     sliceNode = slicer.util.getNode("vtkMRMLSliceNodeRed")
+    #     sliceOffsetMin, sliceOffsetMax = cap.getSliceOffsetRange(sliceNode)
+    #     sliceOffsetStart = sliceOffsetMin + (sliceOffsetMax - sliceOffsetMin) * 0.05
+    #     sliceOffsetEnd = sliceOffsetMax - (sliceOffsetMax - sliceOffsetMin) * 0.05
+    #     cap.captureSliceSweep(
+    #         sliceNode, sliceOffsetStart, sliceOffsetEnd, numberOfImages,
+    #         sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name,
+    #         captureAllViews=None, transparentBackground=False)
+    #     cap.showViewControllers(True)
 
-        # Create lightbox image
-        cap.createLightboxImage(lightboxColumns,
-            sliceScreenshotsFilenamePattern.parent,
-            sliceScreenshotsFilenamePattern.name,
-            numberOfImages,
-            sliceScreenshotFilename)
-        cap.deleteTemporaryFiles(sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name, numberOfImages)
+    #     # Create lightbox image
+    #     cap.createLightboxImage(lightboxColumns,
+    #         sliceScreenshotsFilenamePattern.parent,
+    #         sliceScreenshotsFilenamePattern.name,
+    #         numberOfImages,
+    #         sliceScreenshotFilename)
+    #     cap.deleteTemporaryFiles(sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name, numberOfImages)
 
-        # Capture 3D rotation
-        rotate3dScreenshotsFilenamePattern = outputPath.joinpath("rotate3d_%04d.png")
-        segmentationNode.CreateClosedSurfaceRepresentation()
-        segmentationNode.GetDisplayNode().SetOpacity3D(0.6)
+    #     # Capture 3D rotation
+    #     rotate3dScreenshotsFilenamePattern = outputPath.joinpath("rotate3d_%04d.png")
+    #     segmentationNode.CreateClosedSurfaceRepresentation()
+    #     segmentationNode.GetDisplayNode().SetOpacity3D(0.6)
 
-        if rotate3dScreenshotFilename.suffix.lower() == ".png":
-            video = False
-            numberOfImages3d = numberOfImages
-        else:
-            video = True
-            numberOfImages3d = numberOfVideoFrames
-            if rotate3dScreenshotFilename.suffix.lower() == ".gif":
-                # animated GIF
-                extraOptions = "-filter_complex palettegen,[v]paletteuse"
-            elif rotate3dScreenshotFilename.suffix.lower() == ".mp4":
-                # H264 high-quality
-                extraOptions = "-codec libx264 -preset slower -crf 18 -pix_fmt yuv420p"
-            else:
-                raise ValueError(f"Unsupported format: {rotate3dScreenshotFilename.suffix}")
+    #     if rotate3dScreenshotFilename.suffix.lower() == ".png":
+    #         video = False
+    #         numberOfImages3d = numberOfImages
+    #     else:
+    #         video = True
+    #         numberOfImages3d = numberOfVideoFrames
+    #         if rotate3dScreenshotFilename.suffix.lower() == ".gif":
+    #             # animated GIF
+    #             extraOptions = "-filter_complex palettegen,[v]paletteuse"
+    #         elif rotate3dScreenshotFilename.suffix.lower() == ".mp4":
+    #             # H264 high-quality
+    #             extraOptions = "-codec libx264 -preset slower -crf 18 -pix_fmt yuv420p"
+    #         else:
+    #             raise ValueError(f"Unsupported format: {rotate3dScreenshotFilename.suffix}")
 
-        viewLabel = "1"
-        viewNode = slicer.vtkMRMLViewLogic().GetViewNode(slicer.mrmlScene, viewLabel)
-        viewNode.SetBackgroundColor(0,0,0)
-        viewNode.SetBackgroundColor2(0,0,0)
-        viewNode.SetAxisLabelsVisible(False)
-        viewNode.SetBoxVisible(False)
-        cap.showViewControllers(False)
-        slicer.app.layoutManager().resetThreeDViews()
-        cap.capture3dViewRotation(viewNode, -180, 180, numberOfImages3d, ScreenCapture.AXIS_YAW, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name)
-        cap.showViewControllers(True)
+    #     viewLabel = "1"
+    #     viewNode = slicer.vtkMRMLViewLogic().GetViewNode(slicer.mrmlScene, viewLabel)
+    #     viewNode.SetBackgroundColor(0,0,0)
+    #     viewNode.SetBackgroundColor2(0,0,0)
+    #     viewNode.SetAxisLabelsVisible(False)
+    #     viewNode.SetBoxVisible(False)
+    #     cap.showViewControllers(False)
+    #     slicer.app.layoutManager().resetThreeDViews()
+    #     cap.capture3dViewRotation(viewNode, -180, 180, numberOfImages3d, ScreenCapture.AXIS_YAW, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name)
+    #     cap.showViewControllers(True)
 
-        if video:
-            cap.createVideo(numberOfImages3d/videoLengthSec, extraOptions, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, rotate3dScreenshotFilename)
-        else:
-            cap.createLightboxImage(lightboxColumns,
-                rotate3dScreenshotsFilenamePattern.parent,
-                rotate3dScreenshotsFilenamePattern.name,
-                numberOfImages3d,
-                rotate3dScreenshotFilename)
+    #     if video:
+    #         cap.createVideo(numberOfImages3d/videoLengthSec, extraOptions, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, rotate3dScreenshotFilename)
+    #     else:
+    #         cap.createLightboxImage(lightboxColumns,
+    #             rotate3dScreenshotsFilenamePattern.parent,
+    #             rotate3dScreenshotsFilenamePattern.name,
+    #             numberOfImages3d,
+    #             rotate3dScreenshotFilename)
 
-        cap.deleteTemporaryFiles(rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, numberOfImages3d)
+    #     cap.deleteTemporaryFiles(rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, numberOfImages3d)
 
-        return sliceScreenshotFilename, rotate3dScreenshotFilename
+    #     return sliceScreenshotFilename, rotate3dScreenshotFilename
 
-    def _writeTestResultsToMarkdown(self, modelsTestResultsJsonFilePath, modelsTestResultsMarkdownFilePath=None, screenshotUrlBase=None):
+    # def _writeTestResultsToMarkdown(self, modelsTestResultsJsonFilePath, modelsTestResultsMarkdownFilePath=None, screenshotUrlBase=None):
 
-        if modelsTestResultsMarkdownFilePath is None:
-            modelsTestResultsMarkdownFilePath = modelsTestResultsJsonFilePath.replace(".json", ".md")
-        if screenshotUrlBase is None:
-            screenshotUrlBase = "https://github.com/lassoan/SlicerEvoSeg/releases/download/ModelsTestResults/"
+    #     if modelsTestResultsMarkdownFilePath is None:
+    #         modelsTestResultsMarkdownFilePath = modelsTestResultsJsonFilePath.replace(".json", ".md")
+    #     if screenshotUrlBase is None:
+    #         screenshotUrlBase = "https://github.com/lassoan/SlicerEvoSeg/releases/download/ModelsTestResults/"
 
-        import json
-        from EvoSeg import EvoSegLogic
-        with open(modelsTestResultsJsonFilePath) as f:
-            modelsTestResults = json.load(f)
+    #     import json
+    #     from EvoSeg import EvoSegLogic
+    #     with open(modelsTestResultsJsonFilePath) as f:
+    #         modelsTestResults = json.load(f)
 
-        with open(modelsTestResultsMarkdownFilePath, 'w', newline="\n") as f:
-            f.write("# 3D Slicer EVO Auto3DSeg models\n\n")
-            # Write hardware information (only on Windows for now)
-            if os.name == "nt":
-                import subprocess
-                cpu = subprocess.check_output('wmic cpu get name', stderr=open(os.devnull, 'w')).decode('utf-8').partition('Name')[2].strip(' \r\n')
-                systemInfoStr = subprocess.check_output('systeminfo', stderr=open(os.devnull, 'w')).decode('utf-8')
-                # System information has a line like this: "Total Physical Memory:     32,590 MB"
-                import re
-                ram = re.search(r"Total Physical Memory:(.+)", systemInfoStr).group(1).strip()
-                f.write(f"Testing hardware: {cpu}, {ram}")
-                import torch
-                for i in range(torch.cuda.device_count()):
-                    gpuProperties = torch.cuda.get_device_properties(i)
-                    f.write(f", {gpuProperties.name} {round(torch.cuda.get_device_properties(0).total_memory/(2**30))}GB")
-                f.write("\n\n")
-            # Write test results
-            for model in modelsTestResults:
-                if model["deprecated"]:
-                    continue
-                title = f"{model['title']} (v{model['version']})"
-                f.write(f"## {title}\n")
-                f.write(f"{model['description']}\n\n")
-                f.write(f"Processing time: {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecGPU'])} on GPU, {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecCPU'])} on CPU\n\n")
-                f.write(f"Segment names: {', '.join(model['segmentNames'])}\n\n")
-                f.write(f"![2D view]({screenshotUrlBase}{model['segmentationResultsScreenshot2D']})\n")
-                f.write(f"![3D view]({screenshotUrlBase}{model['segmentationResultsScreenshot3D']})\n")
+    #     with open(modelsTestResultsMarkdownFilePath, 'w', newline="\n") as f:
+    #         f.write("# 3D Slicer EVO Auto3DSeg models\n\n")
+    #         # Write hardware information (only on Windows for now)
+    #         if os.name == "nt":
+    #             import subprocess
+    #             cpu = subprocess.check_output('wmic cpu get name', stderr=open(os.devnull, 'w')).decode('utf-8').partition('Name')[2].strip(' \r\n')
+    #             systemInfoStr = subprocess.check_output('systeminfo', stderr=open(os.devnull, 'w')).decode('utf-8')
+    #             # System information has a line like this: "Total Physical Memory:     32,590 MB"
+    #             import re
+    #             ram = re.search(r"Total Physical Memory:(.+)", systemInfoStr).group(1).strip()
+    #             f.write(f"Testing hardware: {cpu}, {ram}")
+    #             import torch
+    #             for i in range(torch.cuda.device_count()):
+    #                 gpuProperties = torch.cuda.get_device_properties(i)
+    #                 f.write(f", {gpuProperties.name} {round(torch.cuda.get_device_properties(0).total_memory/(2**30))}GB")
+    #             f.write("\n\n")
+    #         # Write test results
+    #         for model in modelsTestResults:
+    #             if model["deprecated"]:
+    #                 continue
+    #             title = f"{model['title']} (v{model['version']})"
+    #             f.write(f"## {title}\n")
+    #             f.write(f"{model['description']}\n\n")
+    #             f.write(f"Processing time: {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecGPU'])} on GPU, {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecCPU'])} on CPU\n\n")
+    #             f.write(f"Segment names: {', '.join(model['segmentNames'])}\n\n")
+    #             f.write(f"![2D view]({screenshotUrlBase}{model['segmentationResultsScreenshot2D']})\n")
+    #             f.write(f"![3D view]({screenshotUrlBase}{model['segmentationResultsScreenshot3D']})\n")
