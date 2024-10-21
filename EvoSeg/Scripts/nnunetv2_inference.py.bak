@@ -4,7 +4,7 @@ import fire
 import time
 import torch
 from collections import OrderedDict
-from flask import Flask, request, jsonify
+#from flask import Flask, request, jsonify
 import torch
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join
@@ -79,7 +79,7 @@ def main(model_folder,
     #                                                 [prop],
     #                                                 None, 3, save_probabilities=False,
     #                                                 num_processes_segmentation_export=2)
-    seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
+    #seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
     
@@ -98,7 +98,15 @@ def main(model_folder,
         # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
 
     else:
-        SimpleITKIO().write_seg(seg_results, result_file, prop)
+        #SimpleITKIO().write_seg(seg_results, result_file, prop)
+        with open(model_folder+"/output-segmentation.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
+            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
+                while True:
+                    # 每次读取 1024 字节
+                    chunk = f_src.read(1024)
+                    if not chunk:
+                        break
+                    f_dest.write(chunk)
     timing_checkpoints.append(("Save", time.time()))
     
     # Print computation time log
