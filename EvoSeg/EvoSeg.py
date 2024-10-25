@@ -163,7 +163,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Manage models:": "管理模型：",
             "Copy to folder":"一键导入",
             "Use standard segment names:": "使用标准分割名称：",
-            "EVO Python package:": "EVO Python 包：",
+            "Python package:": "Python 包：",
             "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
             "Download model if not saved": "如果未保存则下载模型",
             "<p>Copy it yourself.</p>": "请自行复制。",
