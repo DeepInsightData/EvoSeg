@@ -377,7 +377,7 @@
          <string>Force upgrade of EVO Python package to the version required by this module.</string>
         </property>
         <property name="text">
-         <string>Force reinstall</string>
+         <string>Reinstall</string>
         </property>
        </widget>
       </item>

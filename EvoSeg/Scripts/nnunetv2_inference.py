@@ -4,7 +4,7 @@ import fire
 import time
 import torch
 from collections import OrderedDict
-from flask import Flask, request, jsonify
+#from flask import Flask, request, jsonify
 import torch
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join

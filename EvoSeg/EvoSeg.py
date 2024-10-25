@@ -171,7 +171,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Outputs": "输出",
             "Get Python package information": "获取 Python 包信息",
             "<p>Get information on the installed EVO Python package</p>": "获取已安装的 EVO Python 包的信息",
-            "Force reinstall": "强制重新安装",
+            "Reinstall": "重新安装",
             "<p>Force upgrade of EVO Python package to the version required by this module.</p>": "强制将 EVO Python 包升级到本模块所需的版本。",
             "0.50": "0.50",
             "Show 3D": "显示 3D",
@@ -1192,7 +1192,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     def installedEVOPythonPackageInfo(self):
         import shutil
         import subprocess
-        versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "EVO"]).decode()
+        versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "nnunetv2"]).decode()
         return versionInfo
 
     def setupPythonRequirements(self, upgrade=False):
@@ -1227,7 +1227,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"
-        EVOInstallString = "EVO[fire,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators,nnunetv2]>=1.3"
+        EVOInstallString = "nnunetv2[fire,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators]>=1.3"
         if upgrade:
             EVOInstallString += " --upgrade"
         if self.ui_language=="zh-CN":
