@@ -1,0 +1,36 @@
+{
+  "models": [
+    {
+      "title": "Airway_nnUnet",
+      "license": "EvoSeg",
+      "description": "......",
+      "subject": "human",
+      "imagingModality": "CT",
+      "sampleData": [ 
+        "CTLiver"
+      ],
+      "versions": [
+        {
+          "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
+        }
+      ],
+      "segmentNames": []
+    },
+    {
+      "title": "Artery_nnUnet",
+      "license": "EvoSeg",
+      "description": "......",
+      "subject": "human",
+      "imagingModality": "CT",
+      "sampleData": [ 
+        "CTChest"
+      ],
+      "versions": [
+        {
+          "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Artery_nnUnet.7z"
+        }
+      ],
+      "segmentNames": []
+    }
+  ]
+}

@@ -6,31 +6,54 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>311</height>
+    <width>402</width>
+    <height>653</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <!-- 第一个item -->
    <item>
     <widget class="ctkCollapsibleButton" name="inputsCollapsibleButton">
      <property name="text">
       <string>Inputs</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Input volume:</string>
+      <item row="2" column="1">
+       <widget class="QListWidget" name="modelComboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>100</height>
+         </size>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="qMRMLNodeComboBox" name="inputSelector">
+      <item row="4" column="0">
+       <widget class="QLabel" name="inputNodeLabel0">
+        <property name="text">
+         <string>Input volume 1:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="qMRMLNodeComboBox" name="inputNodeSelector0">
         <property name="toolTip">
-         <string>Pick the input to the algorithm.</string>
+         <string/>
         </property>
         <property name="nodeTypes">
-         <stringlist notr="true">
+         <stringlist>
           <string>vtkMRMLScalarVolumeNode</string>
          </stringlist>
         </property>
@@ -43,68 +66,186 @@
         <property name="removeEnabled">
          <bool>false</bool>
         </property>
-        <property name="SlicerParameterName" stdset="0">
-         <string>inputVolume</string>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="inputNodeLabel1">
+        <property name="text">
+         <string>Input volume 2:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="qMRMLNodeComboBox" name="inputNodeSelector1">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="nodeTypes">
+         <stringlist>
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="showChildNodeTypes">
+         <bool>false</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="inputNodeLabel2">
+        <property name="text">
+         <string>Input volume 3:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="qMRMLNodeComboBox" name="inputNodeSelector2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="nodeTypes">
+         <stringlist>
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="showChildNodeTypes">
+         <bool>false</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="inputNodeLabel3">
+        <property name="text">
+         <string>Input volume 4:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="qMRMLNodeComboBox" name="inputNodeSelector3">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="nodeTypes">
+         <stringlist>
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="showChildNodeTypes">
+         <bool>false</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+        <layout class="QVBoxLayout" name="verticalLayout_ToolButton">
+        <item row="1" column="0">
+        <widget class="QToolButton" name="downloadSampleDataToolButton">
+        <property name="toolTip">
+         <string>Download sample data and model set for the current segmentation model</string>
+        </property>
         <property name="text">
-         <string>Image threshold:</string>
+         <string>Download</string>
+        </property>
+       </widget>
+       </item>
+        <item row="2" column="0">
+       <widget class="QToolButton" name="TranslateToolButton">
+        <property name="toolTip">
+         <string>Translate to chinese</string>
+        </property>
+        <property name="text">
+         <string>Translate</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="ctkSliderWidget" name="imageThresholdSliderWidget">
+      <item row="3" column="0">
+       <widget class="QToolButton" name="ImportModelToolButton">
         <property name="toolTip">
-         <string>Set threshold value for computing the output image. Voxels that have intensities lower than this value will set to zero.</string>
+         <string>Import model in local</string>
         </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
+        <property name="text">
+         <string>Import</string>
         </property>
-        <property name="minimum">
-         <double>-100.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>500.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.500000000000000</double>
-        </property>
-        <property name="SlicerParameterName" stdset="0">
-         <string>imageThreshold</string>
+       </widget>
+      </item>
+        </layout>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="ctkSearchBox" name="modelSearchBox">
+          <property name="toolTip">
+           <string>List models that contain all the specified words</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="fullTextSearchCheckBox">
+          <property name="toolTip">
+           <string>Search in full text of the segmentation model description. Uncheck to search only in the model names.</string>
+          </property>
+          <property name="text">
+           <string>Full text</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Segmentation model:</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
+   <!-- 第二个item -->
    <item>
     <widget class="ctkCollapsibleButton" name="outputsCollapsibleButton">
      <property name="text">
       <string>Outputs</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_4">
+     <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Thresholded volume:</string>
+         <string>Segmentation:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="qMRMLNodeComboBox" name="outputSelector">
+       <widget class="qMRMLNodeComboBox" name="outputSegmentationSelector">
         <property name="toolTip">
-         <string>Pick the output to the algorithm.</string>
+         <string>This will store the segmentation result.</string>
         </property>
         <property name="nodeTypes">
-         <stringlist notr="true">
-          <string>vtkMRMLScalarVolumeNode</string>
+         <stringlist>
+          <string>vtkMRMLSegmentationNode</string>
          </stringlist>
         </property>
         <property name="showChildNodeTypes">
          <bool>false</bool>
+        </property>
+        <property name="baseName">
+         <string>Brain</string>
         </property>
         <property name="noneEnabled">
          <bool>true</bool>
@@ -115,105 +256,228 @@
         <property name="removeEnabled">
          <bool>true</bool>
         </property>
-        <property name="SlicerParameterName" stdset="0">
-         <string>thresholdedVolume</string>
+        <property name="editEnabled">
+         <bool>true</bool>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Inverted volume:</string>
+        <property name="renameEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="noneDisplay">
+         <string>Create new segmentation on Apply</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="qMRMLNodeComboBox" name="invertedOutputSelector">
-        <property name="toolTip">
-         <string>Result with inverted threshold will be written into this volume</string>
-        </property>
-        <property name="nodeTypes">
-         <stringlist notr="true">
-          <string>vtkMRMLScalarVolumeNode</string>
-         </stringlist>
-        </property>
-        <property name="showChildNodeTypes">
-         <bool>false</bool>
-        </property>
-        <property name="noneEnabled">
-         <bool>true</bool>
-        </property>
-        <property name="addEnabled">
-         <bool>true</bool>
-        </property>
-        <property name="removeEnabled">
-         <bool>true</bool>
-        </property>
-        <property name="SlicerParameterName" stdset="0">
-         <string>invertedVolume</string>
-        </property>
-       </widget>
+       <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
       </item>
+      <!-- <item row="2" column="1">
+       <widget class="qMRMLSegmentEditorWidget" name="segmentationEditor_"/>
+      </item> -->
+      
      </layout>
     </widget>
    </item>
+   <!-- 第三个item -->
+   <item>
+   <layout class="QHBoxLayout" name="horizontalLayout_apply">
+   <!-- 不好用的，已隐藏弃用，未来版本删除 -->
+   <!-- <item>
+   <widget class="QCheckBox" name="noDownloadSearchCheckBox">
+        <property name="toolTip">
+            <string>Copy it yourself.</string>
+        </property>
+        <property name="text">
+            <string>Download model if not saved</string>
+        </property>
+    </widget>
+    </item> -->
+    <item>
+    <widget class="QPushButton" name="applyButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Start segmentation.</string>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+    </item>
+   </layout>
+   </item>
+   <!-- 第四个item -->
    <item>
     <widget class="ctkCollapsibleButton" name="advancedCollapsibleButton">
      <property name="text">
       <string>Advanced</string>
      </property>
      <property name="collapsed">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QFormLayout" name="formLayout_3">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Invert threshold: </string>
+         <string>Use standard segment names:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QCheckBox" name="invertOutputCheckBox">
+       <widget class="QCheckBox" name="useStandardSegmentNamesCheckBox">
         <property name="toolTip">
-         <string>If checked, values above threshold are set to 0. If unchecked, values below are set to 0.</string>
+         <string>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</string>
         </property>
         <property name="text">
          <string/>
         </property>
-        <property name="invertThreshold" stdset="0">
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <!-- 当前的模型脚本，没有处理相关的cpu选项，所以当前版本隐藏 -->
+      <!-- <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Force to use CPU: </string>
+        </property>
+       </widget>
+      </item> -->
+      <!-- <item row="1" column="1">
+       <widget class="QCheckBox" name="cpuCheckBox">
+        <property name="toolTip">
+         <string>Use CPU, even if GPU is available. Useful if the GPU does not have enough memory.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item> -->
+      <!-- <item row="5" column="0">
+       <widget class="QCheckBox" name="translate_ui">
+          <property name="text">
+           <string>tr(中文)</string>
+          </property>
+         </widget>
+      </item> -->
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Python package:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="packageUpgradeButton">
+        <property name="toolTip">
+         <string>Force upgrade of EVO Python package to the version required by this module.</string>
+        </property>
+        <property name="text">
+         <string>Reinstall</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QPushButton" name="packageInfoUpdateButton">
+        <property name="toolTip">
+         <string>Get information on the installed EVO Python package</string>
+        </property>
+        <property name="text">
+         <string>Get Python package information</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="ctkFittedTextBrowser" name="packageInfoTextBrowser">
+        <property name="collapsed">
+         <bool>false</bool>
+        </property>
+        <property name="showDetailsText">
+         <string/>
+        </property>
+        <property name="hideDetailsText">
          <string/>
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Show all models:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="showAllModelsCheckBox">
+        <property name="toolTip">
+         <string>Show all models in &quot;Segmentation model&quot; list, including old versions.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Manage models:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="browseToModelsFolderButton">
+          <property name="toolTip">
+           <string>Open the folder that contains all downloaded files for models.</string>
+          </property>
+          <property name="text">
+           <string>Open models cache folder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="copyModelsButton">
+          <property name="toolTip">
+           <string>the button is you needed.</string>
+          </property>
+          <property name="text">
+           <string>Copy to folder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="deleteAllModelsButton">
+          <property name="toolTip">
+           <string>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</string>
+          </property>
+          <property name="text">
+           <string>Clear cache</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
+   <!-- 第五个item -->
    <item>
-    <widget class="QPushButton" name="applyButton">
-     <property name="enabled">
-      <bool>false</bool>
+    <widget class="QPlainTextEdit" name="statusLabel">
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::NoWrap</enum>
      </property>
-     <property name="toolTip">
-      <string>Run the algorithm.</string>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
-     <property name="text">
-      <string>Apply</string>
+     <property name="textInteractionFlags">
+      <set>Qt::TextSelectableByMouse</set>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
@@ -230,15 +494,35 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>qMRMLSegmentationShow3DButton</class>
+   <extends>ctkMenuButton</extends>
+   <header>qMRMLSegmentationShow3DButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>ctkCollapsibleButton</class>
    <extends>QWidget</extends>
    <header>ctkCollapsibleButton.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>ctkFittedTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>ctkFittedTextBrowser.h</header>
+  </customwidget>
+  <customwidget>
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>
    <header>ctkSliderWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkMenuButton</class>
+   <extends>QPushButton</extends>
+   <header>ctkMenuButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkSearchBox</class>
+   <extends>QLineEdit</extends>
+   <header>ctkSearchBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -246,7 +530,7 @@
   <connection>
    <sender>EvoSeg</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputSelector</receiver>
+   <receiver>inputNodeSelector0</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -254,31 +538,15 @@
      <y>132</y>
     </hint>
     <hint type="destinationlabel">
-     <x>248</x>
-     <y>61</y>
+     <x>388</x>
+     <y>87</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>EvoSeg</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>outputSelector</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>82</x>
-     <y>135</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>220</x>
-     <y>161</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EvoSeg</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>invertedOutputSelector</receiver>
+   <receiver>outputSegmentationSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -286,8 +554,56 @@
      <y>8</y>
     </hint>
     <hint type="destinationlabel">
-     <x>173</x>
-     <y>176</y>
+     <x>355</x>
+     <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EvoSeg</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>inputNodeSelector1</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>405</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EvoSeg</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>inputNodeSelector2</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>405</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EvoSeg</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>inputNodeSelector3</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>408</x>
+     <y>179</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>154</y>
     </hint>
    </hints>
   </connection>
