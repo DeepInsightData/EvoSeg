@@ -49,7 +49,6 @@ This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc
 and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
 """)
         self.terminologyName = None
-        self.anatomicContextName = None
 
         slicer.app.connect("startupCompleted()", self.configureDefaultTerminology)
         # Additional initialization step after application startup is complete
@@ -700,31 +699,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         return False
 
     def onDownloadSampleData(self):
-        model = self.logic.model(self._currentModelId())
-        sampleDataName = model.get("sampleData")
-        if not sampleDataName:
-            slicer.util.messageBox("No sample data is available for this model.")
-            return
+        
+        copy2dir= os.path.join(self.logic.modelsPath())
+        print(self.logic.modelsPath())
+        if not os.path.exists(copy2dir):
+            os.makedirs(copy2dir)
+            
+        select_file = QFileDialog.getOpenFileNames(None, "快速选择文件", "", "File (*.nii.gz)")
+        
+        slicer.util.loadVolume(select_file[0])
 
-        if type(sampleDataName) == list:
-            # For now, always just use the first data set if multiple data sets are provided
-            sampleDataName = sampleDataName[0]
-
-        with slicer.util.tryWithErrorDisplay("Failed to download sample data", waitCursor=True):
-            import SampleData
-            loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
-            inputs = model.get("inputs")
-
-        if not loadedSampleNodes:
-            slicer.util.messageBox(f"Failed to load sample data set '{sampleDataName}'.")
-            return
-
-        inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
-        #print(inputNodes)
-        for inputIndex, inputNode in enumerate(inputNodes):
-            #print(inputIndex, inputNode)
-            if inputNode:
-                self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
+        # for inputIndex, inputNode in enumerate(inputNodes):
+        #     #print(inputIndex, inputNode)
+        #     if inputNode:
+        #         self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
 
     def onPackageInfoUpdate(self):
         self.ui.packageInfoTextBrowser.plainText = ""
@@ -803,8 +791,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         #self.EvoSegTerminologyPropertyTypes = self._EvoSegTerminologyPropertyTypes()
 
         # List of anatomic regions that are specified by EvoSeg.
-        self.EvoSegAnatomicRegions = self._EvoSegAnatomicRegions()
-
+        
         # Segmentation models specified by in models.json file
         self.models = self.loadModelsDescription()
         self.defaultModel = self.models[0]["id"]
@@ -1019,30 +1006,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         return terminologyPropertyTypes
 
-    def _EvoSegAnatomicRegions(self):
-        """Get anatomic regions defined in from EVO Auto3DSeg terminology.
-        Terminology entries are either in DICOM or EVO Auto3DSeg "Anatomic codes".
-        """
-        anatomicRegions = []
-
-        terminologiesLogic = slicer.util.getModuleLogic("Terminologies")
-        if not hasattr(terminologiesLogic, "GetNumberOfRegionsInAnatomicContext"):
-            # This Slicer version does not have GetNumberOfRegionsInAnatomicContext method,
-            # do not add the region modifier (the only impact is that the modifier will not be selectable
-            # when editing the terminology on the GUI)
-            return anatomicRegions
-
-        EvoSegAnatomicContextName = slicer.modules.EvoSegInstance.anatomicContextName
-
-        # Retrieve all anatomical region codes
-
-        regionObject = slicer.vtkSlicerTerminologyType()
-        numberOfRegions = terminologiesLogic.GetNumberOfRegionsInAnatomicContext(EvoSegAnatomicContextName)
-        for i in range(numberOfRegions):
-            if terminologiesLogic.GetNthRegionInAnatomicContext(EvoSegAnatomicContextName, i, regionObject):
-                anatomicRegions.append(regionObject.GetCodingSchemeDesignator() + "^" + regionObject.GetCodeValue())
-
-        return anatomicRegions
 
     def labelDescriptions(self, modelName):
         """Return mapping from label value to label description.
