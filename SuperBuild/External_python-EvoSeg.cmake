@@ -34,3 +34,4 @@ ExternalProject_Add(${proj}
   DEPENDS
     ${${proj}_DEPENDENCIES}
   )
+  list(APPEND Slicer_DEPENDENCIES ${proj})
