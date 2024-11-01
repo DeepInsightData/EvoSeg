@@ -4,6 +4,7 @@ set(proj python-EvoSeg)
 set(${proj}_DEPENDENCIES
   python-scipy
   python-numpy
+  python-pythonqt-requirements
   )
 
 # Include dependent projects if any
@@ -12,11 +13,12 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 set(requirements_file ${CMAKE_BINARY_DIR}/${proj}-requirements.txt)
 file(WRITE ${requirements_file} [===[
 # [torch]
+pip==23.2.1 --hash=sha256:7ccf472345f20d35bdc9d1841ff5f313260c2c33fe417f48c30ac46cccabf5be
 torch==2.4.0 --hash=sha256:0da13570771e09f6d754196aa865a690222d683df07b62f20922a3f27546faf5  \
              --hash=sha256:e0a73c7384d3e0a09fea5c2a10afc95bac9386e7360fe0bddd167b09697f59a8 
 torchvision==0.19.0  --hash=sha256:03fc97a9058bb489aee898d2b7cef7e2e7636ecda1d9afbadf03e5b7268ae07a \
                      --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7
-light-the-torch==0.5  --hash=sha256:a5ba9c1ed1e6efe28469d0759d603ddffdaecab0d545296aaff180116f694884
+light-the-torch==0.7.5 --hash=sha256:96de7a5accb1c93aa20b0f4322ca3c56295e2505ac8fbf6b05fb81236348653c
 # [/torch]
 # [fire]
 fire==0.6.0 --hash=sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66
@@ -61,8 +63,6 @@ fsspec==2024.10.0 --hash=sha256:03b9a6785766a4de40368b88906366755e2819e758b83705
 #[pillow]
 pillow==11.0.0 --hash=sha256:94f3e1780abb45062287b4614a5bc0874519c86a777d4a7ad34978e86428b8dd
 #[/pillow]
-
-packaging==24.1 --hash=sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124
 ]===])
 
 ExternalProject_Add(${proj}
