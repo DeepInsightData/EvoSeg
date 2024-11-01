@@ -23,6 +23,15 @@ Slicer3D segmentation extension
   - Click `Select all` button in `Managed 3D views` row (top-right corner).
   - Check `Enable` in `Ambient shadows` section and move the `Size scale` slider until the desired shadow appearance is achieved.
 ![](screenshot_5.jpg)
+9. Modify Segmentation Result:
+  - Select `Target` 
+  - Select `Option` checkbutton.
+  - Edit `radius` if you want.
+  - Click `Segmentation Image` find the places where connections are interrupted
+  - Click `Save` button to update Segmentation.
+  - Reference image is for demonstration only; we used a large radius circular fill.
+![](screenshot_6.jpg)
+
 
 ## Troubleshooting
 

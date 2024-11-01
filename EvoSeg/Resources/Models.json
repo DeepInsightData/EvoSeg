@@ -14,7 +14,7 @@
           "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Airway_nnUnet.7z"
         }
       ],
-      "segmentNames": []
+      "segmentNames": ["airway","artery","vein"]
     },
     {
       "title": "Artery_nnUnet",
@@ -30,7 +30,7 @@
           "url": "https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Artery_nnUnet.7z"
         }
       ],
-      "segmentNames": []
+      "segmentNames": ["airway","artery","vein"]
     }
   ]
 }
