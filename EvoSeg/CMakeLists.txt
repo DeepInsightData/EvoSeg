@@ -4,6 +4,7 @@ set(MODULE_NAME EvoSeg)
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
+  Scripts/nnunetv2_inference.py
   )
 
 set(MODULE_PYTHON_RESOURCES

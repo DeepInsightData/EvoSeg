@@ -17,13 +17,14 @@ from slicer.parameterNodeWrapper import (
 
 from slicer import vtkMRMLScalarVolumeNode
 
-from qt import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog
+from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
 
 import subprocess
+
+from OtherCode.data import DataModule
 #
 # EvoSeg
 #
-
 
 class EvoSeg(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
@@ -98,7 +99,6 @@ class EvoSegParameterNode:
 # EvoSegWidget
 #
 
-
 class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
@@ -120,13 +120,21 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._updatingGUIFromParameterNode = False
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
-        
+
+        self.label_np=None
+
+        self.markupsNode=None
+
+        self.data_module=None
 
         with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
             app_config = json.load(file)
         self.ui_language = app_config["language"]
         
         self.logic = EvoSegLogic(self.ui_language)
+
+        super().setup()
+        
 
     ##
     # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
@@ -154,13 +162,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Input volume 3:": "输入体积 3：",
             "Input volume 4:": "输入体积 4：",
             "Inputs": "输入",
+            "Modify Result:": "修改结果:",
             "<p>Translate to chinese</p>": "<p>切换成英文</p>",
             "Force to use CPU: ": "强制使用 CPU：",
             "Segmentation model:": "分割模型：",
-            "Show all models:": "显示所有模型：",
-            "Segmentation:": "分割：",
+            "Show all models:": "显示模型全称：",
+            "Segmentation:": "分割选项:",
             "Manage models:": "管理模型：",
-            "Copy to folder":"一键导入",
+            "Copy to folder":"导入模型",
             "Use standard segment names:": "使用标准分割名称：",
             "Python package:": "Python 包：",
             "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
@@ -253,6 +262,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.processingCompletedCallback = self.onProcessingCompleted
         self.logic.startResultImportCallback = self.onProcessImportStarted
         self.logic.endResultImportCallback = self.onProcessImportEnded
+        
+        self.logic.setResultToLabelCallback = self.onResultSeg
 
         # Connections
 
@@ -282,10 +293,35 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.ImportModelToolButton.connect("clicked(bool)", self.onInputLocalModel)
         self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
         self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
+        self.ui.packageInfoUpdateButton.hide()
         self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
         self.ui.applyButton.connect("clicked(bool)", self.onApplyButton)
         self.ui.browseToModelsFolderButton.connect("clicked(bool)", self.onBrowseModelsFolder)
         self.ui.deleteAllModelsButton.connect("clicked(bool)", self.onClearModelsFolder)
+
+        # check box
+        self.ui.radioButton1.setChecked(True)
+        self.ui.radioButton12.setChecked(True)
+
+        # Hide or delete will
+        self.ui.label_3.hide()
+        self.ui.modelSearchBox.hide()
+        self.ui.fullTextSearchCheckBox.hide()
+
+        # new button click
+        self.ui.lineEdit_radius.setText("{'radius':3,}")
+        self.ui.button_undo.connect("clicked(bool)", self.onButtonUndoClick)
+        self.ui.button_save.connect("clicked(bool)", self.onButtonSaveClick)
+
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.ui.radioButton1)
+        self.button_group.addButton(self.ui.radioButton2)
+        self.button_group.addButton(self.ui.radioButton3)
+        self.button_group2 = QButtonGroup()
+        self.button_group2.addButton(self.ui.radioButton12)
+        self.button_group2.addButton(self.ui.radioButton22)
+        self.button_group2.addButton(self.ui.radioButton32)
+        self.button_group2.addButton(self.ui.radioButton42)
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -297,11 +333,199 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # NOTE: 弃用
         # self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
+        self.CrosshairNode = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLCrosshairNode')
+        
+        if self.CrosshairNode:
+            self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
 
-        # if cn , language set
+
+        # self.sliceView = slicer.app.layoutManager().sliceWidget("Red").sliceView()
+        # print(type(self.sliceView),"========================")
+        # self.checkbox = QCheckBox("123")
+        # self.sliceView.layout().addWidget(self.checkbox)
+
+        self.layoutManager = slicer.app.layoutManager()
+        
+        self.redSliceView = self.layoutManager.sliceWidget("Red")
+
+        
+        views = [
+            # slicer.app.layoutManager().threeDWidget(0).threeDView(),
+            slicer.app.layoutManager().sliceWidget("Red").sliceView(),
+            slicer.app.layoutManager().sliceWidget("Yellow").sliceView(),
+            slicer.app.layoutManager().sliceWidget("Green").sliceView()
+        ]
+
+        self.observations = []
+        # markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
+
+        #for markupsDisplayNode in markupsDisplayNodes:
+            # observations.append([markupsDisplayNode, markupsDisplayNode.AddObserver(markupsDisplayNode.CustomActionEvent1, self.someCustomAction)])
+        for view in views:
+                # markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
+                # widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
+                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
+                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
+            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonPressEvent, self.onPress, 10.0)])
+            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonReleaseEvent, self.onRelease, 10.0)])
+        
+        extensionsPath = slicer.app.extensionsInstallPath
+        print("Extensions Install Path:", extensionsPath)
+        layoutManager = slicer.app.layoutManager()
+        fourByFourWidget = layoutManager.threeDWidget(0).threeDView()
+
+        # 显示小部件
+        fourByFourWidget.show()
+    
+        #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
+          # if cn , language set
+
         if(self.ui_language=="zh-CN"):
             self.translate("zh-CN")
 
+    def onButtonUndoClick(self):
+        self.data_module.undo()
+        self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+    def onButtonSaveClick(self):
+        #segmentation_nodes = slicer.util.getNodesByClass('vtkMRMLSegmentationNode')
+        self.logic.set_new_data_module(self.data_module);
+        print("Save click")
+
+    def check_py_pack(self):
+        try:
+            import fire
+        except ModuleNotFoundError:
+            slicer.util.pip_install("fire")
+
+    def onPress(self,arg1, arg2):
+        import ast
+        position_=self.ui.label_img.text.split("<b>")
+        x,y,z=ast.literal_eval(position_[0])
+        #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
+        #print("Press")
+        if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
+            self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+        else:
+            #print(self.data_module.get_masks())
+            optin_select=self.button_group2.checkedButton().text
+            param = ast.literal_eval(self.ui.lineEdit_radius.text)
+            #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+            if optin_select=="Sphere Addition":
+                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+            elif optin_select=="Sphere Erasure":
+                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+            else:
+                return
+            #print(self.button_group.checkedButton().text)
+            #self.data_module.
+            self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+            self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+            
+    def onRelease(self,arg1, arg2):
+        #print("release")
+        #self.ui.label_img.setText(self.ui.label_img.text+" add done")
+        return
+    def someCustomAction(self,caller, eventId):
+        markupsDisplayNode = caller
+        print(type(markupsDisplayNode))
+        print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
+        #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
+
+    # def generateViewDescription(self, xyz, ras, sliceNode, sliceLogic):
+
+    #     spacing = "%.1f" % sliceLogic.GetLowestVolumeSliceSpacing()[2]
+    #     if sliceNode.GetSliceSpacingMode() == slicer.vtkMRMLSliceNode.PrescribedSliceSpacingMode:
+    #         spacing = "(%s)" % spacing
+    #     hasVolume = False
+    #     layerLogicCalls = (('L', sliceLogic.GetLabelLayer),
+    #                     ('F', sliceLogic.GetForegroundLayer),
+    #                     ('B', sliceLogic.GetBackgroundLayer))
+    #     for layer,logicCall in layerLogicCalls:
+    #         layerLogic = logicCall()
+    #         volumeNode = layerLogic.GetVolumeNode()
+    #         ijk = [0, 0, 0]
+    #         if volumeNode:
+    #             hasVolume = True
+    #             xyToIJK = layerLogic.GetXYToIJKTransform()
+    #             ijkFloat = xyToIJK.TransformDoublePoint(xyz)
+    #             ijk = [_roundInt(value) for value in ijkFloat]
+    #             print(ijk)
+    #             return \
+    #             "  {layoutName: <8s}  ({xyz_position})  {orient: >8s} Sp: {spacing:s}" \
+    #             .format(layoutName=sliceNode.GetLayoutName(),
+    #                     xyz_position=str(ijk),
+    #                     orient=sliceNode.GetOrientationString(),
+    #                     spacing=spacing
+    #                     )
+
+        # return \
+        # "  {layoutName: <8s}  ({rLabel} {ras_x:3.1f}, {aLabel} {ras_y:3.1f}, {sLabel} {ras_z:3.1f})  {orient: >8s} Sp: {spacing:s}" \
+        # .format(layoutName=sliceNode.GetLayoutName(),
+        #         rLabel=sliceNode.GetAxisLabel(1) if ras[0]>=0 else sliceNode.GetAxisLabel(0),
+        #         aLabel=sliceNode.GetAxisLabel(3) if ras[1]>=0 else sliceNode.GetAxisLabel(2),
+        #         sLabel=sliceNode.GetAxisLabel(5) if ras[2]>=0 else sliceNode.GetAxisLabel(4),
+        #         ras_x=abs(ras[0]),
+        #         ras_y=abs(ras[1]),
+        #         ras_z=abs(ras[2]),
+        #         orient=sliceNode.GetOrientationString(),
+        #         spacing=spacing
+        #         )
+
+    def processEvent(self,observee,event):
+
+        insideView = False
+        ras = [0.0,0.0,0.0]
+        xyz = [0.0,0.0,0.0]
+        sliceNode = None
+        if self.CrosshairNode:
+            insideView = self.CrosshairNode.GetCursorPositionRAS(ras)
+            sliceNode = self.CrosshairNode.GetCursorPositionXYZ(xyz)
+        sliceLogic = None
+        if sliceNode:
+            appLogic = slicer.app.applicationLogic()
+            if appLogic:
+                sliceLogic = appLogic.GetSliceLogic(sliceNode)
+
+        if not insideView or not sliceNode or not sliceLogic:
+            return
+        displayableManagerCollection = vtk.vtkCollection()
+        if sliceNode:
+            sliceWidget = slicer.app.layoutManager().sliceWidget(sliceNode.GetName())
+            if sliceWidget:
+                # sliceWidget is owned by the layout manager
+                sliceView = sliceWidget.sliceView()
+                sliceView.getDisplayableManagers(displayableManagerCollection)
+        aggregatedDisplayableManagerInfo = ''
+        myManagerInfo=""
+        for index in range(displayableManagerCollection.GetNumberOfItems()):
+            displayableManager = displayableManagerCollection.GetItemAsObject(index)
+            infoString = displayableManager.GetDataProbeInfoStringForPosition(xyz)
+            if infoString != "":
+                aggregatedDisplayableManagerInfo += infoString + "<br>"
+                myManagerInfo=infoString
+
+        try:
+            infoWidget = slicer.modules.DataProbeInstance.infoWidget
+            #for layer in ("B", "F", "L", "S"):
+                #print(infoWidget.layerNames[layer].text, infoWidget.layerIJKs[layer].text, infoWidget.layerValues[layer].text)
+            
+            self.ui.label_img.setText(infoWidget.layerIJKs["B"].text+" "+infoWidget.layerValues["B"].text)
+            if aggregatedDisplayableManagerInfo != '':
+                #print(myManagerInfo)
+                self.ui.label_img.setText(self.ui.label_img.text+"<br>"+myManagerInfo.split('</font>')[-1])
+            else:
+                self.ui.label_img.setText(self.ui.label_img.text+"<br> ")
+            
+            
+            
+
+            # self.ui.label_img.setText(self.generateViewDescription(xyz, ras, sliceNode, sliceLogic))
+        except:
+            pass
+        # collect information from displayable managers
+    
+
+        
     def onCopyModel(self):
         
         from qt import QMessageBox 
@@ -345,6 +569,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
+
+    def removeObservers(self):
+        print("rm obse..")
+        for observedNode, observation in self.observations:
+            observedNode.RemoveObserver(observation)
 
     def enter(self) -> None:
         """Called each time the user opens this module."""
@@ -540,6 +769,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.ui.applyButton.text = "Cancelling..." if self.ui_language=="en-US" else "正在取消..."
                 self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled" if self.ui_language=="en-US" else "请等待分割进程退出"
                 self.ui.applyButton.enabled = False
+            
 
         finally:
             # All the GUI updates are done
@@ -641,9 +871,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             with slicer.util.tryWithErrorDisplay("Failed to start processing.", waitCursor=True):
 
                 # Create new segmentation node, if not selected yet
+                
                 if not self.ui.outputSegmentationSelector.currentNode():
                     self.ui.outputSegmentationSelector.addNode()
-
+                #print(self.ui.outputSegmentationSelector.currentNode(),"<<<<<")
                 self.logic.useStandardSegmentNames = self.ui.useStandardSegmentNamesCheckBox.checked
 
                 # Compute output
@@ -655,6 +886,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 #     self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
                 self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
                     self._currentModelId(), False, False, waitForCompletion=False)
+                
                 self.setProcessingState(EvoSegWidget.PROCESSING_IN_PROGRESS)
 
         except Exception as e:
@@ -706,8 +938,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             os.makedirs(copy2dir)
             
         select_file = QFileDialog.getOpenFileNames(None, "快速选择文件", "", "File (*.nii.gz)")
-        
-        slicer.util.loadVolume(select_file[0])
+        if len(select_file)>=1:
+            slicer.util.loadVolume(select_file[0])
 
         # for inputIndex, inputNode in enumerate(inputNodes):
         #     #print(inputIndex, inputNode)
@@ -742,6 +974,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.deleteAllModels()
         slicer.util.messageBox("Downloaded models are deleted.")
 
+
+        
+    def onResultSeg(self,myDataModule):
+        # 刷新DataModule 回调
+        self.data_module=myDataModule
+        print("init DataModule ok")
 #
 # EvoSegLogic
 #
@@ -776,7 +1014,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.startResultImportCallback = None
         self.endResultImportCallback = None
         self.useStandardSegmentNames = True
+        self.setResultToLabelCallback = None
         self.ui_language = the_ui_language
+
+        self.mdf_outputSegmentation=None
+        self.mdf_outputSegmentationFile=None
+        self.mdf_model=None
 
         # List of property type codes that are specified by in the EvoSeg terminology.
         #
@@ -801,12 +1044,14 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         # Disabling this flag preserves input and output data after execution is completed,
         # which can be useful for troubleshooting.
-        self.clearOutputFolder = True
+        self.clearOutputFolder = False #NOTE: 临时
 
         # For testing the logic without actually running inference, set self.debugSkipInferenceTempDir to the location
         # where inference result is stored and set self.debugSkipInference to True.
         self.debugSkipInference = False
         self.debugSkipInferenceTempDir = r"c:\Users\andra\AppData\Local\Temp\Slicer\__SlicerTemp__2024-01-16_15+26+25.624"
+
+        self.data_module = []
 
     def model(self, modelId):
         for model in self.models:
@@ -1027,64 +1272,14 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 columnValues.append(columnValue)
             return columnValues
 
-        labelDescriptions = {}
-        labelsFilePath = self.modelPath(modelName).joinpath("labels.csv")
-        print("in this version No should labels.csv",labelsFilePath) # NOTE: label is should define in futrue??
-        # import csv
-        # with open(labelsFilePath, "r") as f:
-        #     reader = csv.reader(f)
-        #     columnNames = next(reader)
-        #     data = {}
-        #     # Loop through the rows of the csv file
-        #     for row in reader:
-
-        #         # Determine segmentation category (DICOM or EvoSeg)
-        #         terminologyPropertyTypeStr = (  # Example: SCT^23451007
-        #             row[columnNames.index("SegmentedPropertyTypeCodeSequence.CodingSchemeDesignator")]
-        #             + "^" + row[columnNames.index("SegmentedPropertyTypeCodeSequence.CodeValue")])
-        #         if terminologyPropertyTypeStr in self.EvoSegTerminologyPropertyTypes:
-        #             terminologyName = slicer.modules.EvoSegInstance.terminologyName
-        #         else:
-        #             terminologyName = "Segmentation category and type - DICOM master list"
-
-        #         # Determine the anatomic context name (DICOM or EvoSeg)
-        #         anatomicRegionStr = (  # Example: SCT^279245009
-        #             row[columnNames.index("AnatomicRegionSequence.CodingSchemeDesignator")]
-        #             + "^" + row[columnNames.index("AnatomicRegionSequence.CodeValue")])
-        #         if anatomicRegionStr in self.EvoSegAnatomicRegions:
-        #             anatomicContextName = slicer.modules.EvoSegInstance.anatomicContextName
-        #         else:
-        #             anatomicContextName = "Anatomic codes - DICOM master list"
-
-        #         terminologyEntryStr = (
-        #             terminologyName
-        #             +"~"
-        #             # Property category: "SCT^123037004^Anatomical Structure" or "SCT^49755003^Morphologically Altered Structure"
-        #             + "^".join(getCodeString("SegmentedPropertyCategoryCodeSequence", columnNames, row))
-        #             + "~"
-        #             # Property type: "SCT^23451007^Adrenal gland", "SCT^367643001^Cyst", ...
-        #             + "^".join(getCodeString("SegmentedPropertyTypeCodeSequence", columnNames, row))
-        #             + "~"
-        #             # Property type modifier: "SCT^7771000^Left", ...
-        #             + "^".join(getCodeString("SegmentedPropertyTypeModifierCodeSequence", columnNames, row))
-        #             + "~"
-        #             + anatomicContextName
-        #             + "~"
-        #             # Anatomic region (set if category is not anatomical structure): "SCT^64033007^Kidney", ...
-        #             + "^".join(getCodeString("AnatomicRegionSequence", columnNames, row))
-        #             + "~"
-        #             # Anatomic region modifier: "SCT^7771000^Left", ...
-        #             + "^".join(getCodeString("AnatomicRegionModifierSequence", columnNames, row))
-        #             )
-
-        #         # Store the terminology string for this structure
-        #         labelValue = int(row[columnNames.index("LabelValue")])
-        #         name = row[columnNames.index("Name")]
-        #         labelDescriptions[labelValue] = { "name": name, "terminology": terminologyEntryStr }
-        # labelDescriptions[0] = { "name": "none", "terminology": "terminologyEntryStr" }
-        # labelDescriptions[1] = { "name": "none", "terminology": "terminologyEntryStr" }
-        # labelDescriptions[2] = { "name": "none", "terminology": "terminologyEntryStr" }
-        print("labelDescriptions",labelDescriptions)
+        labelDescriptions = { 
+            1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
+            2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
+            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'}
+        }
+        # labelsFilePath = self.modelPath(modelName).joinpath("labels.csv")
+        # print("in this version No should labels.csv",labelsFilePath) # NOTE: label is should define in futrue??
+        
         return labelDescriptions
 
     def getSegmentLabelColor(self, terminologyEntryStr):
@@ -1424,9 +1619,114 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import qt
         qt.QTimer.singleShot(self.processOutputCheckTimerIntervalMsec, lambda segmentationProcessInfo=segmentationProcessInfo: self.checkSegmentationProcessOutput(segmentationProcessInfo))
 
+    def beforeReadResult(self, result_data,result_data_path):
+        # 刷新DataModule
+        from vtk.util import numpy_support
+        import nrrd
+        import numpy as np
+        image_data = result_data.GetImageData()
+        if image_data:
+            vtk_array = numpy_support.vtk_to_numpy(image_data.GetPointData().GetScalars())
+            dimensions = image_data.GetDimensions()
+            numpy_array = vtk_array.reshape( dimensions[0], dimensions[1],dimensions[2])  # (Z, Y, X)
+            print("NumPy shape:", numpy_array.shape, dimensions)
+            ct_data = numpy_array
+            ct_data = ct_data - ct_data.min() * 1.0
+            ct_data = ct_data / ct_data.max()
+
+            data, options = nrrd.read(result_data_path+"/output-segmentation.nrrd")
+            #print("------------------------->>>>",options,"<<<<<<<<<<<--------------------")
+            print("------------------>",ct_data.shape,data.shape)
+            print("------------------>",ct_data.shape,data.shape)
+            if data.ndim>3:
+                segmentation_masks = {
+                    "airway" : data[0, :, :, :] == 1, 
+                    "Artery": data[2, :, :, :] == 1, 
+                    "Vein": data[2, :, :, :] == 2
+                }
+            else:
+                segmentation_masks = {
+                    "airway" : data[:, :, :] == 1, 
+                    "Artery": data[:, :, :] == 2, 
+                    "Vein": data[:, :, :] == 3
+                }
+            probability_maps = {
+                "airway": segmentation_masks["airway"].astype(np.float32),
+                "artery": segmentation_masks["Artery"].astype(np.float32),
+                "vein": segmentation_masks["Vein"].astype(np.float32),
+            }
+            self.data_module = DataModule(ct_data, segmentation_masks, probability_maps)
+            
+            
+
+        else:
+            print("no image data!")
+
+        
+
+
+
+
+        self.setResultToLabelCallback(self.data_module)
+        # print(result_path+"/output-segmentation.nrrd")
+        # import numpy as np
+        # import nibabel as nib
+        # import nrrd
+        # from OtherCode.data import DataModule
+        # from OtherCode.display import DisplayModule
+        # import matplotlib.pyplot as plt
+        # from matplotlib.widgets import Slider, Button, RangeSlider, CheckButtons
+        # # Load the NIfTI image
+        # # nii_image = nib.load(result_path+"/input-segmentation.nrrd")  # Replace with your file path
+        # # ct_data = nii_image.get_fdata()
+        # ct_data, optionsx = nrrd.read(result_path+"/input-volume0.nrrd")
+        # ct_data = ct_data - ct_data.min() * 1.0
+        # ct_data = ct_data / ct_data.max()
+
+        # # Load the predicted probability and the segmentation mask
+        # data, options = nrrd.read(result_path+"/output-segmentation.nrrd")
+        # self.setResultToLabelCallback(result_path+"/output-segmentation.nrrd")
+        # segmentation_masks = {
+        #     "airway" : data[0, :, :, :] == 1, 
+        #     "artery": data[2, :, :, :] == 1, 
+        #     "vein": data[2, :, :, :] == 2
+        # }
+        # display_colors = {
+        #     "airway" : [0.854902, 0.0823529, 0.768627], 
+        #     "artery" : [0, 0.478431, 0.670588], 
+        #     "vein": [0.729412, 0.301961, 0.25098]
+        # }
+        # probability_maps = {
+        #     "airway": segmentation_masks["airway"].astype(np.float32),
+        #     "artery": segmentation_masks["artery"].astype(np.float32),
+        #     "vein": segmentation_masks["vein"].astype(np.float32),
+        # }
+
+        # data_module = DataModule(ct_data, segmentation_masks, probability_maps)
+        # display_module = DisplayModule(data_module, display_colors)
+        # display_module.show()
+
+    def set_new_data_module(self, new_data_module):
+        import nrrd
+        import numpy as np
+        self.data_module=new_data_module
+        data, options = nrrd.read(self.mdf_outputSegmentationFile)
+
+        combined_mask = np.zeros(data.shape, dtype=np.uint8)  # 创建一个空的掩码
+        
+        segmentation_masks=new_data_module.get_masks()
+        
+        combined_mask[segmentation_masks["airway"]] = 1  # 标记 airway
+        combined_mask[segmentation_masks["Artery"]] = 2   # 标记 artery
+        combined_mask[segmentation_masks["Vein"]] = 3     # 标记 vein
+
+        nrrd.write(self.mdf_outputSegmentationFile, combined_mask, options)
+
+        self.readSegmentation(self.mdf_outputSegmentation, self.mdf_outputSegmentationFile, self.mdf_model)
+        print("ok")
 
     def onSegmentationProcessCompleted(self, segmentationProcessInfo):
-
+        import nrrd
         startTime = segmentationProcessInfo["startTime"]
         tempDir = segmentationProcessInfo["tempDir"]
         inputNodes = segmentationProcessInfo["inputNodes"]
@@ -1448,17 +1748,28 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                 try:
 
+
+                    print("------------------->Befor read")
+                    self.beforeReadResult(inputNodes[0], tempDir) # NOTE:临时
                     # Load result
                     self.log("Importing segmentation results...")
+                    #print(outputSegmentation,outputSegmentationFile,model)
+                    
+                    self.mdf_outputSegmentation=outputSegmentation
+                    self.mdf_outputSegmentationFile=outputSegmentationFile
+                    self.mdf_model=model
+                    #print(type(outputSegmentation), outputSegmentationFile, type(model))
                     self.readSegmentation(outputSegmentation, outputSegmentationFile, model)
-
+                    
                     # Set source volume - required for DICOM Segmentation export
                     inputVolume = inputNodes[0]
                     if not inputVolume.IsA('vtkMRMLScalarVolumeNode'):
                         raise ValueError("First input node must be a scalar volume")
                     outputSegmentation.SetNodeReferenceID(outputSegmentation.GetReferenceImageGeometryReferenceRole(), inputVolume.GetID())
                     outputSegmentation.SetReferenceImageGeometryParameterFromVolumeNode(inputVolume)
-
+                    
+                    
+                    
                     # Place segmentation node in the same place as the input volume
                     shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
                     inputVolumeShItem = shNode.GetItemByDataNode(inputVolume)
@@ -1504,10 +1815,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         labelValueToDescription = self.labelDescriptions(model)
 
         # Get label descriptions
-        # maxLabelValue = max(labelValueToDescription.keys())
+        maxLabelValue = max(labelValueToDescription.keys())
         # if min(labelValueToDescription.keys()) < 0:
         #     raise RuntimeError("Label values in class_map must be positive")
-        maxLabelValue = 1 # NOTE: one model one label
+        # maxLabelValue = 3 #
         # Get color node with random colors
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
         rgba = [0, 0, 0, 0]
@@ -1518,9 +1829,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         colorTableNode.SetNumberOfColors(maxLabelValue+1)
         colorTableNode.SetName(model)
         for labelValue in labelValueToDescription:
+            print(labelValue,labelValueToDescription[labelValue]["name"])
             randomColorsNode.GetColor(labelValue,rgba)
             colorTableNode.SetColor(labelValue, rgba[0], rgba[1], rgba[2], rgba[3])
             colorTableNode.SetColorName(labelValue, labelValueToDescription[labelValue]["name"])
+        #print(colorTableNode,"----<<")
         slicer.mrmlScene.AddNode(colorTableNode)
 
         # Load the segmentation
@@ -1541,7 +1854,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
     def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
         segment = segmentation.GetSegmentation().GetSegment(segmentId)
+        print("------->",segmentId)
         if not segment:
+            self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
             # Segment is not present in this segmentation
             return
         if terminologyEntryStr:
