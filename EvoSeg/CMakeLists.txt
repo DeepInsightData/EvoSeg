@@ -5,11 +5,17 @@ set(MODULE_NAME EvoSeg)
 set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
   Scripts/nnunetv2_inference.py
+  Scripts/data.py
   )
 
 set(MODULE_PYTHON_RESOURCES
   Resources/Icons/${MODULE_NAME}.png
+  Resources/Icons/import_model.svg
+  Resources/Icons/radiology.svg
+  Resources/Icons/translate.svg
   Resources/UI/${MODULE_NAME}.ui
+  Resources/AppConfig.json
+  Resources/Models.json
   )
 
 #-----------------------------------------------------------------------------
