@@ -9,13 +9,16 @@ set(MODULE_PYTHON_SCRIPTS
   )
 
 set(MODULE_PYTHON_RESOURCES
+  Resources/Icons/import_model.svg
+  Resources/Icons/radiology.svg
+  Resources/Icons/translate.svg
   Resources/Icons/${MODULE_NAME}.png
   Resources/Icons/import_model.svg
   Resources/Icons/radiology.svg
   Resources/Icons/translate.svg
   Resources/UI/${MODULE_NAME}.ui
-  Resources/AppConfig.json
   Resources/Models.json
+  Resources/AppConfig.json
   )
 
 #-----------------------------------------------------------------------------
