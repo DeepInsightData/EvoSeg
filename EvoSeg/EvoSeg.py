@@ -21,6 +21,8 @@ from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, 
 
 import subprocess
 
+!pip install package_name -i https://mirrors.pku.edu.cn/pypi/web/simple
+
 from OtherCode.data import DataModule
 #
 # EvoSeg
@@ -382,6 +384,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         if(self.ui_language=="zh-CN"):
             self.translate("zh-CN")
+        
+        #self.check_py_pack()
 
     def onButtonUndoClick(self):
         self.data_module.undo()
@@ -393,33 +397,37 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def check_py_pack(self):
         try:
-            import fire
+            import fire, skimage
         except ModuleNotFoundError:
             slicer.util.pip_install("fire")
+            slicer.util.pip_install("scikit-image")
 
     def onPress(self,arg1, arg2):
-        import ast
-        position_=self.ui.label_img.text.split("<b>")
-        x,y,z=ast.literal_eval(position_[0])
-        #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
-        #print("Press")
-        if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-            self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
-        else:
-            #print(self.data_module.get_masks())
-            optin_select=self.button_group2.checkedButton().text
-            param = ast.literal_eval(self.ui.lineEdit_radius.text)
-            #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
-            if optin_select=="Sphere Addition":
-                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
-            elif optin_select=="Sphere Erasure":
-                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+        try:
+            import ast
+            position_=self.ui.label_img.text.split("<b>")
+            x,y,z=ast.literal_eval(position_[0])
+            #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
+            #print("Press")
+            if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
+                self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
             else:
-                return
-            #print(self.button_group.checkedButton().text)
-            #self.data_module.
-            self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
-            self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+                #print(self.data_module.get_masks())
+                optin_select=self.button_group2.checkedButton().text
+                param = ast.literal_eval(self.ui.lineEdit_radius.text)
+                #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+                if optin_select=="Sphere Addition":
+                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+                elif optin_select=="Sphere Erasure":
+                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+                else:
+                    return
+                #print(self.button_group.checkedButton().text)
+                #self.data_module.
+                self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+                self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+        except:
+            pass
             
     def onRelease(self,arg1, arg2):
         #print("release")
@@ -1385,7 +1393,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"
-        EVOInstallString = "nnunetv2[fire,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators]>=1.3"
+        EVOInstallString = "nnunetv2[fire,scikit-image,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators]>=1.3"
         if upgrade:
             EVOInstallString += " --upgrade"
         if self.ui_language=="zh-CN":
