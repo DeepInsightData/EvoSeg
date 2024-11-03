@@ -21,7 +21,7 @@ from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, 
 
 import subprocess
 
-from OtherCode.data import DataModule
+from Scripts.data import DataModule
 #
 # EvoSeg
 #

@@ -6,6 +6,7 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
   Scripts/nnunetv2_inference.py
   Scripts/data.py
+  Scripts/__init__.py
   )
 
 set(MODULE_PYTHON_RESOURCES
