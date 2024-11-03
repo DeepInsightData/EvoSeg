@@ -21,8 +21,6 @@ from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, 
 
 import subprocess
 
-!pip install package_name -i https://mirrors.pku.edu.cn/pypi/web/simple
-
 from OtherCode.data import DataModule
 #
 # EvoSeg
