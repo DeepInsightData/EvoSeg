@@ -1641,9 +1641,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             ct_data = ct_data / ct_data.max()
 
             data, options = nrrd.read(result_data_path+"/output-segmentation.nrrd")
+            data_prob, options = nrrd.read(result_data_path+"/output-segmentation_prob.nrrd")
             #print("------------------------->>>>",options,"<<<<<<<<<<<--------------------")
-            print("------------------>",ct_data.shape,data.shape)
-            print("------------------>",ct_data.shape,data.shape)
+            print("------------------>",ct_data.shape,data.shape,data_prob.shape)
+            #print("------------------>",ct_data.shape,data.shape,data_prob.shape)
             if data.ndim>3:
                 segmentation_masks = {
                     "airway" : data[0, :, :, :] == 1, 
@@ -1656,10 +1657,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     "Artery": data[:, :, :] == 2, 
                     "Vein": data[:, :, :] == 3
                 }
+            #print(data_prob,"<<<")
             probability_maps = {
-                "airway": segmentation_masks["airway"].astype(np.float32),
-                "artery": segmentation_masks["Artery"].astype(np.float32),
-                "vein": segmentation_masks["Vein"].astype(np.float32),
+                "airway": data_prob[segmentation_masks["airway"]],#.astype(np.float32),
+                "artery": data_prob[segmentation_masks["Artery"]],#.astype(np.float32),
+                "vein": data_prob[segmentation_masks["Vein"]]#.astype(np.float32),
             }
             self.data_module = DataModule(ct_data, segmentation_masks, probability_maps)
             
