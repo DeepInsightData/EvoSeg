@@ -156,13 +156,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Full text": "全文",
             "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
             "Search...": "搜索...",
+            "Select Model:":"选择模型:",
             "Input volume:": "输入体积:",
             "Input volume 1:": "输入体积 1：",
             "Input volume 2:": "输入体积 2：",
             "Input volume 3:": "输入体积 3：",
             "Input volume 4:": "输入体积 4：",
             "Inputs": "输入",
-            "Modify Result:": "修改结果:",
+            "Modify Result:": "结果修改:",
             "<p>Translate to chinese</p>": "<p>切换成英文</p>",
             "Force to use CPU: ": "强制使用 CPU：",
             "Segmentation model:": "分割模型：",
@@ -242,7 +243,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         import qt
         # 下载样本数据按钮设置icon
         self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/radiology.svg")))
+        self.ui.downloadSampleDataToolButton.hide()
         self.ui.TranslateToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/translate.svg")))
+        self.ui.TranslateToolButton.hide()
         self.ui.ImportModelToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/import_model.svg")))
         self.ui.ImportModelToolButton.hide() # 进一步明确模型描述信息后启用
 
@@ -292,6 +295,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.TranslateToolButton.connect("clicked(bool)", self.tr_ui)
         self.ui.ImportModelToolButton.connect("clicked(bool)", self.onInputLocalModel)
         self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
+        self.ui.copyModelsButton.hide()
         self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
         self.ui.packageInfoUpdateButton.hide()
         self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
@@ -401,7 +405,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             slicer.util.pip_install("scikit-image")
 
     def onPress(self,arg1, arg2):
-        try:
+        #try:
             import ast
             position_=self.ui.label_img.text.split("<b>")
             x,y,z=ast.literal_eval(position_[0])
@@ -417,15 +421,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 if optin_select=="Sphere Addition":
                     self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
                 elif optin_select=="Sphere Erasure":
-                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+                    self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
                 else:
                     return
                 #print(self.button_group.checkedButton().text)
                 #self.data_module.
                 self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
                 self.ui.label_img.setText(self.ui.label_img.text+" >> add")
-        except:
-            pass
+        #except:
+        #    pass
             
     def onRelease(self,arg1, arg2):
         #print("release")
@@ -712,7 +716,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if not currentModelSelectable:
                 modelId = ""
             sampleDataAvailable = self.logic.model(modelId).get("inputs") if modelId else False
-            self.ui.downloadSampleDataToolButton.visible = sampleDataAvailable
+            #TODO:临时
+            #self.ui.downloadSampleDataToolButton.visible = sampleDataAvailable
 
             self.ui.fullTextSearchCheckBox.checked = fullTextSearch
             #self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
@@ -1521,7 +1526,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             auto3DSegCommand.append(inputFiles[inputIndex])
 
         self.log("Creating segmentations with EvoSeg AI...")
-        self.log(f"Auto3DSeg command: {auto3DSegCommand}")
+        self.log(f"command: {auto3DSegCommand}")
 
         additionalEnvironmentVariables = None
         if cpu:
@@ -1641,11 +1646,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             ct_data = ct_data / ct_data.max()
 
             data, options = nrrd.read(result_data_path+"/output-segmentation.nrrd")
-            data_prob, options = nrrd.read(result_data_path+"/output-segmentation_prob.nrrd")
+            #data_prob, options = nrrd.read(result_data_path+"/output-segmentation_prob.nrrd")
             #print("------------------------->>>>",options,"<<<<<<<<<<<--------------------")
-            print("------------------>",ct_data.shape,data.shape,data_prob.shape)
+            #print("------------------>",ct_data.shape,data.shape,data_prob.shape)
             #print("------------------>",ct_data.shape,data.shape,data_prob.shape)
             if data.ndim>3:
+                print("4 dim array!!")
                 segmentation_masks = {
                     "airway" : data[0, :, :, :] == 1, 
                     "Artery": data[2, :, :, :] == 1, 
@@ -1658,11 +1664,19 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     "Vein": data[:, :, :] == 3
                 }
             #print(data_prob,"<<<")
+            # probability_maps = {
+            #     "airway": data_prob[segmentation_masks["airway"]].astype(np.float32),
+            #     "artery": data_prob[segmentation_masks["Artery"]].astype(np.float32),
+            #     "vein": data_prob[segmentation_masks["Vein"]].astype(np.float32),
+            # }
+
             probability_maps = {
-                "airway": data_prob[segmentation_masks["airway"]],#.astype(np.float32),
-                "artery": data_prob[segmentation_masks["Artery"]],#.astype(np.float32),
-                "vein": data_prob[segmentation_masks["Vein"]]#.astype(np.float32),
+                "airway": segmentation_masks["airway"].astype(np.float32),
+                "artery": segmentation_masks["Artery"].astype(np.float32),
+                "vein": segmentation_masks["Vein"].astype(np.float32),
             }
+
+
             self.data_module = DataModule(ct_data, segmentation_masks, probability_maps)
             
             
