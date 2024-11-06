@@ -380,6 +380,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # 显示小部件
         fourByFourWidget.show()
+
+
+        
     
         #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
           # if cn , language set
@@ -405,6 +408,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             slicer.util.pip_install("scikit-image")
 
     def onPress(self,arg1, arg2):
+        
         #try:
             import ast
             position_=self.ui.label_img.text.split("<b>")
@@ -424,12 +428,42 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
                 else:
                     return
+                self.FasterUpdateSegForonPress(self.data_module.get_masks())
                 #print(self.button_group.checkedButton().text)
                 #self.data_module.
                 self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
                 self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+
+            
         #except:
         #    pass
+    def FasterUpdateSegForonPress(self, segmentation_masks):
+        import numpy as np
+        inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
+        outputSegmentationNodeName = self.ui.outputSegmentationSelector.currentNode().GetName()
+        #print("-----> new debug:", inputNode, outputSegmentationNode)
+        #print("-----> new debug:",self.ui.inputNodeSelector0.text,self.ui.outputSegmentationSelector.text)
+        volumeNode = slicer.util.getNode(inputNodeName)
+        segmentationNode = slicer.util.getNode(outputSegmentationNodeName)
+
+        combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8)  # NOTE: 临时的
+        combined_mask[segmentation_masks["airway"]] = 1  
+        combined_mask[segmentation_masks["Artery"]] = 2  
+        combined_mask[segmentation_masks["Vein"]] = 3    
+        
+        segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
+
+        # Get segment as numpy array
+        segmentArray = slicer.util.arrayFromSegmentBinaryLabelmap(segmentationNode, segmentId, volumeNode)
+
+        #print(combined_mask.shape,segmentArray.shape,"<-----")
+        # Modify the segmentation
+        #segmentArray[:] = 0  # clear the segmentation
+        #segmentArray[ slicer.util.arrayFromVolume(volumeNode) > 80 ] = 1  # create segment by simple thresholding of an image
+        #segmentArray[20:80, 40:90, 30:70] = 1  # fill a rectangular region using numpy indexing
+        slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
+    
+        self.ui.segmentationShow3DButton.click()
             
     def onRelease(self,arg1, arg2):
         #print("release")
@@ -513,7 +547,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if infoString != "":
                 aggregatedDisplayableManagerInfo += infoString + "<br>"
                 myManagerInfo=infoString
-
+        
         try:
             infoWidget = slicer.modules.DataProbeInstance.infoWidget
             #for layer in ("B", "F", "L", "S"):
@@ -525,6 +559,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.ui.label_img.setText(self.ui.label_img.text+"<br>"+myManagerInfo.split('</font>')[-1])
             else:
                 self.ui.label_img.setText(self.ui.label_img.text+"<br> ")
+                # position_RAS = xyz
+                # crosshairNode = slicer.util.getNode("Crosshair")
+                # # Set crosshair position
+                # crosshairNode.SetCrosshairRAS(position_RAS)
+                # # Center the position in all slice views
+                # slicer.vtkMRMLSliceNode.JumpAllSlices(slicer.mrmlScene, *position_RAS, slicer.vtkMRMLSliceNode.CenteredJumpSlice)
+                # # Make the crosshair visible
+                # crosshairNode.SetCrosshairMode(slicer.vtkMRMLCrosshairNode.ShowBasic)
             
             
             
