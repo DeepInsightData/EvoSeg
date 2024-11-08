@@ -103,7 +103,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
-
     PROCESSING_IDLE = 0
     PROCESSING_STARTING = 1
     PROCESSING_IN_PROGRESS = 2
@@ -123,9 +122,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.label_np=None
 
-        self.markupsNode=None
+        self.observations = None
 
+        self.markup_node=None
         self.data_module=None
+        
 
         with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
             app_config = json.load(file)
@@ -284,10 +285,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.showAllModelsCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.useStandardSegmentNamesCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 
+        self.ui.set_modifiy.connect("toggled(bool)", self.check_set_modifiy)
+
         self.ui.modelSearchBox.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
         self.ui.modelComboBox.currentTextChanged.connect(self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
+        #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.logic.)
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationEditor_.setSegmentationNode)
 
         # Buttons
@@ -298,7 +302,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.copyModelsButton.hide()
         self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
         self.ui.packageInfoUpdateButton.hide()
-        self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
+        # self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
+        self.ui.packageUpgradeButton.hide()
+        self.ui.label_8.hide()
         self.ui.applyButton.connect("clicked(bool)", self.onApplyButton)
         self.ui.browseToModelsFolderButton.connect("clicked(bool)", self.onBrowseModelsFolder)
         self.ui.deleteAllModelsButton.connect("clicked(bool)", self.onClearModelsFolder)
@@ -341,37 +347,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         if self.CrosshairNode:
             self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
-
-
-        # self.sliceView = slicer.app.layoutManager().sliceWidget("Red").sliceView()
-        # print(type(self.sliceView),"========================")
-        # self.checkbox = QCheckBox("123")
-        # self.sliceView.layout().addWidget(self.checkbox)
-
-        self.layoutManager = slicer.app.layoutManager()
-        
-        self.redSliceView = self.layoutManager.sliceWidget("Red")
-
-        
-        views = [
-            # slicer.app.layoutManager().threeDWidget(0).threeDView(),
-            slicer.app.layoutManager().sliceWidget("Red").sliceView(),
-            slicer.app.layoutManager().sliceWidget("Yellow").sliceView(),
-            slicer.app.layoutManager().sliceWidget("Green").sliceView()
-        ]
-
-        self.observations = []
-        # markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
-
-        #for markupsDisplayNode in markupsDisplayNodes:
-            # observations.append([markupsDisplayNode, markupsDisplayNode.AddObserver(markupsDisplayNode.CustomActionEvent1, self.someCustomAction)])
-        for view in views:
-                # markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
-                # widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
-                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
-                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
-            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonPressEvent, self.onPress, 10.0)])
-            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonReleaseEvent, self.onRelease, 10.0)])
         
         extensionsPath = slicer.app.extensionsInstallPath
         print("Extensions Install Path:", extensionsPath)
@@ -380,9 +355,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # 显示小部件
         fourByFourWidget.show()
-
-
-        
     
         #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
           # if cn , language set
@@ -392,9 +364,50 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         #self.check_py_pack()
 
+    def check_set_modifiy(self,check_it):
+        #print("?>>>",check_it)
+        if check_it:
+            self.layoutManager = slicer.app.layoutManager()
+        
+            views = [
+                slicer.app.layoutManager().threeDWidget(0).threeDView(),
+                slicer.app.layoutManager().sliceWidget("Red").sliceView(),
+                slicer.app.layoutManager().sliceWidget("Yellow").sliceView(),
+                slicer.app.layoutManager().sliceWidget("Green").sliceView()
+            ]
+
+            
+            self.markup_node=slicer.modules.markups.logic().AddControlPoint(0)
+            
+            markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
+            try:
+                for observedNode, observation in self.observations:
+                    observedNode.RemoveObserver(observation)
+            except:
+                pass
+
+            self.observations=[]
+            for markupsDisplayNode in markupsDisplayNodes:
+                self.observations.append([markupsDisplayNode, markupsDisplayNode.AddObserver(markupsDisplayNode.CustomActionEvent1, self.someCustomAction)])
+
+            pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
+            pointListNode.SetNthControlPointLabel(0, "")
+            for view in views:
+                markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
+                widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
+                widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
+                widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
+                # self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonPressEvent, self.onPress, 10.0)])
+                # self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonReleaseEvent, self.onRelease, 10.0)])
+        else:
+            print("should delete")
+            pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
+            pointListNode.RemoveAllMarkups()
+
     def onButtonUndoClick(self):
         self.data_module.undo()
-        self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+        self.ui.label_6.setText("Modifiy Queue Len:"+str(self.data_module.get_history_len()))
+        self.FasterUpdateSegForonPress(self.data_module.get_masks())
     def onButtonSaveClick(self):
         #segmentation_nodes = slicer.util.getNodesByClass('vtkMRMLSegmentationNode')
         self.logic.set_new_data_module(self.data_module);
@@ -409,14 +422,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onPress(self,arg1, arg2):
         
-        #try:
+        try:
             import ast
             position_=self.ui.label_img.text.split("<b>")
             x,y,z=ast.literal_eval(position_[0])
             #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
             #print("Press")
             if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-                self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+                #self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+                QMessageBox.warning(None, "错误", f"模型输出数据丢失，请先进行分割")
             else:
                 #print(self.data_module.get_masks())
                 optin_select=self.button_group2.checkedButton().text
@@ -431,12 +445,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.FasterUpdateSegForonPress(self.data_module.get_masks())
                 #print(self.button_group.checkedButton().text)
                 #self.data_module.
-                self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
-                self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+                self.ui.label_6.setText("Modifiy Queue Len:"+str(self.data_module.get_history_len()))
+                self.ui.label_img.setText(self.ui.label_img.text+"  ")
 
             
-        #except:
-        #    pass
+        except:
+            print("No segmentation")
+            pass
     def FasterUpdateSegForonPress(self, segmentation_masks):
         import numpy as np
         inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
@@ -470,9 +485,64 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #self.ui.label_img.setText(self.ui.label_img.text+" add done")
         return
     def someCustomAction(self,caller, eventId):
+        import numpy as np
         markupsDisplayNode = caller
         print(type(markupsDisplayNode))
         print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
+        inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
+        volumeNode = slicer.util.getNode(inputNodeName)
+        pointListNode = slicer.util.getNode("F")
+        markupsIndex = 0
+
+        # Get point coordinate in RAS
+        point_Ras = [0, 0, 0]
+        pointListNode.GetNthControlPointPositionWorld(markupsIndex, point_Ras)
+
+        # If volume node is transformed, apply that transform to get volume's RAS coordinates
+        transformRasToVolumeRas = vtk.vtkGeneralTransform()
+        slicer.vtkMRMLTransformNode.GetTransformBetweenNodes(None, volumeNode.GetParentTransformNode(), transformRasToVolumeRas)
+        point_VolumeRas = transformRasToVolumeRas.TransformPoint(point_Ras)
+
+        # Get voxel coordinates from physical coordinates
+        volumeRasToIjk = vtk.vtkMatrix4x4()
+        volumeNode.GetRASToIJKMatrix(volumeRasToIjk)
+        point_Ijk = [0, 0, 0, 1]
+        volumeRasToIjk.MultiplyPoint(np.append(point_VolumeRas,1.0), point_Ijk)
+        point_Ijk = [ int(round(c)) for c in point_Ijk[0:3] ]
+
+        # Print output
+        print(point_Ijk)
+
+        try:
+            import ast
+            position_=self.ui.label_img.text.split("<b>")
+            x,y,z=point_Ijk#ast.literal_eval(position_[0])
+            #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
+            #print("Press")
+            if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
+                self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+            else:
+                #print(self.data_module.get_masks())
+                optin_select=self.button_group2.checkedButton().text
+                param = ast.literal_eval(self.ui.lineEdit_radius.text)
+                #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+                if optin_select=="Sphere Addition":
+                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+                elif optin_select=="Sphere Erasure":
+                    self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
+                else:
+                    return
+                self.FasterUpdateSegForonPress(self.data_module.get_masks())
+                #print(self.button_group.checkedButton().text)
+                #self.data_module.
+                self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+                self.ui.label_img.setText(self.ui.label_img.text+" ")
+
+            
+        except:
+            print("No segmentation")
+            pass
+
         #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
 
     # def generateViewDescription(self, xyz, ras, sliceNode, sliceLogic):
@@ -1004,14 +1074,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         with slicer.util.tryWithErrorDisplay("Failed to get EVO package version information", waitCursor=True):
             self.ui.packageInfoTextBrowser.plainText = self.logic.installedEVOPythonPackageInfo().rstrip()
 
-    def onPackageUpgrade(self):
-        with slicer.util.tryWithErrorDisplay("Failed to upgrade EVO", waitCursor=True):
-            self.logic.setupPythonRequirements(upgrade=True)
-        self.onPackageInfoUpdate()
-        if not slicer.util.confirmOkCancelDisplay(f"This EVO update requires a 3D Slicer restart.","Press OK to restart."):
-            raise ValueError("Restart was cancelled.")
-        else:
-            slicer.util.restart()
+    # NOTE:  will delete
+    # def onPackageUpgrade(self):
+    #     with slicer.util.tryWithErrorDisplay("Failed to upgrade EVO", waitCursor=True):
+    #         self.logic.setupPythonRequirements(upgrade=True)
+    #     self.onPackageInfoUpdate()
+    #     if not slicer.util.confirmOkCancelDisplay(f"This EVO update requires a 3D Slicer restart.","Press OK to restart."):
+    #         raise ValueError("Restart was cancelled.")
+    #     else:
+    #         slicer.util.restart()
 
     def onBrowseModelsFolder(self):
         import qt
@@ -1434,7 +1505,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                                  + f" with version requirement set to: >={minimumTorchVersion}")
 
         # Install EVO with required components
-        self.log("Initializing EVO...")
+        self.log("Initializing EvoSeg...")
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"

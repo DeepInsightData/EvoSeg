@@ -26,9 +26,11 @@ Slicer3D segmentation extension
 9. Modify Segmentation Result:
   - Select `Target` 
   - Select `Option` checkbutton.
-  - Edit `radius` if you want.
+  - And the important is check the `Set Modifiy` , a Markup will added in 3D view.
+  - Edit `radius` if you want, then right Click the Markup, can modifiy the data.
+  - You can Click `Interaction` button in slicer. its helpfull you mind the position. 
   - Click `Segmentation Image` find the places where connections are interrupted
-  - Click `Save` button to update Segmentation.
+  - Click `Save` button to Save the Segmentation data in local file.
   - Reference image is for demonstration only; we used a large radius circular fill.
 ![](screenshot_6.jpg)
 

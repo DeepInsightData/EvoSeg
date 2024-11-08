@@ -384,19 +384,32 @@
         
             <layout class="QVBoxLayout" name="verticalLayout">
             <item>
+        <widget class="QCheckBox" name="set_modifiy">
+        <property name="text">
+         <string>Set Modifiy</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+    </item>
+            <item>
    <widget class="QLabel" name="label_img">
         <property name="text">
-         <string>imagelabel</string>
+         <string>Position or Label</string>
         </property>
     </widget>
    </item>
                 <item>
                     <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>gmentation parameter [radius]:</string>
+         <string>[radius]:</string>
         </property>
        </widget>
                 </item>
+                
+                <item>
+                <layout class="QHBoxLayout" name="horizontalLayout0022">
                 <item>
                     <widget class="QLineEdit" name="lineEdit_radius">
             <property name="placeholderText">
@@ -404,6 +417,8 @@
             </property>
         </widget>
                 </item>
+    
+    </layout></item>
                 <item>
                     <layout class="QHBoxLayout" name="horizontalLayout1122">
     <item>
