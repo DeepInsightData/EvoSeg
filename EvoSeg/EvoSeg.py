@@ -134,7 +134,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         self.logic = EvoSegLogic(self.ui_language)
 
-        super().setup()
+        #super().setup()
         
 
     ##
@@ -478,7 +478,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #segmentArray[20:80, 40:90, 30:70] = 1  # fill a rectangular region using numpy indexing
         slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
     
-        self.ui.segmentationShow3DButton.click()
+        #self.ui.segmentationShow3DButton.click()
             
     def onRelease(self,arg1, arg2):
         #print("release")
