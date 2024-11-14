@@ -134,7 +134,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         self.logic = EvoSegLogic(self.ui_language)
 
-        #super().setup()
+        super().setup()
         
 
     ##
@@ -477,9 +477,23 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #segmentArray[ slicer.util.arrayFromVolume(volumeNode) > 80 ] = 1  # create segment by simple thresholding of an image
         #segmentArray[20:80, 40:90, 30:70] = 1  # fill a rectangular region using numpy indexing
         slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
-    
-        #self.ui.segmentationShow3DButton.click()
-            
+
+
+        #logic = slicer.modules.volumerendering.logic()
+        #volumeNode = slicer.mrmlScene.GetNodeByID('vtkMRMLScalarVolumeNode1')
+        # displayNode = logic.CreateVolumeRenderingDisplayNode()
+        # displayNode.UnRegister(logic)
+        # slicer.mrmlScene.AddNode(displayNode)
+        # volumeNode.AddAndObserveDisplayNodeID(displayNode.GetID())
+        # logic.UpdateDisplayNodeFromVolumeNode(displayNode, segmentationNode)
+        # displayNode.SetVisibility3D(True)
+        self.ui.segmentationShow3DButton.setChecked(True)#.updateWidgetFromMRML()
+        #slicer.app.processEvents()
+        #slicer.mrmlScene.Modified()
+        #slicer.util.setSliceViewerLayers(background=segmentationNode)
+        #view=slicer.app.layoutManager().threeDWidget(0).threeDView()
+        #view.resetFocalPoint()
+
     def onRelease(self,arg1, arg2):
         #print("release")
         #self.ui.label_img.setText(self.ui.label_img.text+" add done")
