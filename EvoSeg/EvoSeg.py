@@ -1498,7 +1498,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         # Install PyTorch
         try:
-          import PyTorchUtils
+          import torch
         except ModuleNotFoundError as e:
           raise RuntimeError("This module requires PyTorch extension. Install it from the Extensions Manager.")
 
