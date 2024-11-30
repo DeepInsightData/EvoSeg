@@ -1491,14 +1491,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "nnunetv2"]).decode()
         return versionInfo
 
-    def setupPythonRequirements(self, upgrade=False):
+    def installPyTorchUtils(self):
         import importlib.metadata
         import importlib.util
         import packaging
-
         # Install PyTorch
         try:
-          import torch
+          import PyTorchUtils
         except ModuleNotFoundError as e:
           raise RuntimeError("This module requires PyTorch extension. Install it from the Extensions Manager.")
 
@@ -1517,9 +1516,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 raise ValueError(f"PyTorch version {torchLogic.torch.__version__} is not compatible with this module."
                                  + f" Minimum required version is {minimumTorchVersion}. You can use 'PyTorch Util' module to install PyTorch"
                                  + f" with version requirement set to: >={minimumTorchVersion}")
+    
+    def installNnunetv2(self, upgrade=False):
+        import importlib.metadata
+        import importlib.util
 
-        # Install EVO with required components
-        self.log("Initializing EvoSeg...")
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"
@@ -1531,6 +1532,17 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         
         slicer.util.pip_install(EVOInstallString)
 
+    def setupPythonRequirements(self, upgrade=False):
+        # Install EVO with required components
+        self.log("Setup Dependencies...")
+        try:
+          import torch
+        except ModuleNotFoundError as e:
+          self.log("Installing PyTorchUtils...")
+          self.installPyTorchUtils()
+        
+        self.log("Check and install nnunetv2...")
+        self.installNnunetv2(upgrade)
         self.dependenciesInstalled = True
         self.log("Dependencies are set up successfully.")
 
