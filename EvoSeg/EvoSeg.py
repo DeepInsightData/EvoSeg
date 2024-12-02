@@ -359,10 +359,46 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
           # if cn , language set
 
-        if(self.ui_language=="zh-CN"):
-            self.translate("zh-CN")
-        
+        # 弃用原翻译
+        # if(self.ui_language=="zh-CN"):
+        #     self.translate("zh-CN")
+        self.ui_language=="en-US"
         #self.check_py_pack()
+
+        # 新增UI简化更新 update v1
+        # 隐藏控件将在之后更新中彻底去除
+        self.hide_all_widgets_in_layout(self.ui.formLayout_2)
+        self.hide_all_widgets_in_layout(self.ui.gridLayout)
+
+        self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
+        self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
+
+    def onSegButtonClick(self,button_name):
+        # update v1 临时借用未删除的隐藏控件
+        run_model_name=""
+        if "airway"==button_name:
+            run_model_name="Airway_nnUnet"
+        elif "artery"==button_name:
+            run_model_name="Artery_nnUnet"
+        else:
+            slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
+            return
+
+        model_list_widget = self.ui.modelComboBox
+        found = False
+        for i in range(model_list_widget.count):
+            item = model_list_widget.item(i)
+            if item.text() == run_model_name:
+                model_list_widget.setCurrentRow(i)
+                #slicer.util.messageBox(f"selected model in list : {run_model_name}")
+                found = True
+                break
+        if not found:
+            slicer.util.messageBox(f"Model '{run_model_name}' not found in the QListWidget.")
+            return
+        
+        self.ui.applyButton.click()
+
 
     def check_set_modifiy(self,check_it):
         #print("?>>>",check_it)
@@ -559,45 +595,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
 
-    # def generateViewDescription(self, xyz, ras, sliceNode, sliceLogic):
-
-    #     spacing = "%.1f" % sliceLogic.GetLowestVolumeSliceSpacing()[2]
-    #     if sliceNode.GetSliceSpacingMode() == slicer.vtkMRMLSliceNode.PrescribedSliceSpacingMode:
-    #         spacing = "(%s)" % spacing
-    #     hasVolume = False
-    #     layerLogicCalls = (('L', sliceLogic.GetLabelLayer),
-    #                     ('F', sliceLogic.GetForegroundLayer),
-    #                     ('B', sliceLogic.GetBackgroundLayer))
-    #     for layer,logicCall in layerLogicCalls:
-    #         layerLogic = logicCall()
-    #         volumeNode = layerLogic.GetVolumeNode()
-    #         ijk = [0, 0, 0]
-    #         if volumeNode:
-    #             hasVolume = True
-    #             xyToIJK = layerLogic.GetXYToIJKTransform()
-    #             ijkFloat = xyToIJK.TransformDoublePoint(xyz)
-    #             ijk = [_roundInt(value) for value in ijkFloat]
-    #             print(ijk)
-    #             return \
-    #             "  {layoutName: <8s}  ({xyz_position})  {orient: >8s} Sp: {spacing:s}" \
-    #             .format(layoutName=sliceNode.GetLayoutName(),
-    #                     xyz_position=str(ijk),
-    #                     orient=sliceNode.GetOrientationString(),
-    #                     spacing=spacing
-    #                     )
-
-        # return \
-        # "  {layoutName: <8s}  ({rLabel} {ras_x:3.1f}, {aLabel} {ras_y:3.1f}, {sLabel} {ras_z:3.1f})  {orient: >8s} Sp: {spacing:s}" \
-        # .format(layoutName=sliceNode.GetLayoutName(),
-        #         rLabel=sliceNode.GetAxisLabel(1) if ras[0]>=0 else sliceNode.GetAxisLabel(0),
-        #         aLabel=sliceNode.GetAxisLabel(3) if ras[1]>=0 else sliceNode.GetAxisLabel(2),
-        #         sLabel=sliceNode.GetAxisLabel(5) if ras[2]>=0 else sliceNode.GetAxisLabel(4),
-        #         ras_x=abs(ras[0]),
-        #         ras_y=abs(ras[1]),
-        #         ras_z=abs(ras[2]),
-        #         orient=sliceNode.GetOrientationString(),
-        #         spacing=spacing
-        #         )
 
     def processEvent(self,observee,event):
 
@@ -660,7 +657,18 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             pass
         # collect information from displayable managers
     
-
+    def hide_all_widgets_in_layout(self,layout, HIDE=True):
+        for i in range(layout.count()):
+            item = layout.itemAt(i) 
+            widget = item.widget()
+            if widget is not None:
+                if HIDE:
+                    widget.hide()
+                else:
+                    widget.show()
+            child_layout = item.layout()
+            if child_layout is not None:
+                self.hide_all_widgets_in_layout(child_layout)
         
     def onCopyModel(self):
         
@@ -708,8 +716,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def removeObservers(self):
         print("rm obse..")
-        for observedNode, observation in self.observations:
-            observedNode.RemoveObserver(observation)
+        try:
+            for observedNode, observation in self.observations:
+                observedNode.RemoveObserver(observation)
+        except:
+            print("No have observation")
 
     def enter(self) -> None:
         """Called each time the user opens this module."""
@@ -850,7 +861,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.showAllModelsCheckBox.checked = showAllModels
             self.ui.useStandardSegmentNamesCheckBox.checked = self._parameterNode.GetParameter("UseStandardSegmentNames") == "true"
             self.ui.outputSegmentationSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputSegmentation"))
-
+            self.ui.segmentationShow3DButton.setChecked(True)
+            # Center and fit displayed content in 3D view
+            layoutManager = slicer.app.layoutManager()
+            threeDWidget = layoutManager.threeDWidget(0)
+            threeDView = threeDWidget.threeDView()
+            threeDView.rotateToViewAxis(3)  # look from anterior direction
+            threeDView.resetFocalPoint()  # reset the 3D view cube size and center it
+            threeDView.resetCamera()  # reset camera zoom
             state = self._processingState
             if state == EvoSegWidget.PROCESSING_IDLE:
                 self.ui.applyButton.text = "Apply" if self.ui_language=="en-US" else "应用"
@@ -953,28 +971,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.updateGUIFromParameterNode()
         slicer.app.processEvents()
 
-
-    # def _checkCanApply(self, caller=None, event=None) -> None:
-    #     if self._parameterNode and self._parameterNode.inputVolume and self._parameterNode.thresholdedVolume:
-    #         self.ui.applyButton.toolTip = _("Compute output volume")
-    #         self.ui.applyButton.enabled = True
-    #     else:
-    #         self.ui.applyButton.toolTip = _("Select input and output volume nodes")
-    #         self.ui.applyButton.enabled = False
-
-    # def onApplyButton(self) -> None:
-    #     """Run processing when user clicks "Apply" button."""
-    #     with slicer.util.tryWithErrorDisplay(_("Failed to compute results."), waitCursor=True):
-    #         # Compute output
-    #         self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-    #                            self.ui.imageThresholdSliderWidget.value, self.ui.invertOutputCheckBox.checked)
-
-    #         # Compute inverted output (if needed)
-    #         if self.ui.invertedOutputSelector.currentNode():
-    #             # If additional output volume is selected then result with inverted threshold is written there
-    #             self.logic.process(self.ui.inputSelector.currentNode(), self.ui.invertedOutputSelector.currentNode(),
-    #                                self.ui.imageThresholdSliderWidget.value, not self.ui.invertOutputCheckBox.checked, showResult=False)
-
     def onApplyButton(self):
         """
         Run processing when user clicks "Apply" button.
@@ -985,15 +981,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         else:
             self.onCancel()
         
-        # NOTE: 临时重置视图到中心
-        layoutManager = slicer.app.layoutManager()
-        threeDWidget = layoutManager.threeDWidget(0)
-        threeDView = threeDWidget.threeDView()
-        # 重置视图焦点到场景中心
-        threeDView.resetFocalPoint()
-        # 重新渲染
-        threeDView.forceRender()
-
 
     def onApply(self):
         self.ui.statusLabel.plainText = ""
@@ -1016,9 +1003,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
                 # Compute output
                 inputNodes = []
-                for inputNodeSelector in self.inputNodeSelectors:
-                    if inputNodeSelector.visible:
-                        inputNodes.append(inputNodeSelector.currentNode())
+                # for inputNodeSelector in self.inputNodeSelectors:
+                #     print(inputNodeSelector,"<-")
+                #     if inputNodeSelector.visible:
+                #         inputNodes.append(inputNodeSelector.currentNode())
+
+                # 改为以当前 red窗口显示的node为输入node
+                BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
+                ThisVolumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
+                inputNodes.append(ThisVolumeNode)
                 # self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
                 #     self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
                 self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
@@ -1143,7 +1136,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import pathlib
         self.fileCachePath = pathlib.Path.home().joinpath(".EvoSeg")
 
-        self.dependenciesInstalled = False  # we don't know yet if dependencies have been installed
+        self.dependenciesInstalled = True  # 默认所有依赖已经安装，不需要每次检查依赖以绕过代理导致的pip install问题
 
         self.moduleDir = os.path.dirname(slicer.util.getModule('EvoSeg').path)
 
@@ -1235,7 +1228,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         # Inputs are not defined, use default (single input volume)
                         #print(self.ui_language,"<<<<<")
                         # 暂不好翻译
-                        inputs = [{"title": "Input volume"}] if self.ui_language=="en-US" else [{"title": "输入体积"}]
+                        inputs = []#[{"title": "Input volume"}] if self.ui_language=="en-US" else [{"title": "输入体积"}]
                     segmentNames = model.get('segmentNames')
                     if not segmentNames:
                         segmentNames = "N/A"
@@ -2089,241 +2082,3 @@ class EvoSegTest(ScriptedLoadableModuleTest):
         """
 
         self.delayDisplay("Test is space and Done!")
-
-    #     # Logic testing is disabled by default to not overload automatic build machines (pytorch is a huge package and computation
-    #     # on CPU takes 5-10 minutes). Set testLogic to True to enable testing.
-    #     testLogic = True
-
-    #     if not testLogic:
-    #         self.delayDisplay("Logic testing is disabled. Set testLogic to True to enable it.")
-    #         return
-
-    #     logic = EvoSegLogic()
-    #     logic.logCallback = self._mylog
-
-    #     self.delayDisplay("Set up required Python packages")
-    #     logic.setupPythonRequirements()
-
-    #     testResultsPath = logic.fileCachePath.joinpath("ModelsTestResults")
-    #     if not os.path.exists(testResultsPath):
-    #         os.makedirs(testResultsPath)
-
-    #     import json
-    #     modelsTestResultsJsonFilePath = os.path.join(testResultsPath.joinpath("ModelsTestResults.json"))
-    #     if os.path.exists(modelsTestResultsJsonFilePath):
-    #         # resume testing
-    #         with open(modelsTestResultsJsonFilePath) as f:
-    #           models = json.load(f)
-    #     else:
-    #         # start testing from scratch
-    #         models = logic.models
-
-    #     import PyTorchUtils
-    #     pytorchLogic = PyTorchUtils.PyTorchUtilsLogic()
-    #     if pytorchLogic.cuda:
-    #         # CUDA is available, test on both CPU and GPU
-    #         configurations = [{"forceUseCPU": False}, {"forceUseCPU": True}]
-    #     else:
-    #         # CUDA is not available, only test on CPU
-    #         configurations = [{"forceUseCPU": True}]
-
-    #     for configurationIndex, configuration in enumerate(configurations):
-    #         forceUseCpu = configuration["forceUseCPU"]
-    #         configurationName = "CPU" if forceUseCpu else "GPU"
-
-    #         for modelIndex, model in enumerate(models):
-    #             if model.get("deprecated"):
-    #                 # Do not teset deprecated models
-    #                 continue
-
-    #             segmentationTimePropertyName = "segmentationTimeSec"+configurationName
-    #             if segmentationTimePropertyName in models[modelIndex]:
-    #                 # Skip already tested models
-    #                 continue
-
-    #             self.delayDisplay(f"Testing {model['title']} (v{model['version']})")
-    #             slicer.mrmlScene.Clear()
-
-    #             # Download sample data for model input
-
-    #             sampleDataName = model.get("sampleData")
-    #             if not sampleDataName:
-    #                 self.delayDisplay(f"Sample data not available for {model['title']}")
-    #                 continue
-
-    #             if type(sampleDataName) == list:
-    #                 # For now, always just use the first data set if multiple data sets are provided
-    #                 sampleDataName = sampleDataName[0]
-
-    #             import SampleData
-    #             loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
-    #             if not loadedSampleNodes:
-    #                 raise RuntimeError(f"Failed to load sample data set '{sampleDataName}'.")
-
-    #             # Set model inputs
-
-    #             inputNodes = []
-    #             inputs = model.get("inputs")
-    #             inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
-
-    #             outputSegmentation = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentationNode")
-
-    #             # Run the segmentation
-
-    #             self.delayDisplay(f"Running segmentation for {model['title']}...")
-    #             import time
-    #             startTime = time.time()
-    #             logic.process(inputNodes, outputSegmentation, model["id"], forceUseCpu)
-    #             segmentationTimeSec = time.time() - startTime
-
-    #             # Save segmentation time (rounded to 0.1 sec) into model description
-    #             models[modelIndex][segmentationTimePropertyName] = round(segmentationTimeSec * 10) / 10
-
-    #             # Save all segment names into model description
-    #             labelDescriptions = logic.labelDescriptions(model["id"])
-    #             segmentNames = []
-    #             for terminology in labelDescriptions.values():
-    #                 contextName, category, typeStr, typeModifier, anatomicContext, region, regionModifier = terminology["terminology"].split("~")
-    #                 typeName = typeStr.split("^")[2]
-    #                 typeModifierName = typeModifier.split("^")[2]
-    #                 if typeModifierName:
-    #                     typeName = f"{typeModifierName} {typeName}"
-    #                 regionName = region.split("^")[2]
-    #                 regionModifierName = regionModifier.split("^")[2]
-    #                 if regionModifierName:
-    #                     regionName = f"{regionModifierName} {regionName}"
-    #                 name = f"{typeName} in {regionName}" if regionName else typeName
-    #                 segmentNames.append(name)
-    #             models[modelIndex]["segmentNames"] = segmentNames
-
-    #             sliceScreenshotFilename, rotate3dScreenshotFilename = self._writeScreenshots(outputSegmentation, testResultsPath, model["id"]+"-"+configurationName)
-    #             if configurationIndex == 0:
-    #                 # Use screenshot computed during the first configuration
-    #                 models[modelIndex]["segmentationResultsScreenshot2D"] = sliceScreenshotFilename.name
-    #                 models[modelIndex]["segmentationResultsScreenshot3D"] = rotate3dScreenshotFilename.name
-
-    #             # Write results to file (to allow accessing the results before all tests complete)
-    #             with open(modelsTestResultsJsonFilePath, 'w') as f:
-    #                 json.dump(models, f, indent=2)
-
-    #     logic.updateModelsDescriptionJsonFilePathFromTestResults(modelsTestResultsJsonFilePath)
-    #     self._writeTestResultsToMarkdown(modelsTestResultsJsonFilePath)
-
-    #     self.delayDisplay("Test passed")
-
-    # def _mylog(self,text):
-    #     print(text)
-
-    # def _writeScreenshots(self, segmentationNode, outputPath, baseName, numberOfImages=25, lightboxColumns=5, numberOfVideoFrames=50):
-    #     import ScreenCapture
-    #     cap = ScreenCapture.ScreenCaptureLogic()
-
-    #     sliceScreenshotFilename = outputPath.joinpath(f"{baseName}-slices.png")
-    #     rotate3dScreenshotFilename = outputPath.joinpath(f"{baseName}-rotate3d.gif")  # gif, mp4, png
-    #     videoLengthSec = 5
-
-    #     # Capture slice sweep
-    #     sliceScreenshotsFilenamePattern = outputPath.joinpath("slices_%04d.png")
-    #     cap.showViewControllers(False)
-    #     slicer.app.layoutManager().resetSliceViews()
-    #     sliceNode = slicer.util.getNode("vtkMRMLSliceNodeRed")
-    #     sliceOffsetMin, sliceOffsetMax = cap.getSliceOffsetRange(sliceNode)
-    #     sliceOffsetStart = sliceOffsetMin + (sliceOffsetMax - sliceOffsetMin) * 0.05
-    #     sliceOffsetEnd = sliceOffsetMax - (sliceOffsetMax - sliceOffsetMin) * 0.05
-    #     cap.captureSliceSweep(
-    #         sliceNode, sliceOffsetStart, sliceOffsetEnd, numberOfImages,
-    #         sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name,
-    #         captureAllViews=None, transparentBackground=False)
-    #     cap.showViewControllers(True)
-
-    #     # Create lightbox image
-    #     cap.createLightboxImage(lightboxColumns,
-    #         sliceScreenshotsFilenamePattern.parent,
-    #         sliceScreenshotsFilenamePattern.name,
-    #         numberOfImages,
-    #         sliceScreenshotFilename)
-    #     cap.deleteTemporaryFiles(sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name, numberOfImages)
-
-    #     # Capture 3D rotation
-    #     rotate3dScreenshotsFilenamePattern = outputPath.joinpath("rotate3d_%04d.png")
-    #     segmentationNode.CreateClosedSurfaceRepresentation()
-    #     segmentationNode.GetDisplayNode().SetOpacity3D(0.6)
-
-    #     if rotate3dScreenshotFilename.suffix.lower() == ".png":
-    #         video = False
-    #         numberOfImages3d = numberOfImages
-    #     else:
-    #         video = True
-    #         numberOfImages3d = numberOfVideoFrames
-    #         if rotate3dScreenshotFilename.suffix.lower() == ".gif":
-    #             # animated GIF
-    #             extraOptions = "-filter_complex palettegen,[v]paletteuse"
-    #         elif rotate3dScreenshotFilename.suffix.lower() == ".mp4":
-    #             # H264 high-quality
-    #             extraOptions = "-codec libx264 -preset slower -crf 18 -pix_fmt yuv420p"
-    #         else:
-    #             raise ValueError(f"Unsupported format: {rotate3dScreenshotFilename.suffix}")
-
-    #     viewLabel = "1"
-    #     viewNode = slicer.vtkMRMLViewLogic().GetViewNode(slicer.mrmlScene, viewLabel)
-    #     viewNode.SetBackgroundColor(0,0,0)
-    #     viewNode.SetBackgroundColor2(0,0,0)
-    #     viewNode.SetAxisLabelsVisible(False)
-    #     viewNode.SetBoxVisible(False)
-    #     cap.showViewControllers(False)
-    #     slicer.app.layoutManager().resetThreeDViews()
-    #     cap.capture3dViewRotation(viewNode, -180, 180, numberOfImages3d, ScreenCapture.AXIS_YAW, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name)
-    #     cap.showViewControllers(True)
-
-    #     if video:
-    #         cap.createVideo(numberOfImages3d/videoLengthSec, extraOptions, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, rotate3dScreenshotFilename)
-    #     else:
-    #         cap.createLightboxImage(lightboxColumns,
-    #             rotate3dScreenshotsFilenamePattern.parent,
-    #             rotate3dScreenshotsFilenamePattern.name,
-    #             numberOfImages3d,
-    #             rotate3dScreenshotFilename)
-
-    #     cap.deleteTemporaryFiles(rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, numberOfImages3d)
-
-    #     return sliceScreenshotFilename, rotate3dScreenshotFilename
-
-    # def _writeTestResultsToMarkdown(self, modelsTestResultsJsonFilePath, modelsTestResultsMarkdownFilePath=None, screenshotUrlBase=None):
-
-    #     if modelsTestResultsMarkdownFilePath is None:
-    #         modelsTestResultsMarkdownFilePath = modelsTestResultsJsonFilePath.replace(".json", ".md")
-    #     if screenshotUrlBase is None:
-    #         screenshotUrlBase = "https://github.com/lassoan/SlicerEvoSeg/releases/download/ModelsTestResults/"
-
-    #     import json
-    #     from EvoSeg import EvoSegLogic
-    #     with open(modelsTestResultsJsonFilePath) as f:
-    #         modelsTestResults = json.load(f)
-
-    #     with open(modelsTestResultsMarkdownFilePath, 'w', newline="\n") as f:
-    #         f.write("# 3D Slicer EVO Auto3DSeg models\n\n")
-    #         # Write hardware information (only on Windows for now)
-    #         if os.name == "nt":
-    #             import subprocess
-    #             cpu = subprocess.check_output('wmic cpu get name', stderr=open(os.devnull, 'w')).decode('utf-8').partition('Name')[2].strip(' \r\n')
-    #             systemInfoStr = subprocess.check_output('systeminfo', stderr=open(os.devnull, 'w')).decode('utf-8')
-    #             # System information has a line like this: "Total Physical Memory:     32,590 MB"
-    #             import re
-    #             ram = re.search(r"Total Physical Memory:(.+)", systemInfoStr).group(1).strip()
-    #             f.write(f"Testing hardware: {cpu}, {ram}")
-    #             import torch
-    #             for i in range(torch.cuda.device_count()):
-    #                 gpuProperties = torch.cuda.get_device_properties(i)
-    #                 f.write(f", {gpuProperties.name} {round(torch.cuda.get_device_properties(0).total_memory/(2**30))}GB")
-    #             f.write("\n\n")
-    #         # Write test results
-    #         for model in modelsTestResults:
-    #             if model["deprecated"]:
-    #                 continue
-    #             title = f"{model['title']} (v{model['version']})"
-    #             f.write(f"## {title}\n")
-    #             f.write(f"{model['description']}\n\n")
-    #             f.write(f"Processing time: {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecGPU'])} on GPU, {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecCPU'])} on CPU\n\n")
-    #             f.write(f"Segment names: {', '.join(model['segmentNames'])}\n\n")
-    #             f.write(f"![2D view]({screenshotUrlBase}{model['segmentationResultsScreenshot2D']})\n")
-    #             f.write(f"![3D view]({screenshotUrlBase}{model['segmentationResultsScreenshot3D']})\n")

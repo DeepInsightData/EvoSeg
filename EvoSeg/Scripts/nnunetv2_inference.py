@@ -14,6 +14,8 @@ import SimpleITK as sitk
 
 import nrrd
 
+simulated_data=True
+
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
     output_dimension = len(properties['sitk_stuff']['spacing'])
@@ -34,7 +36,6 @@ def main(model_folder,
          result_file,
          save_prob_maps=True,
          **kwargs):
-    print(model_folder,image_file,result_file)
     start_time = time.time()
     timing_checkpoints = []  # list of (operation, time) tuples
     
@@ -47,7 +48,7 @@ def main(model_folder,
         raise ValueError(f"image_file {image_file} does not exist")
     
     use_folds = (1, )
-    device = torch.device('cuda')
+    device = torch.device('cuda', 0)
     
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
@@ -56,7 +57,7 @@ def main(model_folder,
         perform_everything_on_device=True,
         device=device,
         verbose=False,
-        verbose_preprocessing=True,
+        verbose_preprocessing=False,
         allow_tqdm=True
     )
     
@@ -71,7 +72,6 @@ def main(model_folder,
     
     print(f"Loading image from {image_file}")
     img, prop = SimpleITKIO().read_images([image_file])
-    #print("-->",type(img),"-->",type(prop))
     timing_checkpoints.append(('image loading', time.time()))
     
     print(f"Predicting")
@@ -81,24 +81,42 @@ def main(model_folder,
     #                                                 [prop],
     #                                                 None, 3, save_probabilities=False,
     #                                                 num_processes_segmentation_export=2)
-    
-    seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
+    if not simulated_data:
+        seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
-    #print("-------------------->",save_prob_maps)
+    
     # TODO:多模态分割结果保存
     # save result by copying all image metadata from the input, just replacing the voxel data
     # nrrd_header = nrrd.read_header(image_file)
     # nrrd.write(result_file, seg_results, nrrd_header)
 
     # load NIFTI header
-    if save_prob_maps is True:
+    if simulated_data:
+        with open(model_folder+"/output-segmentation.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
+            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
+                while True:
+                    # 每次读取 1024 字节
+                    chunk = f_src.read(1024)
+                    if not chunk:
+                        break
+                    f_dest.write(chunk)
+        # with open(model_folder+"/output-segmentation_prob.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
+        #     with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
+        #         while True:
+        #             # 每次读取 1024 字节
+        #             chunk = f_src.read(1024)
+        #             if not chunk:
+        #                 break
+        #             f_dest.write(chunk)
+
+    elif save_prob_maps:
         SimpleITKIO().write_seg(seg_results[0], result_file, prop)
         prob_maps = seg_results[1][1]
         # normalize prob_maps to 0-255
-        prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
-        SimpleITKIO().write_seg(prob_maps, result_file.replace('.nrrd', '_prob.nrrd'), prop)
-        # write_prob_maps(seg_results[1][1], result_file.replace('.nrrd', '_prob.nrrd'), prop)
+        prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+        SimpleITKIO().writea_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+        # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
     else:
         SimpleITKIO().write_seg(seg_results, result_file, prop)
     timing_checkpoints.append(("Save", time.time()))
