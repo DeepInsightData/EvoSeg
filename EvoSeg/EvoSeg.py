@@ -571,9 +571,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.removeObservers()
 
     def removeObservers(self):
-        print("rm obse..")
-        for observedNode, observation in self.observations:
-            observedNode.RemoveObserver(observation)
+        print("rm observation..")
+        try:
+            for observedNode, observation in self.observations:
+                observedNode.RemoveObserver(observation)
+        except:
+            print("No have observation")
 
     def enter(self) -> None:
         """Called each time the user opens this module."""
