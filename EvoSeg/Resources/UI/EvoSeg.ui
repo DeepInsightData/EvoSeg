@@ -84,76 +84,7 @@
    </item>
    <item>
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Segmentation model:</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="ctkSearchBox" name="modelSearchBox">
-         <property name="toolTip">
-          <string>List models that contain all the specified words</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="fullTextSearchCheckBox">
-         <property name="toolTip">
-          <string>Search in full text of the segmentation model description. Uncheck to search only in the model names.</string>
-         </property>
-         <property name="text">
-          <string>Full text</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout_ToolButton">
-       <item>
-        <widget class="QLabel" name="select_model_Label">
-         <property name="text">
-          <string>Select Model:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="downloadSampleDataToolButton">
-         <property name="toolTip">
-          <string>Download sample data and model set for the current segmentation model</string>
-         </property>
-         <property name="text">
-          <string>Download</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="TranslateToolButton">
-         <property name="toolTip">
-          <string>Translate to chinese</string>
-         </property>
-         <property name="text">
-          <string>Translate</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="ImportModelToolButton">
-         <property name="toolTip">
-          <string>Import model in local</string>
-         </property>
-         <property name="text">
-          <string>Import</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="1">
       <widget class="QListWidget" name="modelComboBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -175,99 +106,8 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="inputNodeLabel0">
-       <property name="text">
-        <string>Input volume 1:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
+     <item row="2" column="1">
       <widget class="qMRMLNodeComboBox" name="inputNodeSelector0">
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="nodeTypes">
-        <stringlist>
-         <string>vtkMRMLScalarVolumeNode</string>
-        </stringlist>
-       </property>
-       <property name="showChildNodeTypes">
-        <bool>false</bool>
-       </property>
-       <property name="addEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="removeEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="inputNodeLabel1">
-       <property name="text">
-        <string>Input volume 2:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="qMRMLNodeComboBox" name="inputNodeSelector1">
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="nodeTypes">
-        <stringlist>
-         <string>vtkMRMLScalarVolumeNode</string>
-        </stringlist>
-       </property>
-       <property name="showChildNodeTypes">
-        <bool>false</bool>
-       </property>
-       <property name="addEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="removeEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="inputNodeLabel2">
-       <property name="text">
-        <string>Input volume 3:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="qMRMLNodeComboBox" name="inputNodeSelector2">
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="nodeTypes">
-        <stringlist>
-         <string>vtkMRMLScalarVolumeNode</string>
-        </stringlist>
-       </property>
-       <property name="showChildNodeTypes">
-        <bool>false</bool>
-       </property>
-       <property name="addEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="removeEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="inputNodeLabel3">
-       <property name="text">
-        <string>Input volume 4:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="qMRMLNodeComboBox" name="inputNodeSelector3">
        <property name="toolTip">
         <string/>
        </property>
@@ -293,14 +133,10 @@
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <layout class="QGridLayout" name="gridLayout2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Segmentation:</string>
-         </property>
-        </widget>
+       <item row="1" column="0">
+        <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
        </item>
-       <item row="0" column="1">
+       <item row="0" column="0">
         <widget class="qMRMLNodeComboBox" name="outputSegmentationSelector">
          <property name="toolTip">
           <string>This will store the segmentation result.</string>
@@ -336,75 +172,13 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
-       </item>
       </layout>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="applyButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Start segmentation.</string>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-       <property name="default">
-        <bool>true</bool>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_Modify">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_Modify">
-       <property name="text">
-        <string>Modify Result:</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Target</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QRadioButton" name="radioButton1">
-          <property name="text">
-           <string>airway</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton2">
-          <property name="text">
-           <string>artery</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton3">
-          <property name="text">
-           <string>vein</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="2">
       <widget class="QGroupBox" name="groupBox2">
        <property name="title">
         <string>Option</string>
@@ -441,7 +215,37 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Target</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButton1">
+          <property name="text">
+           <string>airway</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton2">
+          <property name="text">
+           <string>artery</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton3">
+          <property name="text">
+           <string>vein</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="2">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QCheckBox" name="set_modifiy">
@@ -535,58 +339,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Python package:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QPushButton" name="packageUpgradeButton">
-        <property name="toolTip">
-         <string>Force upgrade of EVO Python package to the version required by this module.</string>
-        </property>
-        <property name="text">
-         <string>Reinstall</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QPushButton" name="packageInfoUpdateButton">
-        <property name="toolTip">
-         <string>Get information on the installed EVO Python package</string>
-        </property>
-        <property name="text">
-         <string>Get Python package information</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Show all models:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="showAllModelsCheckBox">
-        <property name="toolTip">
-         <string>Show all models in &quot;Segmentation model&quot; list, including old versions.</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Manage models:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="browseToModelsFolderButton">
@@ -638,11 +398,6 @@
    <header>ctkMenuButton.h</header>
   </customwidget>
   <customwidget>
-   <class>ctkSearchBox</class>
-   <extends>QLineEdit</extends>
-   <header>ctkSearchBox.h</header>
-  </customwidget>
-  <customwidget>
    <class>qMRMLNodeComboBox</class>
    <extends>QWidget</extends>
    <header>qMRMLNodeComboBox.h</header>
@@ -690,54 +445,6 @@
     <hint type="destinationlabel">
      <x>355</x>
      <y>233</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EvoSeg</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputNodeSelector1</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>405</x>
-     <y>74</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>323</x>
-     <y>104</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EvoSeg</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputNodeSelector2</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>405</x>
-     <y>133</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>383</x>
-     <y>132</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EvoSeg</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputNodeSelector3</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>408</x>
-     <y>179</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>370</x>
-     <y>154</y>
     </hint>
    </hints>
   </connection>

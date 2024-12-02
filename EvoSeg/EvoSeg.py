@@ -72,30 +72,6 @@ and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR0132
 
 
 #
-# EvoSegParameterNode
-#
-
-
-@parameterNodeWrapper
-class EvoSegParameterNode:
-    """
-    The parameters needed by module.
-
-    inputVolume - The volume to threshold.
-    imageThreshold - The value at which to threshold the input volume.
-    invertThreshold - If true, will invert the threshold.
-    thresholdedVolume - The output volume that will contain the thresholded volume.
-    invertedVolume - The output volume that will contain the inverted thresholded volume.
-    """
-
-    inputVolume: vtkMRMLScalarVolumeNode
-    imageThreshold: Annotated[float, WithinRange(-100, 500)] = 100
-    invertThreshold: bool = False
-    thresholdedVolume: vtkMRMLScalarVolumeNode
-    invertedVolume: vtkMRMLScalarVolumeNode
-
-
-#
 # EvoSegWidget
 #
 
@@ -128,108 +104,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.data_module=None
         
 
-        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
-            app_config = json.load(file)
-        self.ui_language = app_config["language"]
-        
-        self.logic = EvoSegLogic(self.ui_language)
+        self.logic = EvoSegLogic()
 
         super().setup()
         
-
-    ##
-    # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
-    # 
-    def translate(self, language="en-US"):
-        # 翻译
-        en_zh={
-            "Advanced": "设置",
-            "Apply": "应用",
-            "<p>Start segmentation.</p>": "开始分割。",
-            "Open models cache folder": "打开模型缓存文件夹",
-            "<p>Open the folder that contains all downloaded files for models.</p>":"打开包含所有下载模型文件的文件夹。",
-            "<p>Use CPU, even if GPU is available. Useful if the GPU does not have enough memory.</p>": "即使有 GPU 可用，也使用 CPU。如果 GPU 内存不足，则此选项很有用。",
-            "<p>Higher value means stronger smoothing during closed surface representation conversion.</p>": "更高的值表示在闭合表面表示转换期间更强的平滑。",
-            "Clear cache": "清除缓存",
-            "<p>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</p>": "删除所有模型的所有下载文件。文件会根据需要自动重新下载。",
-            "Download": "下载",
-            "<p>Download sample data and model set for the current segmentation model</p>": "<p>下载当前分割模型和示例数据集</p>",
-            "Full text": "全文",
-            "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
-            "Search...": "搜索...",
-            "Select Model:":"选择模型:",
-            "Input volume:": "输入体积:",
-            "Input volume 1:": "输入体积 1：",
-            "Input volume 2:": "输入体积 2：",
-            "Input volume 3:": "输入体积 3：",
-            "Input volume 4:": "输入体积 4：",
-            "Inputs": "输入",
-            "Modify Result:": "结果修改:",
-            "<p>Translate to chinese</p>": "<p>切换成英文</p>",
-            "Force to use CPU: ": "强制使用 CPU：",
-            "Segmentation model:": "分割模型：",
-            "Show all models:": "显示模型全称：",
-            "Segmentation:": "分割选项:",
-            "Manage models:": "管理模型：",
-            "Copy to folder":"导入模型",
-            "Use standard segment names:": "使用标准分割名称：",
-            "Python package:": "Python 包：",
-            "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
-            "Download model if not saved": "如果未保存则下载模型",
-            "<p>Copy it yourself.</p>": "请自行复制。",
-            "<p>This will store the segmentation result.</p>": "这将保存分割结果。",
-            "Outputs": "输出",
-            "Get Python package information": "获取 Python 包信息",
-            "<p>Get information on the installed EVO Python package</p>": "获取已安装的 EVO Python 包的信息",
-            "Reinstall": "重新安装",
-            "<p>Force upgrade of EVO Python package to the version required by this module.</p>": "强制将 EVO Python 包升级到本模块所需的版本。",
-            "0.50": "0.50",
-            "Show 3D": "显示 3D",
-            '<p>Show all models in "Segmentation model" list, including old versions.</p>': "显示“分割模型”列表中的所有模型，包括旧版本。",
-            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。",
-            "<p>Create new segmentation on Apply</p>":"<p>创建新分割</p>",
-        }
-
-        if language == "zh-CN":
-            for name in dir(self.ui):
-                widget = getattr(self.ui, name)
-                try:
-                    #print(widget.text)
-                    widget.setText(en_zh[widget.text])
-                except:
-                    pass
-                try:
-                    #print(widget.toolTip)
-                    widget.setToolTip(en_zh[widget.toolTip])
-                except:
-                    pass
-            self.ui_language="zh-CN"
-        else:
-            for name in dir(self.ui):
-                widget = getattr(self.ui, name)
-                try:
-                    #print(widget.text)
-                    widget.setText([k for k, v in en_zh.items() if v == widget.text][0])
-                except:
-                    pass
-                try:
-                    #print(widget.toolTip)
-                    widget.setToolTip([k for k, v in en_zh.items() if v ==widget.toolTip][0])
-                except:
-                    pass
-            self.ui_language="en-US"
-        
-        save_data={  
-            "Name": "EvoSeg",
-            "language": "zh-CN"
-            }
-        save_data["language"] = self.ui_language
-        self.logic.ui_language =self.ui_language
-
-        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'w') as file:
-            json.dump(save_data, file, indent=4) 
-        #print
-        # 非官方翻译最后一个版本
 
     def setup(self) -> None:
         """Called when the user opens the module the first time and the widget is initialized."""
@@ -242,17 +120,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui = slicer.util.childWidgetVariables(uiWidget)
         
         import qt
-        # 下载样本数据按钮设置icon
-        self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/radiology.svg")))
-        self.ui.downloadSampleDataToolButton.hide()
-        self.ui.TranslateToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/translate.svg")))
-        self.ui.TranslateToolButton.hide()
-        self.ui.ImportModelToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/import_model.svg")))
-        self.ui.ImportModelToolButton.hide() # 进一步明确模型描述信息后启用
 
-        self.inputNodeSelectors = [self.ui.inputNodeSelector0, self.ui.inputNodeSelector1, self.ui.inputNodeSelector2, self.ui.inputNodeSelector3]
-        self.inputNodeLabels = [self.ui.inputNodeLabel0, self.ui.inputNodeLabel1, self.ui.inputNodeLabel2, self.ui.inputNodeLabel3]
-
+        self.inputNodeSelectors = [self.ui.inputNodeSelector0]
 
         # Set scene in MRML widgets. Make sure that in Qt designer the top-level qMRMLWidget's
         # "mrmlSceneChanged(vtkMRMLScene*)" signal in is connected to each MRML widget's.
@@ -279,15 +148,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # (in the selected parameter node).
         for inputNodeSelector in self.inputNodeSelectors:
             inputNodeSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.fullTextSearchCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
-        # NOTE:已隐藏暂时没有用的选项
-        # self.ui.cpuCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
-        self.ui.showAllModelsCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.useStandardSegmentNamesCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 
         self.ui.set_modifiy.connect("toggled(bool)", self.check_set_modifiy)
 
-        self.ui.modelSearchBox.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
         self.ui.modelComboBox.currentTextChanged.connect(self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
@@ -295,28 +159,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationEditor_.setSegmentationNode)
 
         # Buttons
-        self.ui.downloadSampleDataToolButton.connect("clicked(bool)", self.onDownloadSampleData)
-        self.ui.TranslateToolButton.connect("clicked(bool)", self.tr_ui)
-        self.ui.ImportModelToolButton.connect("clicked(bool)", self.onInputLocalModel)
         self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
-        self.ui.copyModelsButton.hide()
-        self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
-        self.ui.packageInfoUpdateButton.hide()
-        # self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
-        self.ui.packageUpgradeButton.hide()
-        self.ui.label_8.hide()
-        self.ui.applyButton.connect("clicked(bool)", self.onApplyButton)
+        
         self.ui.browseToModelsFolderButton.connect("clicked(bool)", self.onBrowseModelsFolder)
         self.ui.deleteAllModelsButton.connect("clicked(bool)", self.onClearModelsFolder)
 
         # check box
         self.ui.radioButton1.setChecked(True)
         self.ui.radioButton12.setChecked(True)
-
-        # Hide or delete will
-        self.ui.label_3.hide()
-        self.ui.modelSearchBox.hide()
-        self.ui.fullTextSearchCheckBox.hide()
 
         # new button click
         self.ui.lineEdit_radius.setText("{'radius':3,}")
@@ -338,11 +188,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.updateGUIFromParameterNode()
 
-        # Make the model search box in focus by default so users can just start typing to find the model they need
-        qt.QTimer.singleShot(0, self.ui.modelSearchBox.setFocus)
-
-        # NOTE: 弃用
-        # self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
         self.CrosshairNode = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLCrosshairNode')
         
         if self.CrosshairNode:
@@ -355,15 +200,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # 显示小部件
         fourByFourWidget.show()
-    
-        #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
-          # if cn , language set
-
-        # 弃用原翻译
-        # if(self.ui_language=="zh-CN"):
-        #     self.translate("zh-CN")
-        self.ui_language=="en-US"
-        #self.check_py_pack()
 
         # 新增UI简化更新 update v1
         # 隐藏控件将在之后更新中彻底去除
@@ -397,7 +233,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             slicer.util.messageBox(f"Model '{run_model_name}' not found in the QListWidget.")
             return
         
-        self.ui.applyButton.click()
+        self.onApplyButton()
 
 
     def check_set_modifiy(self,check_it):
@@ -433,8 +269,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
-                # self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonPressEvent, self.onPress, 10.0)])
-                # self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonReleaseEvent, self.onRelease, 10.0)])
+                
         else:
             print("should delete")
             pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
@@ -448,13 +283,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #segmentation_nodes = slicer.util.getNodesByClass('vtkMRMLSegmentationNode')
         self.logic.set_new_data_module(self.data_module);
         print("Save click")
-
-    def check_py_pack(self):
-        try:
-            import fire, skimage
-        except ModuleNotFoundError:
-            slicer.util.pip_install("fire")
-            slicer.util.pip_install("scikit-image")
 
     def onPress(self,arg1, arg2):
         
@@ -507,33 +335,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Get segment as numpy array
         segmentArray = slicer.util.arrayFromSegmentBinaryLabelmap(segmentationNode, segmentId, volumeNode)
 
-        #print(combined_mask.shape,segmentArray.shape,"<-----")
-        # Modify the segmentation
-        #segmentArray[:] = 0  # clear the segmentation
-        #segmentArray[ slicer.util.arrayFromVolume(volumeNode) > 80 ] = 1  # create segment by simple thresholding of an image
-        #segmentArray[20:80, 40:90, 30:70] = 1  # fill a rectangular region using numpy indexing
         slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
 
+        self.ui.segmentationShow3DButton.setChecked(True)
 
-        #logic = slicer.modules.volumerendering.logic()
-        #volumeNode = slicer.mrmlScene.GetNodeByID('vtkMRMLScalarVolumeNode1')
-        # displayNode = logic.CreateVolumeRenderingDisplayNode()
-        # displayNode.UnRegister(logic)
-        # slicer.mrmlScene.AddNode(displayNode)
-        # volumeNode.AddAndObserveDisplayNodeID(displayNode.GetID())
-        # logic.UpdateDisplayNodeFromVolumeNode(displayNode, segmentationNode)
-        # displayNode.SetVisibility3D(True)
-        self.ui.segmentationShow3DButton.setChecked(True)#.updateWidgetFromMRML()
-        #slicer.app.processEvents()
-        #slicer.mrmlScene.Modified()
-        #slicer.util.setSliceViewerLayers(background=segmentationNode)
-        #view=slicer.app.layoutManager().threeDWidget(0).threeDView()
-        #view.resetFocalPoint()
-
-    def onRelease(self,arg1, arg2):
-        #print("release")
-        #self.ui.label_img.setText(self.ui.label_img.text+" add done")
-        return
     def someCustomAction(self,caller, eventId):
         import numpy as np
         markupsDisplayNode = caller
@@ -689,27 +494,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.extract_7z(select_file[0],copy2dir)
         print("ok?")
         
-
-    def onInputLocalModel(self):
-        print("input local model")
-        # file_name, _ = QFileDialog.getOpenFileName(None, "选择文件", "", "File (*.7z)")
-        # if file_name:
-            # text, ok = QInputDialog.getText(None, "输入对话框", "当前版本不允许自定义模型导入:",text="Airway nnUnet(artery)")
-            # if ok and text:
-            #     print(f"你输入了: {text}")
-            # else:
-            #     print("你取消了输入")
-        # else:
-        #     return
-
-    def tr_ui(self):
-        #if self.ui.translate_ui.checked:
-        if self.ui_language=="en-US":
-            self.translate("zh-CN")
-            #self.ui.translate_ui.setEnabled(False)
-        else:
-            self.translate()
-
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
@@ -811,8 +595,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._updatingGUIFromParameterNode = True
         try:
 
-            self.ui.modelSearchBox.text = self._parameterNode.GetParameter("ModelSearchText")
-
             searchWords = self._parameterNode.GetParameter("ModelSearchText").lower().split()
             fullTextSearch = self._parameterNode.GetParameter("FullTextSearch") == "true"
             showAllModels = self._parameterNode.GetParameter("ShowAllModels") == "true"
@@ -853,12 +635,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if not currentModelSelectable:
                 modelId = ""
             sampleDataAvailable = self.logic.model(modelId).get("inputs") if modelId else False
-            #TODO:临时
-            #self.ui.downloadSampleDataToolButton.visible = sampleDataAvailable
 
-            self.ui.fullTextSearchCheckBox.checked = fullTextSearch
-            #self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
-            self.ui.showAllModelsCheckBox.checked = showAllModels
             self.ui.useStandardSegmentNamesCheckBox.checked = self._parameterNode.GetParameter("UseStandardSegmentNames") == "true"
             self.ui.outputSegmentationSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputSegmentation"))
             self.ui.segmentationShow3DButton.setChecked(True)
@@ -871,7 +648,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             threeDView.resetCamera()  # reset camera zoom
             state = self._processingState
             if state == EvoSegWidget.PROCESSING_IDLE:
-                self.ui.applyButton.text = "Apply" if self.ui_language=="en-US" else "应用"
                 inputErrorMessages = []  # it will contain text if the inputs are not valid
                 if modelId:
                     modelInputs = self.logic.model(modelId)["inputs"]
@@ -879,51 +655,25 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     modelInputs = []
                     inputErrorMessages.append("Select a model.")
                 inputNodes = []  # list of output nodes so far, for checking for duplicates
-                for inputIndex in range(len(self.inputNodeSelectors)):
-                    inputNodeSelector = self.inputNodeSelectors[inputIndex]
-                    inputNodeLabel = self.inputNodeLabels[inputIndex]
-                    if inputIndex < len(modelInputs):
-                        inputNodeLabel.visible = True
-                        inputTitle = modelInputs[inputIndex]["title"]
-                        inputNodeLabel.text = f"{inputTitle}:"
-                        inputNodeSelector.visible = True
-                        inputNode = self._parameterNode.GetNodeReference("InputNode" + str(inputIndex))
-                        inputNodeSelector.setCurrentNode(inputNode)
-                        if inputIndex == 0 and inputNode:
-                            self.ui.outputSegmentationSelector.baseName = inputNode.GetName() + " segmentation"
-                        if not inputNode:
-                            inputErrorMessages.append(f"Select {inputTitle}.")
-                        else:
-                            if inputNode in inputNodes:
-                                inputErrorMessages.append(f"'{inputTitle}' does not have a unique input ('{inputNode.GetName()}' is already used as another input).")
-                            inputNodes.append(inputNode)
-                    else:
-                        inputNodeLabel.visible = False
-                        inputNodeSelector.visible = False
 
                 if inputErrorMessages:
-                    self.ui.applyButton.toolTip = "\n".join(inputErrorMessages)
-                    self.ui.applyButton.enabled = False
+                    print(inputErrorMessages)
                 else:
-                    self.ui.applyButton.toolTip = "Start segmentation" if self.ui_language=="en-US" else "开始分割"
-                    self.ui.applyButton.enabled = True
+                    print("Start segmentation")
 
             elif state == EvoSegWidget.PROCESSING_STARTING:
-                self.ui.applyButton.text = "Starting..." if self.ui_language=="en-US" else "启动中..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation is being initialized" if self.ui_language=="en-US" else "请稍等，分割正在初始化"
-                self.ui.applyButton.enabled = False
+                print("Starting...") 
+                print("Please wait while the segmentation is being initialized")
             elif state == EvoSegWidget.PROCESSING_IN_PROGRESS:
-                self.ui.applyButton.text = "Cancel" if self.ui_language=="en-US" else "取消"
-                self.ui.applyButton.toolTip = "Cancel in-progress segmentation" if self.ui_language=="en-US" else "停止分割进程"
-                self.ui.applyButton.enabled = True
+                print("Cancel") 
+                print("Cancel in-progress segmentation")
             elif state == EvoSegWidget.PROCESSING_IMPORT_RESULTS:
-                self.ui.applyButton.text = "Importing results..." if self.ui_language=="en-US" else "载入结果..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation result is being imported" if self.ui_language=="en-US" else "请稍等，分割结果正在载入"
-                self.ui.applyButton.enabled = False
+                print("Importing results...") 
+                print("Please wait while the segmentation result is being imported") 
             elif state == EvoSegWidget.PROCESSING_CANCEL_REQUESTED:
-                self.ui.applyButton.text = "Cancelling..." if self.ui_language=="en-US" else "正在取消..."
-                self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled" if self.ui_language=="en-US" else "请等待分割进程退出"
-                self.ui.applyButton.enabled = False
+                print("Cancelling...") 
+                print("Please wait for the segmentation to be cancelled")
+                # self.ui.applyButton.enabled = False
             
 
         finally:
@@ -946,14 +696,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 inputNodeSelector = self.inputNodeSelectors[inputIndex]
                 self._parameterNode.SetNodeReferenceID("InputNode" + str(inputIndex), inputNodeSelector.currentNodeID)
 
-            self._parameterNode.SetParameter("ModelSearchText", self.ui.modelSearchBox.text)
             modelId = self._currentModelId()
             if modelId:
                 # Only save model ID if valid, otherwise it is temporarily filtered out in the selector
                 self._parameterNode.SetParameter("Model", modelId)
-            self._parameterNode.SetParameter("FullTextSearch", "true" if self.ui.fullTextSearchCheckBox.checked else "false")
             #self._parameterNode.SetParameter("CPU", "true" if self.ui.cpuCheckBox.checked else "false")
-            self._parameterNode.SetParameter("ShowAllModels", "true" if self.ui.showAllModelsCheckBox.checked else "false")
             self._parameterNode.SetParameter("UseStandardSegmentNames", "true" if self.ui.useStandardSegmentNamesCheckBox.checked else "false")
             self._parameterNode.SetNodeReferenceID("OutputSegmentation", self.ui.outputSegmentationSelector.currentNodeID)
 
@@ -1076,21 +823,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #     if inputNode:
         #         self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
 
-    def onPackageInfoUpdate(self):
-        self.ui.packageInfoTextBrowser.plainText = ""
-        with slicer.util.tryWithErrorDisplay("Failed to get EVO package version information", waitCursor=True):
-            self.ui.packageInfoTextBrowser.plainText = self.logic.installedEVOPythonPackageInfo().rstrip()
-
-    # NOTE:  will delete
-    # def onPackageUpgrade(self):
-    #     with slicer.util.tryWithErrorDisplay("Failed to upgrade EVO", waitCursor=True):
-    #         self.logic.setupPythonRequirements(upgrade=True)
-    #     self.onPackageInfoUpdate()
-    #     if not slicer.util.confirmOkCancelDisplay(f"This EVO update requires a 3D Slicer restart.","Press OK to restart."):
-    #         raise ValueError("Restart was cancelled.")
-    #     else:
-    #         slicer.util.restart()
-
     def onBrowseModelsFolder(self):
         import qt
         self.logic.createModelsDir()
@@ -1129,7 +861,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     EXIT_CODE_USER_CANCELLED = 1001
     EXIT_CODE_DID_NOT_RUN = 1002
     
-    def __init__(self,the_ui_language) -> None:
+    def __init__(self) -> None:
         """Called when the logic class is instantiated. Can be used for initializing member variables."""
         ScriptedLoadableModuleLogic.__init__(self)
         from collections import OrderedDict
@@ -1146,7 +878,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.endResultImportCallback = None
         self.useStandardSegmentNames = True
         self.setResultToLabelCallback = None
-        self.ui_language = the_ui_language
 
         self.mdf_outputSegmentation=None
         self.mdf_outputSegmentationFile=None
@@ -1478,12 +1209,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if self.logCallback:
             self.logCallback(text)
 
-    def installedEVOPythonPackageInfo(self):
-        import shutil
-        import subprocess
-        versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "nnunetv2"]).decode()
-        return versionInfo
-
     def installPyTorchUtils(self):
         import importlib.metadata
         import importlib.util
@@ -1520,7 +1245,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         EVOInstallString = "nnunetv2[fire,scikit-image,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators]>=1.3"
         if upgrade:
             EVOInstallString += " --upgrade"
-        if self.ui_language=="zh-CN":
             EVOInstallString += " -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
         
         slicer.util.pip_install(EVOInstallString)
@@ -1570,8 +1294,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if retcode != 0:
             raise CalledProcessError(retcode, proc.args, output=proc.stdout, stderr=proc.stderr)
 
-    # def getParameterNode(self):
-    #     return EvoSegParameterNode(super().getParameterNode())
 
     def process(self, 
                 inputNodes, 
@@ -1822,43 +1544,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
 
         self.setResultToLabelCallback(self.data_module)
-        # print(result_path+"/output-segmentation.nrrd")
-        # import numpy as np
-        # import nibabel as nib
-        # import nrrd
-        # from OtherCode.data import DataModule
-        # from OtherCode.display import DisplayModule
-        # import matplotlib.pyplot as plt
-        # from matplotlib.widgets import Slider, Button, RangeSlider, CheckButtons
-        # # Load the NIfTI image
-        # # nii_image = nib.load(result_path+"/input-segmentation.nrrd")  # Replace with your file path
-        # # ct_data = nii_image.get_fdata()
-        # ct_data, optionsx = nrrd.read(result_path+"/input-volume0.nrrd")
-        # ct_data = ct_data - ct_data.min() * 1.0
-        # ct_data = ct_data / ct_data.max()
-
-        # # Load the predicted probability and the segmentation mask
-        # data, options = nrrd.read(result_path+"/output-segmentation.nrrd")
-        # self.setResultToLabelCallback(result_path+"/output-segmentation.nrrd")
-        # segmentation_masks = {
-        #     "airway" : data[0, :, :, :] == 1, 
-        #     "artery": data[2, :, :, :] == 1, 
-        #     "vein": data[2, :, :, :] == 2
-        # }
-        # display_colors = {
-        #     "airway" : [0.854902, 0.0823529, 0.768627], 
-        #     "artery" : [0, 0.478431, 0.670588], 
-        #     "vein": [0.729412, 0.301961, 0.25098]
-        # }
-        # probability_maps = {
-        #     "airway": segmentation_masks["airway"].astype(np.float32),
-        #     "artery": segmentation_masks["artery"].astype(np.float32),
-        #     "vein": segmentation_masks["vein"].astype(np.float32),
-        # }
-
-        # data_module = DataModule(ct_data, segmentation_masks, probability_maps)
-        # display_module = DisplayModule(data_module, display_colors)
-        # display_module.show()
 
     def set_new_data_module(self, new_data_module):
         import nrrd
@@ -2022,63 +1707,3 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 segment.SetColor(color)
             except RuntimeError as e:
                 self.log(str(e))
-
-    def updateModelsDescriptionJsonFilePathFromTestResults(self, modelsTestResultsJsonFilePath):
-        import json
-
-        modelsDescriptionJsonFilePath = self.modelsDescriptionJsonFilePath()
-
-        with open(modelsTestResultsJsonFilePath) as f:
-            modelsTestResults = json.load(f)
-
-        with open(modelsDescriptionJsonFilePath) as f:
-            modelsDescription = json.load(f)
-
-        for model in modelsDescription["models"]:
-            title = model["title"]
-            for modelTestResult in modelsTestResults:
-                if modelTestResult["title"] == title:
-                    for fieldName in ["segmentNames"]:
-                        fieldValue = modelTestResult.get(fieldName)
-                        if fieldValue:
-                            model[fieldName] = fieldValue
-                    break
-
-        with open(modelsDescriptionJsonFilePath, 'w', newline="\n") as f:
-            json.dump(modelsDescription, f, indent=2)
-
-
-#
-# EvoSegTest
-#
-
-
-class EvoSegTest(ScriptedLoadableModuleTest):
-    """
-    This is the test case for your scripted module.
-    Uses ScriptedLoadableModuleTest base class, available at:
-    https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
-    """
-
-    def setUp(self):
-        """Do whatever is needed to reset the state - typically a scene clear will be enough."""
-        slicer.mrmlScene.Clear()
-
-    def runTest(self):
-        """Run as few or as many tests as needed here."""
-        self.setUp()
-        self.test_EvoSeg()
-
-    def test_EvoSeg(self):
-        """Ideally you should have several levels of tests.  At the lowest level
-        tests should exercise the functionality of the logic with different inputs
-        (both valid and invalid).  At higher levels your tests should emulate the
-        way the user would interact with your code and confirm that it still works
-        the way you intended.
-        One of the most important features of the tests is that it should alert other
-        developers when their changes will have an impact on the behavior of your
-        module.  For example, if a developer removes a feature that you depend on,
-        your test should break so they know that the feature is needed.
-        """
-
-        self.delayDisplay("Test is space and Done!")
