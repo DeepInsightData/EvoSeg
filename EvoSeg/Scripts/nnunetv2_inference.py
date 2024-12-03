@@ -83,9 +83,14 @@ def main(model_folder,
     #                                                 num_processes_segmentation_export=2)
     if not simulated_data:
         seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
+        # TODO: 根据model_folder->确定当前模型->修改mask值
+        if os.path.basename(model_folder)=="Airway_nnUnet":
+            pass
+        else:
+            seg_results*=1
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
-    
+
     # TODO:多模态分割结果保存
     # save result by copying all image metadata from the input, just replacing the voxel data
     # nrrd_header = nrrd.read_header(image_file)
@@ -102,6 +107,11 @@ def main(model_folder,
                     if not chunk:
                         break
                     f_dest.write(chunk)
+        if os.path.basename(model_folder)=="Artery_nnUnet":
+            data, header = nrrd.read(result_file)
+            data = data * 2
+            nrrd.write(result_file, data, header)
+            print("-> Done")
         if save_prob_maps:
             print("->copy:"+model_folder+"/output-segmentation_prob.nrrd to"+result_file.replace('.nrrd', '_prob.nrrd'))
             with open(model_folder+"/output-segmentation_prob.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件

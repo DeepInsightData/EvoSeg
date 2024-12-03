@@ -127,22 +127,9 @@ Segment</string>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="browseToModelsFolderButton">
-       <property name="toolTip">
-        <string>Open the folder that contains all downloaded files for models.</string>
-       </property>
+      <widget class="QPushButton" name="bt_export">
        <property name="text">
-        <string>Open models cache folder</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="copyModelsButton">
-       <property name="toolTip">
-        <string>the button is you needed.</string>
-       </property>
-       <property name="text">
-        <string>Copy to folder</string>
+        <string>Export Mask</string>
        </property>
       </widget>
      </item>
@@ -160,9 +147,22 @@ Segment</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="bt_export">
+      <widget class="QPushButton" name="copyModelsButton">
+       <property name="toolTip">
+        <string>the button is you needed.</string>
+       </property>
        <property name="text">
-        <string>Export Mask</string>
+        <string>Copy to folder</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browseToModelsFolderButton">
+       <property name="toolTip">
+        <string>Open the folder that contains all downloaded files for models.</string>
+       </property>
+       <property name="text">
+        <string>Open models cache folder</string>
        </property>
       </widget>
      </item>
