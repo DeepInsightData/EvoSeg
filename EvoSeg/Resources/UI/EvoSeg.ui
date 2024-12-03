@@ -6,25 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
+    <width>542</width>
     <height>653</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,1,5">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,5,5">
    <item>
     <layout class="QHBoxLayout" name="new_ui_layout_1" stretch="2,8">
      <item>
-      <layout class="QVBoxLayout" name="vlayout_seg_button" stretch="2,9,9">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Run Seg</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
+      <layout class="QVBoxLayout" name="vlayout_seg_button" stretch="5,5,3">
        <item>
         <widget class="QPushButton" name="bt_seg_airway">
          <property name="sizePolicy">
@@ -34,7 +24,8 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Airway</string>
+          <string>Airway
+Segment</string>
          </property>
         </widget>
        </item>
@@ -47,24 +38,28 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Artery</string>
+          <string>Artery
+Segment</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Run All</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="vlayout_running_log" stretch="2,18">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Log Print</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
+      <layout class="QVBoxLayout" name="vlayout_running_log" stretch="18">
        <item>
         <widget class="QPlainTextEdit" name="statusLabel">
          <property name="lineWrapMode">
@@ -79,53 +74,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="1">
-      <widget class="QListWidget" name="modelComboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="qMRMLNodeComboBox" name="inputNodeSelector0">
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="nodeTypes">
-        <stringlist>
-         <string>vtkMRMLScalarVolumeNode</string>
-        </stringlist>
-       </property>
-       <property name="showChildNodeTypes">
-        <bool>false</bool>
-       </property>
-       <property name="addEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="removeEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -177,218 +125,207 @@
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout_Modify">
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="groupBox2">
-       <property name="title">
-        <string>Option</string>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="browseToModelsFolderButton">
+       <property name="toolTip">
+        <string>Open the folder that contains all downloaded files for models.</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QRadioButton" name="radioButton12">
-          <property name="text">
-           <string>Sphere Addition</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton22">
-          <property name="text">
-           <string>Sphere Erasure</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton32">
-          <property name="text">
-           <string>Magic Addition</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton42">
-          <property name="text">
-           <string>Magic Erasure</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="text">
+        <string>Open models cache folder</string>
+       </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Target</string>
+     <item>
+      <widget class="QPushButton" name="copyModelsButton">
+       <property name="toolTip">
+        <string>the button is you needed.</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QRadioButton" name="radioButton1">
-          <property name="text">
-           <string>airway</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton2">
-          <property name="text">
-           <string>artery</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton3">
-          <property name="text">
-           <string>vein</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="text">
+        <string>Copy to folder</string>
+       </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QCheckBox" name="set_modifiy">
-         <property name="text">
-          <string>Set Modifiy</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_img">
-         <property name="text">
-          <string>Position or Label</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>[radius]:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout0022">
-         <item>
-          <widget class="QLineEdit" name="lineEdit_radius">
-           <property name="placeholderText">
-            <string>radius value</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout1122">
-         <item>
-          <widget class="QPushButton" name="button_undo">
-           <property name="text">
-            <string>Undo</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="button_save">
-           <property name="text">
-            <string>Save</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton">
-           <property name="text">
-            <string>Export</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
+     <item>
+      <widget class="QPushButton" name="deleteAllModelsButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</string>
+       </property>
+       <property name="text">
+        <string>Clear cache</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bt_export">
+       <property name="text">
+        <string>Export Mask</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
     <widget class="ctkCollapsibleButton" name="advancedCollapsibleButton">
      <property name="text">
-      <string>Advanced</string>
+      <string>Results Modifiy</string>
      </property>
      <property name="checkable">
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>true</bool>
-     </property>
-     <property name="collapsed">
       <bool>false</bool>
      </property>
-     <layout class="QFormLayout" name="formLayout_3">
+     <property name="collapsed">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Use standard segment names:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="useStandardSegmentNamesCheckBox">
-        <property name="toolTip">
-         <string>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Manage models:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="browseToModelsFolderButton">
-          <property name="toolTip">
-           <string>Open the folder that contains all downloaded files for models.</string>
+       <layout class="QGridLayout" name="gridLayout_Modify">
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="groupBox2">
+          <property name="title">
+           <string>Option</string>
           </property>
-          <property name="text">
-           <string>Open models cache folder</string>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QRadioButton" name="radioButton12">
+             <property name="text">
+              <string>Sphere Addition</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton22">
+             <property name="text">
+              <string>Sphere Erasure</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton32">
+             <property name="text">
+              <string>Magic Addition</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton42">
+             <property name="text">
+              <string>Magic Erasure</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="copyModelsButton">
-          <property name="toolTip">
-           <string>the button is you needed.</string>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Target</string>
           </property>
-          <property name="text">
-           <string>Copy to folder</string>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QRadioButton" name="radioButton1">
+             <property name="text">
+              <string>airway</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton2">
+             <property name="text">
+              <string>artery</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton3">
+             <property name="text">
+              <string>vein</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="deleteAllModelsButton">
-          <property name="toolTip">
-           <string>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</string>
-          </property>
-          <property name="text">
-           <string>Clear cache</string>
-          </property>
-         </widget>
+        <item row="0" column="2">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QCheckBox" name="set_modifiy">
+            <property name="text">
+             <string>Set Modifiy</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_img">
+            <property name="text">
+             <string>Position or Label</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>[radius]:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout0022">
+            <item>
+             <widget class="QLineEdit" name="lineEdit_radius">
+              <property name="placeholderText">
+               <string>radius value</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout1122">
+            <item>
+             <widget class="QPushButton" name="button_undo">
+              <property name="text">
+               <string>Undo</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_save">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -423,22 +360,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>EvoSeg</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputNodeSelector0</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>122</x>
-     <y>132</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>388</x>
-     <y>87</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>EvoSeg</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
