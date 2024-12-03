@@ -57,7 +57,7 @@ def main(model_folder,
         perform_everything_on_device=True,
         device=device,
         verbose=False,
-        verbose_preprocessing=False,
+        verbose_preprocessing=True,
         allow_tqdm=True
     )
     
@@ -90,9 +90,10 @@ def main(model_folder,
     # save result by copying all image metadata from the input, just replacing the voxel data
     # nrrd_header = nrrd.read_header(image_file)
     # nrrd.write(result_file, seg_results, nrrd_header)
-
+    
     # load NIFTI header
     if simulated_data:
+        print("->copy:"+model_folder+"/output-segmentation.nrrd to"+result_file)
         with open(model_folder+"/output-segmentation.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
             with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
                 while True:
@@ -101,24 +102,29 @@ def main(model_folder,
                     if not chunk:
                         break
                     f_dest.write(chunk)
-        # with open(model_folder+"/output-segmentation_prob.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
-        #     with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
-        #         while True:
-        #             # 每次读取 1024 字节
-        #             chunk = f_src.read(1024)
-        #             if not chunk:
-        #                 break
-        #             f_dest.write(chunk)
-
-    elif save_prob_maps:
-        SimpleITKIO().write_seg(seg_results[0], result_file, prop)
-        prob_maps = seg_results[1][1]
-        # normalize prob_maps to 0-255
-        prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
-        SimpleITKIO().writea_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
-        # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+        if save_prob_maps:
+            print("->copy:"+model_folder+"/output-segmentation_prob.nrrd to"+result_file.replace('.nrrd', '_prob.nrrd'))
+            with open(model_folder+"/output-segmentation_prob.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
+                with open(result_file.replace('.nrrd', '_prob.nrrd'), 'wb') as f_dest:  # 以二进制模式写入目标文件
+                    while True:
+                        # 每次读取 1024 字节
+                        chunk = f_src.read(1024)
+                        if not chunk:
+                            break
+                        f_dest.write(chunk)
     else:
+        if save_prob_maps:
+            SimpleITKIO().write_seg(seg_results[0], result_file, prop)
+            prob_maps = seg_results[1][1]
+            # normalize prob_maps to 0-255
+            prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+            SimpleITKIO().write_seg(prob_maps, result_file.replace('.nrrd', '_prob.nrrd'), prop)
+            # write_prob_maps(seg_results[1][1], result_file.replace('.nrrd', '_prob.nrrd'), prop)
+            # prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+            # SimpleITKIO().writea_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+            # # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
         SimpleITKIO().write_seg(seg_results, result_file, prop)
+    
     timing_checkpoints.append(("Save", time.time()))
     
     # Print computation time log
