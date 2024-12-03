@@ -543,6 +543,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def onProcessingCompleted(self, returnCode, customData):
         self.ui.statusLabel.appendPlainText("\nProcessing finished.")
         print(EvoSegWidget.PROCESSING_IDLE)
+
+        # 临时在这个回调里处理 3d视图居中和颜色重调(不使用原标准色彩)
+        #---------------------------------------------------------------------
         self.ui.segmentationShow3DButton.setChecked(True)
         # Center and fit displayed content in 3D view
         layoutManager = slicer.app.layoutManager()
@@ -551,6 +554,22 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         threeDView.rotateToViewAxis(3)  # look from anterior direction
         threeDView.resetFocalPoint()  # reset the 3D view cube size and center it
         threeDView.resetCamera()  # reset camera zoom
+
+        # 每次执行后随机为所有SegmentationNode中的所有标签重置颜色
+        # https://slicer.readthedocs.io/en/latest/developer_guide/script_repository.html#modify-segmentation-display-options
+        for node in slicer.mrmlScene.GetNodesByClass('vtkMRMLSegmentationNode'):
+            segmentation = node.GetSegmentation()
+            display_node = node.GetDisplayNode()
+            display_node.SetOpacity3D(0.8)
+            for i in range(segmentation.GetNumberOfSegments()):
+                segment = segmentation.GetNthSegment(i)
+                
+                import random
+                segment.SetColor(random.random(), random.random(), random.random())
+            #segment_id = segment.GetName()
+            # display_node.SetSegmentOpacity3D(segment_id, 0.2)
+            # display_node.SetSegmentOverrideColor(segment_id, 0, 0, 1)
+        #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
 
     def onDownloadSampleData(self):
