@@ -140,7 +140,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
         
         extensionsPath = slicer.app.extensionsInstallPath
-        print("Extensions Install Path:", extensionsPath)
+        #print("Extensions Install Path:", extensionsPath)
         layoutManager = slicer.app.layoutManager()
         fourByFourWidget = layoutManager.threeDWidget(0).threeDView()
 
@@ -166,7 +166,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         for i in self.data_module_list:
             if i["model_name"]==model_name_must_is:
                 self.data_module=i["seg_data"]
-                print("set DataModule for:"+model_name_must_is)
+                #print("set DataModule for:"+model_name_must_is)
                 return
 
     def onExportClick(self):
@@ -244,7 +244,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
                 
         else:
-            print("should delete")
+            #print("should delete")
             pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
             pointListNode.RemoveAllMarkups()
 
@@ -284,7 +284,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def someCustomAction(self,caller, eventId):
         import numpy as np
         markupsDisplayNode = caller
-        print(type(markupsDisplayNode))
+        #print(type(markupsDisplayNode))
         print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
         
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
@@ -310,7 +310,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         point_Ijk = [ int(round(c)) for c in point_Ijk[0:3] ]
 
         # Print output
-        print(point_Ijk)
+        #print(point_Ijk)
 
         #try:
         import ast
@@ -422,14 +422,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
 
         self.logic.extract_7z(select_file[0],copy2dir)
-        print("ok?")
+        #print("ok?")
         
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
 
     def removeObservers(self):
-        print("rm obse..")
+        #print("rm obse..")
         try:
             for observedNode, observation in self.observations:
                 observedNode.RemoveObserver(observation)
@@ -489,8 +489,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                                                           "process":self._segmentationProcessInfo
                                                          })
 
-                print("---->",len(self._segmentationProcessInfoList))
-                print("---->",self._segmentationProcessInfoList)
+                #print("---->",len(self._segmentationProcessInfoList))
+                #print("---->",self._segmentationProcessInfoList)
                 print(EvoSegWidget.PROCESSING_IN_PROGRESS,"PROCESSING_IN_PROGRESS")
 
         except Exception as e:
@@ -591,15 +591,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onResultSeg(self,myDataModule, model_name):
         # 刷新DataModule 回调
-        print("-------->",model_name,self.data_module_list)
+        #print("-------->",model_name,self.data_module_list)
         self.data_module=myDataModule
         for i in self.data_module_list:
             if i["model_name"]==model_name:
                 i["seg_data"]=self.data_module
-                print("reinit DataModule ok")
+                #print("reinit DataModule ok")
                 return
         self.data_module_list.append({"model_name":model_name,"seg_data":self.data_module})
-        print("init DataModule ok")
+        #print("init DataModule ok")
 #
 # EvoSegLogic
 #
@@ -918,7 +918,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         except:
             self.downloadModel(model,withDownload)
             modelPath = self.modelPath(model)
-        print("modelPath",modelPath)
+        #print("modelPath",modelPath)
         segmentationProcessInfo = {}
 
         import time
@@ -938,7 +938,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Get Python executable path
         import shutil
         pythonSlicerExecutablePath = shutil.which("PythonSlicer")
-        print(pythonSlicerExecutablePath)
+        #print(pythonSlicerExecutablePath)
         if not pythonSlicerExecutablePath:
             raise RuntimeError("Python was not found")
 
