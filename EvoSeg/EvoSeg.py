@@ -2,9 +2,7 @@ import logging
 import json
 import os
 from typing import Annotated, Optional
-
 import vtk
-
 import slicer
 from slicer.i18n import tr as _
 from slicer.i18n import translate
@@ -14,61 +12,35 @@ from slicer.parameterNodeWrapper import (
     parameterNodeWrapper,
     WithinRange,
 )
-
 from slicer import vtkMRMLScalarVolumeNode
-
-from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
-
+from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup,QMessageBox
 import subprocess
-
 from Scripts.data import DataModule
+
 #
 # EvoSeg
 #
 
 class EvoSeg(ScriptedLoadableModule):
-    """Uses ScriptedLoadableModule base class, available at:
-    https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
-    """
-
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = _("EvoSeg")  # TODO: make this more human readable by adding spaces
+        self.parent.title = _("EvoSeg")
         # TODO: set categories (folders where the module shows up in the module selector)
         self.parent.categories = [translate("qSlicerAbstractCoreModule", "Segmentation")]
-        self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
-        # TODO: update with short description of the module and a link to online module documentation
-        # _() function marks text as translatable to other languages
-        self.parent.helpText = _("""
-This is an example of scripted loadable module bundled in an extension.
-See more information in <a href="https://github.com/organization/projectname#EvoSeg">module documentation</a>.
-""")
+        self.parent.dependencies = []  
+        self.parent.contributors = ["DeepInsightData"] 
+        # TODO: set help text
+        self.parent.helpText = _(" ")
         # TODO: replace with organization, grant and thanks
-        self.parent.acknowledgementText = _("""
-This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
-and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
-""")
+        self.parent.acknowledgementText = _(" ")
         self.terminologyName = None
 
-        slicer.app.connect("startupCompleted()", self.configureDefaultTerminology)
         # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", self.registerSampleData)
+        slicer.app.connect("startupCompleted()", self.EvoSegHello)
 
-    def configureDefaultTerminology(self):
-        moduleDir = os.path.dirname(self.parent.path)
-        #terminologyFilePath = os.path.join(moduleDir, "Resources", "SegmentationCategoryTypeModifier-EvoSeg.term.json")
-        #anatomicContextFilePath = os.path.join(moduleDir, "Resources", "AnatomicRegionAndModifier-EvoSeg.term.json")
-        tlogic = slicer.modules.terminologies.logic()
-        #self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
-        #self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
-
-
-    def registerSampleData(self):
-        """
-        Add data sets to Sample Data module.
-        """
-        print("~")
+    def EvoSegHello(self):
+        #print("EvoSeg Init.")
+        pass
 
 
 #
@@ -76,9 +48,6 @@ and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR0132
 #
 
 class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
-    """Uses ScriptedLoadableModuleWidget base class, available at:
-    https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
-    """
     PROCESSING_IDLE = 0
     PROCESSING_STARTING = 1
     PROCESSING_IN_PROGRESS = 2
@@ -89,23 +58,18 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """Called when the user opens the module the first time and the widget is initialized."""
         ScriptedLoadableModuleWidget.__init__(self, parent)
         VTKObservationMixin.__init__(self)  # needed for parameter node observation
+
         self.logic = None
         self._updatingGUIFromParameterNode = False
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
-
-        self.label_np=None
+        self._segmentationProcessInfoList = []
 
         self.observations = None
-
         self.markup_node=None
         self.data_module=None
-        
-
+        self.data_module_list=[]
         self.logic = EvoSegLogic()
-
-        super().setup()
-        
 
     def setup(self) -> None:
         """Called when the user opens the module the first time and the widget is initialized."""
@@ -148,8 +112,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.bt_export.connect("clicked(bool)", self.onExportClick)
 
+        self.ui.bt_seg_all_run.connect("clicked(bool)", self.onCancel)
+
         # check box
-        self.ui.radioButton1.setChecked(True)
+        self.ui.radio_airway_tag.setChecked(True)
         self.ui.radioButton12.setChecked(True)
 
         # new button click
@@ -158,9 +124,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.button_save.connect("clicked(bool)", self.onButtonSaveClick)
 
         self.button_group = QButtonGroup()
-        self.button_group.addButton(self.ui.radioButton1)
-        self.button_group.addButton(self.ui.radioButton2)
-        self.button_group.addButton(self.ui.radioButton3)
+        self.button_group.addButton(self.ui.radio_airway_tag)
+        self.button_group.addButton(self.ui.radio_artery_tag)
+        self.button_group.addButton(self.ui.radio_vein_tag)
+        self.button_group.buttonToggled.connect(self.onButtonGroupClick)
+
         self.button_group2 = QButtonGroup()
         self.button_group2.addButton(self.ui.radioButton12) 
         self.button_group2.addButton(self.ui.radioButton22)
@@ -187,6 +155,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
+    def onButtonGroupClick(self,value_for_group):
+        if value_for_group.text=="airway":
+            model_name_must_is = "Airway_nnUnet"
+        elif value_for_group.text=="artery":
+            model_name_must_is = "Artery_nnUnet"
+        output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+        self.ui.outputSegmentationSelector.setCurrentNode(output_segmentation_node)
+        for i in self.data_module_list:
+            if i["model_name"]==model_name_must_is:
+                self.data_module=i["seg_data"]
+                print("set DataModule for:"+model_name_must_is)
+                return
+
     def onExportClick(self):
         dataModuleWidget = slicer.modules.data.widgetRepresentation()
         subjectHierarchyTreeView = dataModuleWidget.findChild(slicer.qMRMLSubjectHierarchyTreeView)
@@ -201,14 +182,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 openExportDICOMDialogAction=plugin.children()[0]
                 openExportDICOMDialogAction.trigger()
 
-
     def onSegButtonClick(self,button_name):
-        # update v1 临时借用未删除的隐藏控件
+        # update v2 目前剩3d按钮和一个输出部分保留原来的
         run_model_name=""
         if "airway"==button_name:
             run_model_name="Airway_nnUnet"
+            self.ui.bt_seg_airway.setEnabled(False)
+            self.ui.bt_seg_artery.setEnabled(False)# 并行时删除
+            self.ui.bt_seg_all_run.setEnabled(True)
         elif "artery"==button_name:
             run_model_name="Artery_nnUnet"
+            self.ui.bt_seg_artery.setEnabled(False)
+            self.ui.bt_seg_airway.setEnabled(False)
+            self.ui.bt_seg_all_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
             return
@@ -218,9 +204,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         else:
             self.onCancel()
 
-
     def check_set_modifiy(self,check_it):
-        #print("?>>>",check_it)
         if check_it:
             self.layoutManager = slicer.app.layoutManager()
         
@@ -230,7 +214,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 slicer.app.layoutManager().sliceWidget("Yellow").sliceView(),
                 slicer.app.layoutManager().sliceWidget("Green").sliceView()
             ]
-
             
             self.markup_node=slicer.modules.markups.logic().AddControlPoint(0)
             
@@ -267,54 +250,27 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.set_new_data_module(self.data_module);
         print("Save click")
 
-    def onPress(self,arg1, arg2):
-        
-        try:
-            import ast
-            position_=self.ui.label_img.text.split("<b>")
-            x,y,z=ast.literal_eval(position_[0])
-            #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
-            #print("Press")
-            if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-                #self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
-                QMessageBox.warning(None, "错误", f"模型输出数据丢失，请先进行分割")
-            else:
-                #print(self.data_module.get_masks())
-                optin_select=self.button_group2.checkedButton().text
-                param = ast.literal_eval(self.ui.lineEdit_radius.text)
-                #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
-                if optin_select=="Sphere Addition":
-                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
-                elif optin_select=="Sphere Erasure":
-                    self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
-                else:
-                    return
-                self.FasterUpdateSegForonPress(self.data_module.get_masks())
-                #print(self.button_group.checkedButton().text)
-                #self.data_module.
-                self.ui.label_6.setText("Modifiy Queue Len:"+str(self.data_module.get_history_len()))
-                self.ui.label_img.setText(self.ui.label_img.text+"  ")
-
-            
-        except:
-            print("No segmentation")
-            pass
     def FasterUpdateSegForonPress(self, segmentation_masks):
+        # 新增 模型与其生成的数据 的配对
         import numpy as np
-        inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
-        outputSegmentationNodeName = self.ui.outputSegmentationSelector.currentNode().GetName()
-        #print("-----> new debug:", inputNode, outputSegmentationNode)
-        #print("-----> new debug:",self.ui.inputNodeSelector0.text,self.ui.outputSegmentationSelector.text)
-        volumeNode = slicer.util.getNode(inputNodeName)
-        segmentationNode = slicer.util.getNode(outputSegmentationNodeName)
+        if self.ui.radio_airway_tag.isChecked():
+            segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
+            combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8)  
+        elif self.ui.radio_artery_tag.isChecked():
+            segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
+            combined_mask = np.zeros(segmentation_masks["artery"].shape, dtype=np.uint8) 
+        BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
+        volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
 
-        combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8)  # NOTE: 临时的
         combined_mask[segmentation_masks["airway"]] = 1  
-        combined_mask[segmentation_masks["Artery"]] = 2  
-        combined_mask[segmentation_masks["Vein"]] = 3    
+        combined_mask[segmentation_masks["artery"]] = 2  
+        combined_mask[segmentation_masks["vein"]] = 3    
         
-        segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
-
+        if self.ui.radio_airway_tag.isChecked():
+            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
+        elif self.ui.radio_artery_tag.isChecked():
+            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
+        
         # Get segment as numpy array
         segmentArray = slicer.util.arrayFromSegmentBinaryLabelmap(segmentationNode, segmentId, volumeNode)
 
@@ -327,8 +283,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         markupsDisplayNode = caller
         print(type(markupsDisplayNode))
         print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
-        inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
-        volumeNode = slicer.util.getNode(inputNodeName)
+        
+        BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
+        # inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
+        volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red) #slicer.util.getNode(inputNodeName)
         pointListNode = slicer.util.getNode("F")
         markupsIndex = 0
 
@@ -351,35 +309,35 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Print output
         print(point_Ijk)
 
-        try:
-            import ast
-            position_=self.ui.label_img.text.split("<b>")
-            x,y,z=point_Ijk#ast.literal_eval(position_[0])
-            #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
-            #print("Press")
-            if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-                self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+        #try:
+        import ast
+        position_=self.ui.label_img.text.split("<b>")
+        x,y,z=point_Ijk#ast.literal_eval(position_[0])
+        #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
+        #print("Press")
+        if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
+            self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+        else:
+            #print(self.data_module.get_masks())
+            optin_select=self.button_group2.checkedButton().text
+            param = ast.literal_eval(self.ui.lineEdit_radius.text)
+            #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+            if optin_select=="Sphere Addition":
+                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+            elif optin_select=="Sphere Erasure":
+                self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
             else:
-                #print(self.data_module.get_masks())
-                optin_select=self.button_group2.checkedButton().text
-                param = ast.literal_eval(self.ui.lineEdit_radius.text)
-                #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
-                if optin_select=="Sphere Addition":
-                    self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
-                elif optin_select=="Sphere Erasure":
-                    self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
-                else:
-                    return
-                self.FasterUpdateSegForonPress(self.data_module.get_masks())
-                #print(self.button_group.checkedButton().text)
-                #self.data_module.
-                self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
-                self.ui.label_img.setText(self.ui.label_img.text+" ")
+                return
+            self.FasterUpdateSegForonPress(self.data_module.get_masks())
+            #print(self.button_group.checkedButton().text)
+            #self.data_module.
+            self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+            self.ui.label_img.setText(self.ui.label_img.text+" ")
 
             
-        except:
-            print("No segmentation")
-            pass
+        # except:
+        #     print("No segmentation")
+        #     pass
 
         #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
 
@@ -447,7 +405,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
     def onCopyModel(self):
         
-        from qt import QMessageBox 
         if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
             QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
             return
@@ -488,29 +445,34 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         try:
             with slicer.util.tryWithErrorDisplay("Failed to start processing.", waitCursor=True):
 
-                # Create new segmentation node
+                # 配置输入
+                inputNodes = []
+                try:
+                    BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
+                    ThisVolumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
+                except:
+                    slicer.util.messageBox("Pelease import and show date in 3Dslicer")
+                    self.ui.bt_seg_airway.setEnabled(True)
+                    self.ui.bt_seg_artery.setEnabled(True)
+                    return
+                inputNodes.append(ThisVolumeNode)
 
+                # 配置输出
                 output_segmentation_name=model_name+"_Output_Mask"
                 self.ui.outputSegmentationSelector.baseName = output_segmentation_name
-
                 output_segmentation_node = slicer.mrmlScene.GetFirstNodeByName(output_segmentation_name)
                 if output_segmentation_node:
                     self.ui.outputSegmentationSelector.setCurrentNode(output_segmentation_node)
                 else:
                     self.ui.outputSegmentationSelector.addNode()
+                
+                # 调用self.logic.process
 
-
-                    
-                # Compute output
-                inputNodes = []
-
-                # 改为以当前 red窗口显示的node为输入node
-                BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
-                ThisVolumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
-                #print("debug----->",ThisVolumeNode)
-                inputNodes.append(ThisVolumeNode)
-                # self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
-                #     self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
+                for i in self._segmentationProcessInfoList:
+                    if i["name"]==model_name:
+                        slicer.util.messageBox("This model is running.")
+                        return
+                
                 self._segmentationProcessInfo = self.logic.process(inputNodes, 
                                                                 self.ui.outputSegmentationSelector.currentNode(),
                                                                 model_name, 
@@ -519,18 +481,27 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                                                                 waitForCompletion=False
                                                                 )
                 
-                print(EvoSegWidget.PROCESSING_IN_PROGRESS)
+                self._segmentationProcessInfoList.append({
+                                                          "name":model_name,
+                                                          "process":self._segmentationProcessInfo
+                                                         })
+
+                print("---->",len(self._segmentationProcessInfoList))
+                print("---->",self._segmentationProcessInfoList)
+                print(EvoSegWidget.PROCESSING_IN_PROGRESS,"PROCESSING_IN_PROGRESS")
 
         except Exception as e:
-            print(EvoSegWidget.PROCESSING_IDLE)
+            print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
-            self.logic.cancelProcessing(self._segmentationProcessInfo)
-            print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED)
+            for i in self._segmentationProcessInfoList:
+                self.logic.cancelProcessing(i["process"])
+                self._segmentationProcessInfoList.remove(i)
+            print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
     def onProcessImportStarted(self, customData):
-        print(EvoSegWidget.PROCESSING_IMPORT_RESULTS)
+        print(EvoSegWidget.PROCESSING_IMPORT_RESULTS,"PROCESSING_IMPORT_RESULTS")
         import qt
         qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
         slicer.app.processEvents()
@@ -542,9 +513,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onProcessingCompleted(self, returnCode, customData):
         self.ui.statusLabel.appendPlainText("\nProcessing finished.")
-        print(EvoSegWidget.PROCESSING_IDLE)
+        print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
 
-        # 临时在这个回调里处理 3d视图居中和颜色重调(不使用原标准色彩)
+        # TODO: 以下代码是临时写在此处的！
+        # 临时在这个回调里处理 3d视图居中和颜色重调(不使用原标准色彩) 和 self._segmentationProcessInfoList
         #---------------------------------------------------------------------
         self.ui.segmentationShow3DButton.setChecked(True)
         # Center and fit displayed content in 3D view
@@ -555,11 +527,32 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         threeDView.resetFocalPoint()  # reset the 3D view cube size and center it
         threeDView.resetCamera()  # reset camera zoom
 
+        # 运行完成的Process要在列表中删除
+        # 并确定当前运行完的模型名字
+        end_model_name_list=[]
+        for i in self._segmentationProcessInfoList:
+            if i["process"]["proc"].returncode==0:
+                end_model_name_list.append(i["name"])
+                self._segmentationProcessInfoList.remove(i)
+                continue
+            #其它操作待定
+
         # 每次执行后随机为所有SegmentationNode中的所有标签重置颜色
         # https://slicer.readthedocs.io/en/latest/developer_guide/script_repository.html#modify-segmentation-display-options
-        for node in slicer.mrmlScene.GetNodesByClass('vtkMRMLSegmentationNode'):
+        for name in end_model_name_list:
+            
+            # 同时把按钮setenbled true
+            if name=="Airway_nnUnet":
+            #     self.ui.bt_seg_airway.setEnabled(True)
+                self.ui.radio_airway_tag.setChecked(True)
+            if name=="Artery_nnUnet":
+            #     self.ui.bt_seg_artery.setEnabled(True)
+                self.ui.radio_artery_tag.setChecked(True)
+            node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             segmentation = node.GetSegmentation()
             display_node = node.GetDisplayNode()
+            if display_node==None:
+                continue
             display_node.SetOpacity3D(0.8)
             for i in range(segmentation.GetNumberOfSegments()):
                 segment = segmentation.GetNthSegment(i)
@@ -569,8 +562,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             #segment_id = segment.GetName()
             # display_node.SetSegmentOpacity3D(segment_id, 0.2)
             # display_node.SetSegmentOverrideColor(segment_id, 0, 0, 1)
+        
+        self.ui.bt_seg_airway.setEnabled(True)
+        self.ui.bt_seg_artery.setEnabled(True)
+        self.ui.bt_seg_all_run.setEnabled(False)
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
+        
 
     def onDownloadSampleData(self):
         
@@ -598,11 +596,16 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.deleteAllModels()
         slicer.util.messageBox("Downloaded models are deleted.")
 
-
-        
-    def onResultSeg(self,myDataModule):
+    def onResultSeg(self,myDataModule, model_name):
         # 刷新DataModule 回调
+        print("-------->",model_name,self.data_module_list)
         self.data_module=myDataModule
+        for i in self.data_module_list:
+            if i["model_name"]==model_name:
+                i["seg_data"]=self.data_module
+                print("reinit DataModule ok")
+                return
+        self.data_module_list.append({"model_name":model_name,"seg_data":self.data_module})
         print("init DataModule ok")
 #
 # EvoSegLogic
@@ -882,41 +885,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         logging.info(text)
         if self.logCallback:
             self.logCallback(text)
-
-    def installPyTorchUtils(self):
-        import importlib.metadata
-        import importlib.util
-        import packaging
-        # Install PyTorch
-        try:
-          import PyTorchUtils
-        except ModuleNotFoundError as e:
-          raise RuntimeError("This module requires PyTorch extension. Install it from the Extensions Manager.")
-
-        self.log("Initializing PyTorch...")
-        minimumTorchVersion = "1.12"
-        torchLogic = PyTorchUtils.PyTorchUtilsLogic()
-        if not torchLogic.torchInstalled():
-            self.log("PyTorch Python package is required. Installing... (it may take several minutes)")
-            torch = torchLogic.installTorch(askConfirmation=True, torchVersionRequirement = f">={minimumTorchVersion}")
-            if torch is None:
-                raise ValueError("PyTorch extension needs to be installed to use this module.")
-        else:
-            # torch is installed, check version
-            from packaging import version
-            if version.parse(torchLogic.torch.__version__) < version.parse(minimumTorchVersion):
-                raise ValueError(f"PyTorch version {torchLogic.torch.__version__} is not compatible with this module."
-                                 + f" Minimum required version is {minimumTorchVersion}. You can use 'PyTorch Util' module to install PyTorch"
-                                 + f" with version requirement set to: >={minimumTorchVersion}")
-    
-    def setupPythonRequirements(self, upgrade=False):
-        # Install EVO with required components
-        self.log("Setup Dependencies...")
-        try:
-          import torch
-        except ModuleNotFoundError as e:
-          self.log("Installing PyTorchUtils...")
-          self.installPyTorchUtils()
         
     def logProcessOutputUntilCompleted(self, segmentationProcessInfo):
         # Wait for the process to end and forward output to the log
@@ -965,7 +933,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         import time
         startTime = time.time()
-        self.log("Processing started")
+        self.log(model+": Processing started")
 
         if self.debugSkipInference:
             # For debugging, use a fixed temporary folder
@@ -989,7 +957,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         for inputIndex, inputNode in enumerate(inputNodes):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
                 inputImageFile = tempDir + f"/input-volume{inputIndex}.nrrd"
-                self.log(f"Writing input file to {inputImageFile}")
+                self.log(model+f": Writing input file to {inputImageFile}")
                 volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
                 volumeStorageNode.SetFileName(inputImageFile)
                 volumeStorageNode.UseCompressionOff()
@@ -1010,13 +978,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             auto3DSegCommand.append(f"--image-file-{inputIndex+1}")
             auto3DSegCommand.append(inputFiles[inputIndex])
 
-        self.log("Creating segmentations with EvoSeg AI...")
-        self.log(f"command: {auto3DSegCommand}")
+        self.log(model+": Creating segmentations with EvoSeg AI...")
+        self.log(model+f": command: {auto3DSegCommand}")
 
         additionalEnvironmentVariables = None
         if cpu:
             additionalEnvironmentVariables = {"CUDA_VISIBLE_DEVICES": "-1"}
-            self.log(f"Additional environment variables: {additionalEnvironmentVariables}")
+            self.log(model+f": Additional environment variables: {additionalEnvironmentVariables}")
 
         if self.debugSkipInference:
             proc = None
@@ -1115,7 +1083,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import qt
         qt.QTimer.singleShot(self.processOutputCheckTimerIntervalMsec, lambda segmentationProcessInfo=segmentationProcessInfo: self.checkSegmentationProcessOutput(segmentationProcessInfo))
 
-    def beforeReadResult(self, result_data,result_data_path):
+    def beforeReadResult(self, result_data,result_data_path,model_name):
         # 刷新DataModule
         from vtk.util import numpy_support
         import nrrd
@@ -1125,7 +1093,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             vtk_array = numpy_support.vtk_to_numpy(image_data.GetPointData().GetScalars())
             dimensions = image_data.GetDimensions()
             numpy_array = vtk_array.reshape( dimensions[0], dimensions[1],dimensions[2])  # (Z, Y, X)
-            print("NumPy shape:", numpy_array.shape, dimensions)
+            #print("NumPy shape:", numpy_array.shape, dimensions)
             ct_data = numpy_array
             ct_data = ct_data - ct_data.min() * 1.0
             ct_data = ct_data / ct_data.max()
@@ -1135,20 +1103,20 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 print("4 dim array!!")
                 segmentation_masks = {
                     "airway" : data[0, :, :, :] == 1, 
-                    "Artery": data[2, :, :, :] == 1, 
-                    "Vein": data[2, :, :, :] == 2
+                    "artery": data[2, :, :, :] == 1, 
+                    "vein": data[2, :, :, :] == 2
                 }
             else:
                 segmentation_masks = {
                     "airway" : data[:, :, :] == 1, 
-                    "Artery": data[:, :, :] == 2, 
-                    "Vein": data[:, :, :] == 3
+                    "artery": data[:, :, :] == 2, 
+                    "vein": data[:, :, :] == 3
                 }
 
             probability_maps = {
                 "airway": segmentation_masks["airway"].astype(np.float32),
-                "artery": segmentation_masks["Artery"].astype(np.float32),
-                "vein": segmentation_masks["Vein"].astype(np.float32),
+                "artery": segmentation_masks["artery"].astype(np.float32),
+                "vein": segmentation_masks["vein"].astype(np.float32),
             }
 
 
@@ -1157,7 +1125,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         else:
             print("no image data!")
 
-        self.setResultToLabelCallback(self.data_module)
+        self.setResultToLabelCallback(self.data_module,model_name)
 
     def set_new_data_module(self, new_data_module):
         import nrrd
@@ -1170,7 +1138,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         segmentation_masks=new_data_module.get_masks()
         
         combined_mask[segmentation_masks["airway"]] = 1  # 标记 airway
-        combined_mask[segmentation_masks["Artery"]] = 2   # 标记 artery
+        combined_mask[segmentation_masks["artery"]] = 2   # 标记 artery
         combined_mask[segmentation_masks["Vein"]] = 3     # 标记 vein
 
         nrrd.write(self.mdf_outputSegmentationFile, combined_mask, options)
@@ -1198,8 +1166,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 if self.startResultImportCallback:
                     self.startResultImportCallback(customData)
                 try:
-                    print("------------------->Befor read")
-                    self.beforeReadResult(inputNodes[0], tempDir) # NOTE:临时
+                    #print("------------------->Befor read")
+                    self.beforeReadResult(inputNodes[0], tempDir,model) # NOTE:临时
                     # Load result
                     self.log("Importing segmentation results...")
                     #print(outputSegmentation,outputSegmentationFile,model)
@@ -1270,7 +1238,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         colorTableNode.SetNumberOfColors(maxLabelValue+1)
         colorTableNode.SetName(model)
         for labelValue in labelValueToDescription:
-            print(labelValue,labelValueToDescription[labelValue]["name"])
+            #print(labelValue,labelValueToDescription[labelValue]["name"])
             randomColorsNode.GetColor(labelValue,rgba)
             colorTableNode.SetColor(labelValue, rgba[0], rgba[1], rgba[2], rgba[3])
             colorTableNode.SetColorName(labelValue, labelValueToDescription[labelValue]["name"])
@@ -1295,7 +1263,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
     def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
         segment = segmentation.GetSegmentation().GetSegment(segmentId)
-        print("------->",segmentId)
+        #print("------->",segmentId)
         if not segment:
             self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
             # Segment is not present in this segmentation

@@ -44,7 +44,10 @@ Segment</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="bt_seg_all_run">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -52,7 +55,7 @@ Segment</string>
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Run All</string>
+          <string>Cancel</string>
          </property>
         </widget>
        </item>
@@ -81,9 +84,6 @@ Segment</string>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <layout class="QGridLayout" name="gridLayout2">
-       <item row="1" column="0">
-        <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
-       </item>
        <item row="0" column="0">
         <widget class="qMRMLNodeComboBox" name="outputSegmentationSelector">
          <property name="toolTip">
@@ -120,39 +120,42 @@ Segment</string>
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="deleteAllModelsButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</string>
+         </property>
+         <property name="text">
+          <string>Clear cache</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="copyModelsButton">
+         <property name="toolTip">
+          <string>the button is you needed.</string>
+         </property>
+         <property name="text">
+          <string>Copy to folder</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
      <item>
       <widget class="QPushButton" name="bt_export">
        <property name="text">
         <string>Export Mask</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="deleteAllModelsButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</string>
-       </property>
-       <property name="text">
-        <string>Clear cache</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="copyModelsButton">
-       <property name="toolTip">
-        <string>the button is you needed.</string>
-       </property>
-       <property name="text">
-        <string>Copy to folder</string>
        </property>
       </widget>
      </item>
@@ -177,10 +180,10 @@ Segment</string>
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="collapsed">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -229,21 +232,21 @@ Segment</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QRadioButton" name="radioButton1">
+            <widget class="QRadioButton" name="radio_airway_tag">
              <property name="text">
               <string>airway</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton2">
+            <widget class="QRadioButton" name="radio_artery_tag">
              <property name="text">
               <string>artery</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton3">
+            <widget class="QRadioButton" name="radio_vein_tag">
              <property name="text">
               <string>vein</string>
              </property>
