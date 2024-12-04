@@ -487,6 +487,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         except Exception as e:
             print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
+            self.ui.bt_seg_airway.setEnabled(True)
+            self.ui.bt_seg_artery.setEnabled(True)
+            self.ui.bt_seg_all_run.setEnabled(False)
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
@@ -564,19 +567,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
         
-
-    def onDownloadSampleData(self):
-        
-        copy2dir= os.path.join(self.logic.modelsPath())
-        print(self.logic.modelsPath())
-        if not os.path.exists(copy2dir):
-            os.makedirs(copy2dir)
-            
-        select_file = QFileDialog.getOpenFileNames(None, "快速选择文件", "", "File (*.nii.gz)")
-        if len(select_file)>=1:
-            slicer.util.loadVolume(select_file[0])
-
-
     def onBrowseModelsFolder(self):
         import qt
         self.logic.createModelsDir()
@@ -688,13 +678,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     def modelPath(self, modelName):
         import pathlib
         modelRoot = self.modelsPath().joinpath(modelName)
-        # find labels.csv file within the modelRoot folder and subfolders
-        # for path in pathlib.Path(modelRoot).rglob("labels.csv"): # TODO: 原项目强制要求labels.csv存在
-        #     return path.parent
-        # modelRoot = self.modelsPath().joinpath(modelName)
         for path in pathlib.Path(modelRoot).rglob("dataset.json"):
             return path.parent
-        raise RuntimeError(f"Model {modelName} path not found, You can try:\n 1. click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\n 2. click 'Copy to folder' button -> Select your model_name.7z")
+        raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  |-...\n  ...\n")
 
     def deleteAllModels(self):
         if self.modelsPath().exists():
@@ -709,6 +695,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             print(f"Error during extraction: {e}")
 
     def downloadModel(self, modelName, withDownload):
+        if not withDownload:
+            return
 
         url = self.model(modelName)["url"]
 
@@ -726,8 +714,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.log(f"Downloading model '{modelName}' from {url}...")
         logging.debug(f"Downloading from {url} to {modelZipFile}...")
         
-        if not withDownload:
-            return
+        
         try:
             with open(modelZipFile, 'wb') as f:
                 with requests.get(url, stream=True) as r:
