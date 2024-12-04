@@ -121,7 +121,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # new button click
         self.ui.lineEdit_radius.setText("{'radius':3,}")
         self.ui.button_undo.connect("clicked(bool)", self.onButtonUndoClick)
-        self.ui.button_save.connect("clicked(bool)", self.onButtonSaveClick)
 
         self.button_group = QButtonGroup()
         self.button_group.addButton(self.ui.radio_airway_tag)
@@ -245,10 +244,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.data_module.undo()
         self.ui.label_6.setText("Modifiy Queue Len:"+str(self.data_module.get_history_len()))
         self.FasterUpdateSegForonPress(self.data_module.get_masks())
-    def onButtonSaveClick(self):
-        #segmentation_nodes = slicer.util.getNodesByClass('vtkMRMLSegmentationNode')
-        self.logic.set_new_data_module(self.data_module);
-        print("Save click")
 
     def FasterUpdateSegForonPress(self, segmentation_masks):
         # 新增 模型与其生成的数据 的配对
@@ -1126,26 +1121,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             print("no image data!")
 
         self.setResultToLabelCallback(self.data_module,model_name)
-
-    def set_new_data_module(self, new_data_module):
-        import nrrd
-        import numpy as np
-        self.data_module=new_data_module
-        data, options = nrrd.read(self.mdf_outputSegmentationFile)
-
-        combined_mask = np.zeros(data.shape, dtype=np.uint8)  # 创建一个空的掩码
         
-        segmentation_masks=new_data_module.get_masks()
-        
-        combined_mask[segmentation_masks["airway"]] = 1  # 标记 airway
-        combined_mask[segmentation_masks["artery"]] = 2   # 标记 artery
-        combined_mask[segmentation_masks["Vein"]] = 3     # 标记 vein
-
-        nrrd.write(self.mdf_outputSegmentationFile, combined_mask, options)
-
-        self.readSegmentation(self.mdf_outputSegmentation, self.mdf_outputSegmentationFile, self.mdf_model)
-        
-
     def onSegmentationProcessCompleted(self, segmentationProcessInfo):
         import nrrd
         startTime = segmentationProcessInfo["startTime"]
