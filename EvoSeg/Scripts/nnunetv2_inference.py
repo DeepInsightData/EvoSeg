@@ -86,8 +86,8 @@ def main(model_folder,
         # TODO: 根据model_folder->确定当前模型->修改mask值
         if os.path.basename(model_folder)=="Airway_nnUnet":
             pass
-        else:
-            seg_results*=1
+        else: # 注意之后添加vein模型
+            seg_results*=2
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
 
