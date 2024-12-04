@@ -87,8 +87,9 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Airway_nnUnet":
             pass
         else: # 注意之后添加vein模型
-            #print(seg_results)
-            seg_results*=2
+            val, val_prob = seg_results
+            val=val*2
+            seg_results=(val, val_prob)
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
 

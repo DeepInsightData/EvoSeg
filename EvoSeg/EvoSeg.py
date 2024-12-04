@@ -98,7 +98,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         self.logic.setResultToLabelCallback = self.onResultSeg
 
-        self.ui.set_modifiy.connect("toggled(bool)", self.check_set_modifiy)
+        self.ui.advancedCollapsibleButton.connect("contentsCollapsed(bool)", self.check_set_modifiy)
 
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.logic.)
@@ -154,6 +154,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
+
+
     def onButtonGroupClick(self,value_for_group):
         if value_for_group.text=="airway":
             model_name_must_is = "Airway_nnUnet"
@@ -204,7 +206,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.onCancel()
 
     def check_set_modifiy(self,check_it):
-        if check_it:
+
+        if len(self.data_module_list)==0:
+            self.ui.advancedCollapsibleButton.checked=False
+            return
+
+        if not check_it:
             self.layoutManager = slicer.app.layoutManager()
         
             views = [
@@ -217,6 +224,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.markup_node=slicer.modules.markups.logic().AddControlPoint(0)
             
             markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
+            markupsDisplayNodes[0].SetSelectedColor(1,1,1)
             try:
                 for observedNode, observation in self.observations:
                     observedNode.RemoveObserver(observation)
@@ -242,7 +250,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onButtonUndoClick(self):
         self.data_module.undo()
-        self.ui.label_6.setText("Modifiy Queue Len:"+str(self.data_module.get_history_len()))
+        self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
         self.FasterUpdateSegForonPress(self.data_module.get_masks())
 
     def FasterUpdateSegForonPress(self, segmentation_masks):
@@ -326,7 +334,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.FasterUpdateSegForonPress(self.data_module.get_masks())
             #print(self.button_group.checkedButton().text)
             #self.data_module.
-            self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+            self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
             self.ui.label_img.setText(self.ui.label_img.text+" ")
 
             

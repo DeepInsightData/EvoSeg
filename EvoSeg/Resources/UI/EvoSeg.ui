@@ -154,6 +154,12 @@ Segment</string>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
      <item>
       <widget class="QPushButton" name="bt_export">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Export Mask</string>
        </property>
@@ -161,6 +167,12 @@ Segment</string>
      </item>
      <item>
       <widget class="QPushButton" name="browseToModelsFolderButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="toolTip">
         <string>Open the folder that contains all downloaded files for models.</string>
        </property>
@@ -180,10 +192,10 @@ Segment</string>
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="collapsed">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -256,17 +268,7 @@ Segment</string>
          </widget>
         </item>
         <item row="0" column="2">
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,1,1,1">
-          <item>
-           <widget class="QCheckBox" name="set_modifiy">
-            <property name="text">
-             <string>Set Modifiy</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,1,1">
           <item>
            <widget class="QLabel" name="label_img">
             <property name="text">
