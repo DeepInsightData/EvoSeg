@@ -87,6 +87,7 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Airway_nnUnet":
             pass
         else: # 注意之后添加vein模型
+            #print(seg_results)
             seg_results*=2
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
@@ -133,7 +134,8 @@ def main(model_folder,
             # prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
             # SimpleITKIO().writea_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
             # # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
-        SimpleITKIO().write_seg(seg_results, result_file, prop)
+        else:
+            SimpleITKIO().write_seg(seg_results, result_file, prop)
     
     timing_checkpoints.append(("Save", time.time()))
     

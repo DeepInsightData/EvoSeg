@@ -10,7 +10,7 @@
     <height>653</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,5,5">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,3,5">
    <item>
     <layout class="QHBoxLayout" name="new_ui_layout_1" stretch="2,8">
      <item>
@@ -256,7 +256,7 @@ Segment</string>
          </widget>
         </item>
         <item row="0" column="2">
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,1,1,1">
           <item>
            <widget class="QCheckBox" name="set_modifiy">
             <property name="text">
