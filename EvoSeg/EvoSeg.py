@@ -155,7 +155,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
-
+        # event module selector
+        slicer.util.moduleSelector().connect('moduleSelected(QString)', self.otherModuleChanged)
+    
+    def otherModuleChanged(self,module_name):
+        #print(module_name)
+        # 切换模块关掉advancedCollapsibleButton以免带来bug
+        if self.ui.advancedCollapsibleButton.checked:
+            self.ui.advancedCollapsibleButton.checked=False
 
     def onButtonGroupClick(self,value_for_group):
         if value_for_group.text=="airway":
@@ -232,7 +239,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.markup_node=slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
             self.markup_node.AddControlPoint(0,0,0)
             DisplayNode=self.markup_node.GetDisplayNode()
-            print("1",type(DisplayNode),DisplayNode.GetNodeTagName())
             DisplayNode.SetSelectedColor(1,1,1)
 
             try:
@@ -251,8 +257,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
                 
         else:
-            self.markup_node.RemoveAllControlPoints()
             if self.markup_node:
+                self.markup_node.RemoveAllControlPoints()
                 slicer.mrmlScene.RemoveNode(self.markup_node)
             
             for node in originMarkupsDisplayNodes:
