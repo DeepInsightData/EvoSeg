@@ -26,7 +26,7 @@ class EvoSeg(ScriptedLoadableModule):
         ScriptedLoadableModule.__init__(self, parent)
         self.parent.title = _("EvoSeg")
         # TODO: set categories (folders where the module shows up in the module selector)
-        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Segmentation")]
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "")]
         self.parent.dependencies = []  
         self.parent.contributors = ["DeepInsightData"] 
         # TODO: set help text
