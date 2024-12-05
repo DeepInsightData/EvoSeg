@@ -133,10 +133,17 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="qMRMLSegmentationShow3DButton" name="segmentationShow3DButton"/>
-       </item>
        <item row="2" column="0">
+        <widget class="QPushButton" name="copyModelsButton">
+         <property name="toolTip">
+          <string>the button is you needed.</string>
+         </property>
+         <property name="text">
+          <string>Copy to folder</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QPushButton" name="deleteAllModelsButton">
          <property name="enabled">
           <bool>false</bool>
@@ -149,16 +156,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="copyModelsButton">
-         <property name="toolTip">
-          <string>the button is you needed.</string>
-         </property>
-         <property name="text">
-          <string>Copy to folder</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -168,7 +165,7 @@
      <item>
       <widget class="QPushButton" name="bt_seg_all_run">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -374,11 +371,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ctkMenuButton</class>
-   <extends>QPushButton</extends>
-   <header>ctkMenuButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>
    <header>ctkSliderWidget.h</header>
@@ -398,11 +390,6 @@
    <extends>QWidget</extends>
    <header>qMRMLWidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>qMRMLSegmentationShow3DButton</class>
-   <extends>ctkMenuButton</extends>
-   <header>qMRMLSegmentationShow3DButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -100,7 +100,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.advancedCollapsibleButton.connect("contentsCollapsed(bool)", self.check_set_modifiy)
 
-        self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
+        #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.logic.)
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationEditor_.setSegmentationNode)
 
@@ -190,12 +190,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         if "airway"==button_name:
             run_model_name="Airway_nnUnet"
             self.ui.bt_seg_airway.setEnabled(False)
-            self.ui.bt_seg_artery.setEnabled(False)# 并行时删除
+            #self.ui.bt_seg_artery.setEnabled(False)# 并行时删除
             self.ui.bt_seg_all_run.setEnabled(True)
         elif "artery"==button_name:
             run_model_name="Artery_nnUnet"
             self.ui.bt_seg_artery.setEnabled(False)
-            self.ui.bt_seg_airway.setEnabled(False)
+            #self.ui.bt_seg_airway.setEnabled(False)
             self.ui.bt_seg_all_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
@@ -208,7 +208,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def check_set_modifiy(self,check_it):
 
-        if len(self.data_module_list)==0:
+        if len(self.data_module_list)==0 and check_it==False:
             self.ui.advancedCollapsibleButton.checked=False
             slicer.util.messageBox("No result output")
             return
@@ -281,7 +281,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
 
-        self.ui.segmentationShow3DButton.setChecked(True)
+        segmentationNode.CreateClosedSurfaceRepresentation()
+
 
     def someCustomAction(self,caller, eventId):
         import numpy as np
@@ -421,8 +422,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             
         select_file = QFileDialog.getOpenFileNames(None, "选择文件", "", "File (*.7z)")
         
-        
-
         self.logic.extract_7z(select_file[0],copy2dir)
         #print("ok?")
         
@@ -445,7 +444,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         slicer.app.processEvents()  # force update
 
     def onApply(self,model_name):
-        self.ui.statusLabel.plainText = ""
+        #self.ui.statusLabel.plainText = ""
 
         try:
             with slicer.util.tryWithErrorDisplay("Failed to start processing.", waitCursor=True):
@@ -465,6 +464,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # 配置输出
                 output_segmentation_name=model_name+"_Output_Mask"
                 self.ui.outputSegmentationSelector.baseName = output_segmentation_name
+
+                print(self.ui.outputSegmentationSelector.nodeTypes)
+                #print("---->",dir(self.ui.outputSegmentationSelector))
+
                 output_segmentation_node = slicer.mrmlScene.GetFirstNodeByName(output_segmentation_name)
                 if output_segmentation_node:
                     self.ui.outputSegmentationSelector.setCurrentNode(output_segmentation_node)
@@ -503,9 +506,18 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
+            if len(self._segmentationProcessInfoList)==0:
+                slicer.util.messageBox("No Process Run")
+                return
+            #print(len(self._segmentationProcessInfoList),"----<<")
             for i in self._segmentationProcessInfoList:
                 self.logic.cancelProcessing(i["process"])
                 self._segmentationProcessInfoList.remove(i)
+                if i["name"]=="Airway_nnUnet":
+                    self.ui.bt_seg_airway.setEnabled(True)
+                if i["name"]=="Artery_nnUnet":
+                    self.ui.bt_seg_artery.setEnabled(True)
+           
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
     def onProcessImportStarted(self, customData):
@@ -520,14 +532,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         slicer.app.processEvents()
 
     def onProcessingCompleted(self, returnCode, customData):
-        self.ui.statusLabel.appendPlainText("\nProcessing finished.")
+        # self.ui.statusLabel.appendPlainText("\nProcessing finished.")
         print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
 
         # TODO: 以下代码是临时写在此处的！
         # 临时在这个回调里处理 3d视图居中和颜色重调(不使用原标准色彩) 和 self._segmentationProcessInfoList
         #---------------------------------------------------------------------
-        self.ui.segmentationShow3DButton.setChecked(True)
-        # Center and fit displayed content in 3D view
+        # Center the 3D view
+
         layoutManager = slicer.app.layoutManager()
         threeDWidget = layoutManager.threeDWidget(0)
         threeDView = threeDWidget.threeDView()
@@ -551,12 +563,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             
             # 同时把按钮setenbled true
             if name=="Airway_nnUnet":
-            #     self.ui.bt_seg_airway.setEnabled(True)
+                self.ui.bt_seg_airway.setEnabled(True)
                 self.ui.radio_airway_tag.setChecked(True)
             if name=="Artery_nnUnet":
-            #     self.ui.bt_seg_artery.setEnabled(True)
+                self.ui.bt_seg_artery.setEnabled(True)
                 self.ui.radio_artery_tag.setChecked(True)
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
+            node.CreateClosedSurfaceRepresentation()
             segmentation = node.GetSegmentation()
             display_node = node.GetDisplayNode()
             if display_node==None:
@@ -567,13 +580,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 
                 import random
                 segment.SetColor(random.random(), random.random(), random.random())
+            
+            self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
             #segment_id = segment.GetName()
             # display_node.SetSegmentOpacity3D(segment_id, 0.2)
             # display_node.SetSegmentOverrideColor(segment_id, 0, 0, 1)
         
-        self.ui.bt_seg_airway.setEnabled(True)
-        self.ui.bt_seg_artery.setEnabled(True)
-        self.ui.bt_seg_all_run.setEnabled(False)
+        
+        #self.ui.bt_seg_all_run.setEnabled(False)
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
         
@@ -1133,7 +1147,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         if cancelRequested:
             procReturnCode = EvoSegLogic.EXIT_CODE_USER_CANCELLED
-            self.log(f"Processing was cancelled.")
+            self.log(model+f": Processing was cancelled.")
         else:
             if procReturnCode == 0:
                 if self.startResultImportCallback:
@@ -1142,7 +1156,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     #print("------------------->Befor read")
                     self.beforeReadResult(inputNodes[0], tempDir,model) # NOTE:临时
                     # Load result
-                    self.log("Importing segmentation results...")
+                    self.log(model+": Importing segmentation results...")
                     #print(outputSegmentation,outputSegmentationFile,model)
                     
                     self.mdf_outputSegmentation=outputSegmentation
@@ -1171,15 +1185,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         self.endResultImportCallback(customData)
 
             else:
-                self.log(f"Processing failed with return code {procReturnCode}")
+                self.log(model+f": Processing failed with return code {procReturnCode}")
 
         if self.clearOutputFolder:
-            self.log("Cleaning up temporary folder.")
+            self.log(model+": Cleaning up temporary folder.")
             if os.path.isdir(tempDir):
                 import shutil
                 shutil.rmtree(tempDir)
         else:
-            self.log(f"Not cleaning up temporary folder: {tempDir}")
+            self.log(model+f": Not cleaning up temporary folder: {tempDir}")
 
         # Report total elapsed time
         import time
@@ -1187,12 +1201,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         segmentationProcessInfo["stopTime"] = stopTime
         elapsedTime = stopTime - startTime
         if cancelRequested:
-            self.log(f"Processing was cancelled after {elapsedTime:.2f} seconds.")
+            self.log(model+f": Processing was cancelled after {elapsedTime:.2f} seconds.")
         else:
             if procReturnCode == 0:
-                self.log(f"Processing was completed in {elapsedTime:.2f} seconds.")
+                self.log(model+f": Processing was completed in {elapsedTime:.2f} seconds.")
             else:
-                self.log(f"Processing failed after {elapsedTime:.2f} seconds.")
+                self.log(model+f": Processing failed after {elapsedTime:.2f} seconds.")
 
         if self.processingCompletedCallback:
             self.processingCompletedCallback(procReturnCode, customData)
