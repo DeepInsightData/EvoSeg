@@ -14,7 +14,7 @@ import SimpleITK as sitk
 
 import nrrd
 
-simulated_data=True
+simulated_data=False
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
