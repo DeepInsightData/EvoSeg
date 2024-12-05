@@ -119,7 +119,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.radioButton12.setChecked(True)
 
         # new button click
-        self.ui.lineEdit_radius.setText("{'radius':3,}")
         self.ui.button_undo.connect("clicked(bool)", self.onButtonUndoClick)
 
         self.button_group = QButtonGroup()
@@ -150,7 +149,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # 新增UI简化更新 update v1
         # 隐藏控件将在之后更新中彻底去除
         self.hide_all_widgets_in_layout(self.ui.gridLayout)
-
+        
+        self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/aireway_segmentation.png")))
+        self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
@@ -324,7 +325,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         else:
             #print(self.data_module.get_masks())
             optin_select=self.button_group2.checkedButton().text
-            param = ast.literal_eval(self.ui.lineEdit_radius.text)
+            param = ast.literal_eval("{'radius':"+str(int(self.ui.radius_slider.value))+",}")
             #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
             if optin_select=="Sphere Addition":
                 self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
