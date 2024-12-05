@@ -155,14 +155,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
-        # event module selector
-        slicer.util.moduleSelector().connect('moduleSelected(QString)', self.otherModuleChanged)
-    
-    def otherModuleChanged(self,module_name):
-        #print(module_name)
+    def enter(self):
         # 切换模块关掉advancedCollapsibleButton以免带来bug
         if self.ui.advancedCollapsibleButton.checked:
             self.ui.advancedCollapsibleButton.checked=False
+        
+    def exit(self):
+        pass
 
     def onButtonGroupClick(self,value_for_group):
         if value_for_group.text=="airway":
