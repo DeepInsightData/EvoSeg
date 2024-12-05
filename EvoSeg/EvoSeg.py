@@ -213,6 +213,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             slicer.util.messageBox("No result output")
             return
 
+        originMarkupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
+
         if not check_it:
             self.layoutManager = slicer.app.layoutManager()
         
@@ -223,32 +225,39 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 slicer.app.layoutManager().sliceWidget("Green").sliceView()
             ]
             
-            self.markup_node=slicer.modules.markups.logic().AddControlPoint(0)
+
+            for node in originMarkupsDisplayNodes:
+                node.SetVisibility(False)
             
-            markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
-            markupsDisplayNodes[0].SetSelectedColor(1,1,1)
+            self.markup_node=slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
+            self.markup_node.AddControlPoint(0,0,0)
+            DisplayNode=self.markup_node.GetDisplayNode()
+            print("1",type(DisplayNode),DisplayNode.GetNodeTagName())
+            DisplayNode.SetSelectedColor(1,1,1)
+
             try:
                 for observedNode, observation in self.observations:
                     observedNode.RemoveObserver(observation)
             except:
                 pass
-
-            self.observations=[]
-            for markupsDisplayNode in markupsDisplayNodes:
-                self.observations.append([markupsDisplayNode, markupsDisplayNode.AddObserver(markupsDisplayNode.CustomActionEvent1, self.someCustomAction)])
-
-            pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
-            pointListNode.SetNthControlPointLabel(0, "")
+            
+            self.observations=[[DisplayNode, DisplayNode.AddObserver(DisplayNode.CustomActionEvent1, self.someCustomAction)]]
+            
+            self.markup_node.SetNthControlPointLabel(0, "")
             for view in views:
                 markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
-                widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
+                widget = markupsDisplayableManager.GetWidget(DisplayNode)
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
                 
         else:
-            #print("should delete")
-            pointListNode = slicer.util.getNode("vtkMRMLMarkupsFiducialNode1")
-            pointListNode.RemoveAllMarkups()
+            self.markup_node.RemoveAllControlPoints()
+            if self.markup_node:
+                slicer.mrmlScene.RemoveNode(self.markup_node)
+            
+            for node in originMarkupsDisplayNodes:
+                node.SetVisibility(True)
+            
 
     def onButtonUndoClick(self):
         self.data_module.undo()
@@ -293,7 +302,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
         # inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
         volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red) #slicer.util.getNode(inputNodeName)
-        pointListNode = slicer.util.getNode("F")
+        pointListNode = self.markup_node
         markupsIndex = 0
 
         # Get point coordinate in RAS
