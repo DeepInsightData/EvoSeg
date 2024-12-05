@@ -176,7 +176,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         export_node = [slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask"),
                        slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")]
         for node in export_node:
-            if node:
+            if node and node.GetSegmentation().GetNumberOfSegments()!=0:
                 NodeShItem = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene).GetItemByDataNode(node)
                 subjectHierarchyTreeView.setCurrentItem(NodeShItem)
                 plugin=slicer.qSlicerSubjectHierarchyPluginHandler.instance().pluginByName('Export')
@@ -209,6 +209,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         if len(self.data_module_list)==0:
             self.ui.advancedCollapsibleButton.checked=False
+            slicer.util.messageBox("No result output")
             return
 
         if not check_it:

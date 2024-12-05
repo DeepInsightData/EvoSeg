@@ -222,6 +222,9 @@ Segment</string>
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton32">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Magic Addition</string>
              </property>
@@ -229,6 +232,9 @@ Segment</string>
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton42">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Magic Erasure</string>
              </property>
@@ -259,6 +265,9 @@ Segment</string>
            </item>
            <item>
             <widget class="QRadioButton" name="radio_vein_tag">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>vein</string>
              </property>
