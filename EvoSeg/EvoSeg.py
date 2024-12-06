@@ -156,11 +156,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
     def enter(self):
-        # 切换模块关掉advancedCollapsibleButton以免带来bug
-        if self.ui.advancedCollapsibleButton.checked:
-            self.ui.advancedCollapsibleButton.checked=False
+        pass
         
     def exit(self):
+        # 切出模块时，关掉advancedCollapsibleButton以还原显示原先存在的markups，并删除EvoSeg专用于辅助模型修改的小球
+        if self.ui.advancedCollapsibleButton.checked:
+            self.ui.advancedCollapsibleButton.checked=False
         pass
 
     def onButtonGroupClick(self,value_for_group):
@@ -237,6 +238,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             
             self.markup_node=slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
             self.markup_node.AddControlPoint(0,0,0)
+            self.markup_node.SetNthControlPointLabel(0, "")
             DisplayNode=self.markup_node.GetDisplayNode()
             DisplayNode.SetSelectedColor(1,1,1)
 
@@ -248,7 +250,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             
             self.observations=[[DisplayNode, DisplayNode.AddObserver(DisplayNode.CustomActionEvent1, self.someCustomAction)]]
             
-            self.markup_node.SetNthControlPointLabel(0, "")
             for view in views:
                 markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
                 widget = markupsDisplayableManager.GetWidget(DisplayNode)
