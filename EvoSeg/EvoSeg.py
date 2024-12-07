@@ -41,8 +41,6 @@ class EvoSeg(ScriptedLoadableModule):
     def EvoSegHello(self):
         #print("EvoSeg Init.")
         pass
-
-
 #
 # EvoSegWidget
 #
@@ -181,15 +179,25 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         dataModuleWidget = slicer.modules.data.widgetRepresentation()
         subjectHierarchyTreeView = dataModuleWidget.findChild(slicer.qMRMLSubjectHierarchyTreeView)
 
-        export_node = [slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask"),
-                       slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")]
-        for node in export_node:
+        export_labelmap_node = [slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask"),
+                                slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")]
+        for node in export_labelmap_node:
             if node and node.GetSegmentation().GetNumberOfSegments()!=0:
                 NodeShItem = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene).GetItemByDataNode(node)
+                subjectHierarchyTreeView.setCurrentItem(NodeShItem)
+                plugin=slicer.qSlicerSubjectHierarchyPluginHandler.instance().pluginByName('Segmentations')
+                openExportDICOMDialogAction=plugin.children()[0]
+                openExportDICOMDialogAction.trigger()
+
+                export_node = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLLabelMapVolumeNode')
+
+                NodeShItem = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene).GetItemByDataNode(export_node)
                 subjectHierarchyTreeView.setCurrentItem(NodeShItem)
                 plugin=slicer.qSlicerSubjectHierarchyPluginHandler.instance().pluginByName('Export')
                 openExportDICOMDialogAction=plugin.children()[0]
                 openExportDICOMDialogAction.trigger()
+                slicer.mrmlScene.RemoveNode(export_node)
+
 
     def onSegButtonClick(self,button_name):
         # update v2 目前剩3d按钮和一个输出部分保留原来的
