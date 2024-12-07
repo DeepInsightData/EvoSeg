@@ -28,6 +28,9 @@
            <property name="toolTip">
             <string>Artery Segment</string>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton { background-color: transparent; border: 0px }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -36,6 +39,9 @@
              <width>100</width>
              <height>100</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -50,6 +56,9 @@
            <property name="toolTip">
             <string>Airway Segment</string>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton { background-color: transparent; border: 0px }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -58,6 +67,9 @@
              <width>100</width>
              <height>100</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -365,17 +377,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ctkCollapsibleButton</class>
-   <extends>QWidget</extends>
-   <header>ctkCollapsibleButton.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkSliderWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkSliderWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>qMRMLNodeComboBox</class>
    <extends>QWidget</extends>
    <header>qMRMLNodeComboBox.h</header>
@@ -390,6 +391,17 @@
    <extends>QWidget</extends>
    <header>qMRMLWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleButton</class>
+   <extends>QWidget</extends>
+   <header>ctkCollapsibleButton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkSliderWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkSliderWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
