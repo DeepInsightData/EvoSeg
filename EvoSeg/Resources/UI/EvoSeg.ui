@@ -10,7 +10,7 @@
     <height>653</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,3,5">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,1,3,5">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2">
      <item>
@@ -173,17 +173,23 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,4,4">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
      <item>
       <widget class="QPushButton" name="bt_seg_all_run">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
        </property>
        <property name="text">
         <string>Cancel</string>
@@ -193,10 +199,16 @@
      <item>
       <widget class="QPushButton" name="bt_export">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="text">
         <string>Export Mask</string>
@@ -206,7 +218,7 @@
      <item>
       <widget class="QPushButton" name="browseToModelsFolderButton">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -215,11 +227,74 @@
         <string>Open the folder that contains all downloaded files for models.</string>
        </property>
        <property name="text">
-        <string>Open models cache folder</string>
+        <string>Models Folder</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleButton" name="settingsCollapsibleButton">
+     <property name="text">
+      <string>EvoSeg Settings</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="autoRepeatInterval">
+      <number>100</number>
+     </property>
+     <property name="collapsedHeight">
+      <number>14</number>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QVBoxLayout" name="settings_Layout">
+        <item>
+         <layout class="QHBoxLayout" name="color_setting_layout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Color Setting:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bt_color_airway">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(127, 127, 127);</string>
+            </property>
+            <property name="text">
+             <string>Airway</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bt_color_artery">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(216, 101, 79);</string>
+            </property>
+            <property name="text">
+             <string>Artery</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bt_color_vein">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 151, 206);</string>
+            </property>
+            <property name="text">
+             <string>Vein</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="ctkCollapsibleButton" name="advancedCollapsibleButton">
@@ -377,6 +452,17 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>ctkCollapsibleButton</class>
+   <extends>QWidget</extends>
+   <header>ctkCollapsibleButton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkSliderWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkSliderWidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>qMRMLNodeComboBox</class>
    <extends>QWidget</extends>
    <header>qMRMLNodeComboBox.h</header>
@@ -391,17 +477,6 @@
    <extends>QWidget</extends>
    <header>qMRMLWidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkCollapsibleButton</class>
-   <extends>QWidget</extends>
-   <header>ctkCollapsibleButton.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkSliderWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkSliderWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
