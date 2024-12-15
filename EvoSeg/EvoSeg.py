@@ -15,7 +15,6 @@ from slicer.parameterNodeWrapper import (
 from slicer import vtkMRMLScalarVolumeNode
 from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup,QMessageBox
 import subprocess
-from Scripts.data import DataModule
 from EvoSegLib import *
 #
 # EvoSeg
@@ -1042,7 +1041,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         outputSegmentationFile = tempDir + "/output-segmentation.nrrd"
         modelPtFile = modelPath #.joinpath("model.pth") # TODO: 符合nnunetv2_inference.py的输入
-        inferenceScriptPyFile = os.path.join(self.moduleDir, "Scripts", "nnunetv2_inference.py")
+        inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
         auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
             "--model_folder", str(modelPtFile),
             "--image_file", inputFiles[0],

@@ -4,11 +4,12 @@ set(MODULE_NAME EvoSeg)
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
-  Scripts/nnunetv2_inference.py
-  Scripts/data.py
-  Scripts/__init__.py
   ${MODULE_NAME}Lib/__init__.py
+  ${MODULE_NAME}Lib/data.py
+  ${MODULE_NAME}Lib/EvoSegModels.py
+  ${MODULE_NAME}Lib/EvoSegEditor.py
   ${MODULE_NAME}Lib/EvoSegSettingsPanel.py
+  ${MODULE_NAME}Lib/nnunetv2_inference.py
   )
 
 set(MODULE_PYTHON_RESOURCES
