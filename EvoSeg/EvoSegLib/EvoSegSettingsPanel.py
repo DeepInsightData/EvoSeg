@@ -17,9 +17,9 @@ class EvoSegModel:
 
 class EvoSegModels:
     MODELS = [
-        EvoSegModel("Airway", "#c8c8eb"),
-        EvoSegModel("Artery", "#d8654f"),
-        EvoSegModel("Vein", "#0097ce"),
+        EvoSegModel("Airway", qt.QColor("#c8c8eb")),
+        EvoSegModel("Artery", qt.QColor("#d8654f")),
+        EvoSegModel("Vein", qt.QColor("#0097ce")),
     ]
 
     _model_dict = {model.name: model for model in MODELS}

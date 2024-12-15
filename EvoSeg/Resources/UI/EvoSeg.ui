@@ -251,41 +251,31 @@
       <item>
        <layout class="QVBoxLayout" name="settings_Layout">
         <item>
-         <layout class="QHBoxLayout" name="color_setting_layout">
+         <layout class="QHBoxLayout" name="lobe_setting_layout" stretch="2,2,4">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Color Setting:</string>
+             <string>Lung Lobe:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="bt_color_airway">
-            <property name="styleSheet">
-             <string notr="true">color: rgb(127, 127, 127);</string>
-            </property>
+           <widget class="QCheckBox" name="show_lobe_checkbox">
             <property name="text">
-             <string>Airway</string>
+             <string>Show in results</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="bt_color_artery">
-            <property name="styleSheet">
-             <string notr="true">color: rgb(216, 101, 79);</string>
+           <widget class="ctkSliderWidget" name="lobe_slider">
+            <property name="singleStep">
+             <double>0.050000000000000</double>
             </property>
-            <property name="text">
-             <string>Artery</string>
+            <property name="maximum">
+             <double>1.000000000000000</double>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="bt_color_vein">
-            <property name="styleSheet">
-             <string notr="true">color: rgb(0, 151, 206);</string>
-            </property>
-            <property name="text">
-             <string>Vein</string>
+            <property name="value">
+             <double>0.200000000000000</double>
             </property>
            </widget>
           </item>

@@ -155,9 +155,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
-        self.ui.bt_color_airway.clicked.connect(lambda: self.onSettingColorButtonClick('airway'))
-        self.ui.bt_color_artery.clicked.connect(lambda: self.onSettingColorButtonClick('artery'))
-        self.ui.bt_color_vein.clicked.connect(lambda: self.onSettingColorButtonClick('vein'))
+        # self.ui.bt_color_airway.clicked.connect(lambda: self.onSettingColorButtonClick('airway'))
+        # self.ui.bt_color_artery.clicked.connect(lambda: self.onSettingColorButtonClick('artery'))
+        # self.ui.bt_color_vein.clicked.connect(lambda: self.onSettingColorButtonClick('vein'))
 
     def enter(self):
         pass
@@ -168,39 +168,39 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.advancedCollapsibleButton.checked=False
         pass
     
-    def onSettingColorButtonClick(self,segName):
-        try:
-            if segName=="airway":
-                segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
-                segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
-            elif segName=="artery":
-                segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
-                segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
-            else:
-                return
-                #segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Vein_nnUnet_Output_Mask")
-                #segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Vein')
+    # def onSettingColorButtonClick(self,segName):
+    #     try:
+    #         if segName=="airway":
+    #             segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
+    #             segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
+    #         elif segName=="artery":
+    #             segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
+    #             segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
+    #         else:
+    #             return
+    #             #segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Vein_nnUnet_Output_Mask")
+    #             #segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Vein')
             
-            if segmentId:
-                import ctk
-                from qt import QColor
-                segment = segmentationNode.GetSegmentation().GetSegment(segmentId)
-                currentColor = segment.GetColor()
-                #print(currentColor)
-                colorDialog = ctk.ctkColorDialog()
-                initialColor = QColor(currentColor[0]*255, currentColor[1]*255, currentColor[2]*255)
-                newColor = colorDialog.getColor(initialColor, slicer.util.mainWindow(), "Choose new segment color")
+    #         if segmentId:
+    #             import ctk
+    #             from qt import QColor
+    #             segment = segmentationNode.GetSegmentation().GetSegment(segmentId)
+    #             currentColor = segment.GetColor()
+    #             #print(currentColor)
+    #             colorDialog = ctk.ctkColorDialog()
+    #             initialColor = QColor(currentColor[0]*255, currentColor[1]*255, currentColor[2]*255)
+    #             newColor = colorDialog.getColor(initialColor, slicer.util.mainWindow(), "Choose new segment color")
                 
-                if newColor.isValid():
-                    segment.SetColor(newColor.redF(), newColor.greenF(), newColor.blueF())
-                    if segName == "airway":
-                        self.ui.bt_color_airway.setStyleSheet(f"color: {newColor.name()};")
-                    elif segName == "artery":
-                        self.ui.bt_color_artery.setStyleSheet(f"color: {newColor.name()};")
-                    else:
-                        self.ui.bt_color_vein.setStyleSheet(f"color: {newColor.name()};")
-        except:
-            slicer.util.messageBox("No Segment For EvoSeg")
+    #             if newColor.isValid():
+    #                 segment.SetColor(newColor.redF(), newColor.greenF(), newColor.blueF())
+    #                 if segName == "airway":
+    #                     self.ui.bt_color_airway.setStyleSheet(f"color: {newColor.name()};")
+    #                 elif segName == "artery":
+    #                     self.ui.bt_color_artery.setStyleSheet(f"color: {newColor.name()};")
+    #                 else:
+    #                     self.ui.bt_color_vein.setStyleSheet(f"color: {newColor.name()};")
+    #     except:
+    #         slicer.util.messageBox("No Segment For EvoSeg")
             
 
     def onButtonGroupClick(self,value_for_group):
@@ -621,7 +621,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 continue
             #其它操作待定
 
-        # 现在不再随机颜色，以下代码将在下次更新整理删除
+        # 现在使用Slicer Setting所设置的颜色
         for name in end_model_name_list:
             
             # 同时把按钮setenbled true
@@ -633,16 +633,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.ui.radio_artery_tag.setChecked(True)
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
-            # segmentation = node.GetSegmentation()
-            # display_node = node.GetDisplayNode()
-            # if display_node==None:
-            #     continue
-            # display_node.SetOpacity3D(0.8)
-            # for i in range(segmentation.GetNumberOfSegments()):
-            #     segment = segmentation.GetNthSegment(i)
+            segmentation = node.GetSegmentation()
+            display_node = node.GetDisplayNode()
+            if display_node==None:
+                continue
+            display_node.SetOpacity3D(0.8)
+            for i in range(segmentation.GetNumberOfSegments()):
+                segment = segmentation.GetNthSegment(i)
                 
-            #     import random
-            #     segment.SetColor(random.random(), random.random(), random.random())
+                # import random
+                # segment.SetColor(random.random(), random.random(), random.random())
+                color = EvoSegModels.get(name.split('_')[0]).color()
+                rgb = (color.red()/255, color.green()/255, color.blue()/255)
+                
+                segment.SetColor(rgb)
             
             self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
             #segment_id = segment.GetName()
