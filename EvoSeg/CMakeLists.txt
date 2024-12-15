@@ -7,6 +7,8 @@ set(MODULE_PYTHON_SCRIPTS
   Scripts/nnunetv2_inference.py
   Scripts/data.py
   Scripts/__init__.py
+  ${MODULE_NAME}Lib/__init__.py
+  ${MODULE_NAME}Lib/EvoSegSettingsPanel.py
   )
 
 set(MODULE_PYTHON_RESOURCES

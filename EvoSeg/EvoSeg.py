@@ -16,7 +16,7 @@ from slicer import vtkMRMLScalarVolumeNode
 from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup,QMessageBox
 import subprocess
 from Scripts.data import DataModule
-
+from EvoSegLib import *
 #
 # EvoSeg
 #
@@ -34,6 +34,8 @@ class EvoSeg(ScriptedLoadableModule):
         # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = _(" ")
         self.terminologyName = None
+        self.settingsPanel = EvoSegSettingsPanel()
+        slicer.app.settingsDialog().addPanel("EvoSeg", self.settingsPanel)
 
         # Additional initialization step after application startup is complete
         slicer.app.connect("startupCompleted()", self.EvoSegHello)
