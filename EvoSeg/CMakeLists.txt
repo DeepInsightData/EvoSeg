@@ -7,7 +7,6 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}Lib/__init__.py
   ${MODULE_NAME}Lib/data.py
   ${MODULE_NAME}Lib/EvoSegModels.py
-  ${MODULE_NAME}Lib/EvoSegEditor.py
   ${MODULE_NAME}Lib/EvoSegSettingsPanel.py
   ${MODULE_NAME}Lib/nnunetv2_inference.py
   )
