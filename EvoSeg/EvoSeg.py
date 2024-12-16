@@ -104,7 +104,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationEditor_.setSegmentationNode)
 
         # Buttons
-        self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
+        # self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
         
         self.ui.browseToModelsFolderButton.connect("clicked(bool)", self.onBrowseModelsFolder)
         self.ui.deleteAllModelsButton.connect("clicked(bool)", self.onClearModelsFolder)
@@ -472,20 +472,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if child_layout is not None:
                 self.hide_all_widgets_in_layout(child_layout)
         
-    def onCopyModel(self):
+    # def onCopyModel(self):
         
-        if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
-            QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
-            return
-        import qt
-        copy2dir= os.path.join(self.logic.modelsPath())
-        print(self.logic.modelsPath())
-        if not os.path.exists(copy2dir):
-            os.makedirs(copy2dir)
+    #     if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
+    #         QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
+    #         return
+    #     import qt
+    #     copy2dir= os.path.join(self.logic.modelsPath())
+    #     print(self.logic.modelsPath())
+    #     if not os.path.exists(copy2dir):
+    #         os.makedirs(copy2dir)
             
-        select_file = QFileDialog.getOpenFileNames(None, "选择文件", "", "File (*.7z)")
+    #     select_file = QFileDialog.getOpenFileNames(None, "选择文件", "", "File (*.7z)")
         
-        self.logic.extract_7z(select_file[0],copy2dir)
+    #     self.logic.extract_7z(select_file[0],copy2dir)
         #print("ok?")
         
     def cleanup(self) -> None:
@@ -777,12 +777,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             import shutil
             shutil.rmtree(self.modelsPath())
 
-    def extract_7z(self, archive, destination):
-        try:
-            subprocess.run(['7z', 'x', archive, f'-o{destination}'], check=True)
-            print(f"Successfully extracted {archive} to {destination}")
-        except subprocess.CalledProcessError as e:
-            print(f"Error during extraction: {e}")
+    # def extract_7z(self, archive, destination):
+    #     try:
+    #         subprocess.run(['7z', 'x', archive, f'-o{destination}'], check=True)
+    #         print(f"Successfully extracted {archive} to {destination}")
+    #     except subprocess.CalledProcessError as e:
+    #         print(f"Error during extraction: {e}")
 
     def downloadModel(self, modelName, withDownload):
         if not withDownload:
@@ -893,45 +893,45 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         
         return labelDescriptions
 
-    def getSegmentLabelColor(self, terminologyEntryStr):
-        """Get segment label and color from terminology"""
+    # def getSegmentLabelColor(self, terminologyEntryStr):
+    #     """Get segment label and color from terminology"""
 
-        def labelColorFromTypeObject(typeObject):
-            """typeObject is a terminology type or type modifier"""
-            label = typeObject.GetSlicerLabel() if typeObject.GetSlicerLabel() else typeObject.GetCodeMeaning()
-            rgb = typeObject.GetRecommendedDisplayRGBValue()
-            return label, (rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
+    #     def labelColorFromTypeObject(typeObject):
+    #         """typeObject is a terminology type or type modifier"""
+    #         label = typeObject.GetSlicerLabel() if typeObject.GetSlicerLabel() else typeObject.GetCodeMeaning()
+    #         rgb = typeObject.GetRecommendedDisplayRGBValue()
+    #         return label, (rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
 
-        tlogic = slicer.modules.terminologies.logic()
+    #     tlogic = slicer.modules.terminologies.logic()
 
-        terminologyEntry = slicer.vtkSlicerTerminologyEntry()
-        if not tlogic.DeserializeTerminologyEntry(terminologyEntryStr, terminologyEntry):
-            raise RuntimeError(f"Failed to deserialize terminology string: {terminologyEntryStr}")
+    #     terminologyEntry = slicer.vtkSlicerTerminologyEntry()
+    #     if not tlogic.DeserializeTerminologyEntry(terminologyEntryStr, terminologyEntry):
+    #         raise RuntimeError(f"Failed to deserialize terminology string: {terminologyEntryStr}")
 
-        numberOfTypes = tlogic.GetNumberOfTypesInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject())
-        foundTerminologyEntry = slicer.vtkSlicerTerminologyEntry()
-        for typeIndex in range(numberOfTypes):
-            tlogic.GetNthTypeInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), typeIndex, foundTerminologyEntry.GetTypeObject())
-            if terminologyEntry.GetTypeObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeObject().GetCodingSchemeDesignator():
-                continue
-            if terminologyEntry.GetTypeObject().GetCodeValue() != foundTerminologyEntry.GetTypeObject().GetCodeValue():
-                continue
-            if terminologyEntry.GetTypeModifierObject() and terminologyEntry.GetTypeModifierObject().GetCodeValue():
-                # Type has a modifier, get the color from there
-                numberOfModifiers = tlogic.GetNumberOfTypeModifiersInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject())
-                foundMatchingModifier = False
-                for modifierIndex in range(numberOfModifiers):
-                    tlogic.GetNthTypeModifierInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject(),
-                        modifierIndex, foundTerminologyEntry.GetTypeModifierObject())
-                    if terminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator():
-                        continue
-                    if terminologyEntry.GetTypeModifierObject().GetCodeValue() != foundTerminologyEntry.GetTypeModifierObject().GetCodeValue():
-                        continue
-                    return labelColorFromTypeObject(foundTerminologyEntry.GetTypeModifierObject())
-                continue
-            return labelColorFromTypeObject(foundTerminologyEntry.GetTypeObject())
+    #     numberOfTypes = tlogic.GetNumberOfTypesInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject())
+    #     foundTerminologyEntry = slicer.vtkSlicerTerminologyEntry()
+    #     for typeIndex in range(numberOfTypes):
+    #         tlogic.GetNthTypeInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), typeIndex, foundTerminologyEntry.GetTypeObject())
+    #         if terminologyEntry.GetTypeObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeObject().GetCodingSchemeDesignator():
+    #             continue
+    #         if terminologyEntry.GetTypeObject().GetCodeValue() != foundTerminologyEntry.GetTypeObject().GetCodeValue():
+    #             continue
+    #         if terminologyEntry.GetTypeModifierObject() and terminologyEntry.GetTypeModifierObject().GetCodeValue():
+    #             # Type has a modifier, get the color from there
+    #             numberOfModifiers = tlogic.GetNumberOfTypeModifiersInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject())
+    #             foundMatchingModifier = False
+    #             for modifierIndex in range(numberOfModifiers):
+    #                 tlogic.GetNthTypeModifierInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject(),
+    #                     modifierIndex, foundTerminologyEntry.GetTypeModifierObject())
+    #                 if terminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator():
+    #                     continue
+    #                 if terminologyEntry.GetTypeModifierObject().GetCodeValue() != foundTerminologyEntry.GetTypeModifierObject().GetCodeValue():
+    #                     continue
+    #                 return labelColorFromTypeObject(foundTerminologyEntry.GetTypeModifierObject())
+    #             continue
+    #         return labelColorFromTypeObject(foundTerminologyEntry.GetTypeObject())
 
-        raise RuntimeError(f"Color was not found for terminology {terminologyEntryStr}")
+    #     raise RuntimeError(f"Color was not found for terminology {terminologyEntryStr}")
 
     @staticmethod
     def _findFirstNodeBynamePattern(namePattern, nodes):
@@ -1308,25 +1308,25 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         slicer.mrmlScene.RemoveNode(colorTableNode)
 
         # Set terminology and color
-        for labelValue in labelValueToDescription:
-            segmentName = labelValueToDescription[labelValue]["name"]
-            terminologyEntryStr = labelValueToDescription[labelValue]["terminology"]
-            segmentId = segmentName
-            self.setTerminology(outputSegmentation, segmentName, segmentId, terminologyEntryStr)
+        # for labelValue in labelValueToDescription:
+        #     segmentName = labelValueToDescription[labelValue]["name"]
+        #     terminologyEntryStr = labelValueToDescription[labelValue]["terminology"]
+        #     segmentId = segmentName
+        #     self.setTerminology(outputSegmentation, segmentName, segmentId, terminologyEntryStr)
 
-    def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
-        segment = segmentation.GetSegmentation().GetSegment(segmentId)
-        #print("------->",segmentId)
-        if not segment:
-            self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
-            # Segment is not present in this segmentation
-            return
-        if terminologyEntryStr:
-            segment.SetTag(segment.GetTerminologyEntryTagName(), terminologyEntryStr)
-            try:
-                label, color = self.getSegmentLabelColor(terminologyEntryStr)
-                if self.useStandardSegmentNames:
-                    segment.SetName(label)
-                segment.SetColor(color)
-            except RuntimeError as e:
-                self.log(str(e))
+    # def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
+    #     segment = segmentation.GetSegmentation().GetSegment(segmentId)
+    #     #print("------->",segmentId)
+    #     if not segment:
+    #         self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
+    #         # Segment is not present in this segmentation
+    #         return
+    #     if terminologyEntryStr:
+    #         segment.SetTag(segment.GetTerminologyEntryTagName(), terminologyEntryStr)
+    #         try:
+    #             label, color = self.getSegmentLabelColor(terminologyEntryStr)
+    #             if self.useStandardSegmentNames:
+    #                 segment.SetName(label)
+    #             segment.SetColor(color)
+    #         except RuntimeError as e:
+    #             self.log(str(e))

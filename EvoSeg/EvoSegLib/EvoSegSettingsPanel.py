@@ -1,7 +1,7 @@
 import qt
 import ctk
 from slicer.i18n import tr as _
-from EvoSegModels import EvoSegModels
+from .EvoSegModels import EvoSegModels
     
 class _ui_EvoSegSettingsPanel:
     def __init__(self, parent):
