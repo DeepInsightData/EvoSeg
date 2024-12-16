@@ -10,7 +10,56 @@
     <height>653</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,0,0,3,5">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,5,0,0,3,5">
+   <item>
+    <layout class="QHBoxLayout" name="hlayoutVolumeNode">
+     <item>
+      <widget class="QLabel" name="labelVolume">
+       <property name="text">
+        <string>Volume:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="qMRMLNodeComboBox" name="VolumeNodeComboBox" native="true">
+       <property name="nodeTypes" stdset="0">
+        <stringlist notr="true">
+         <string>vtkMRMLScalarVolumeNode</string>
+        </stringlist>
+       </property>
+       <property name="hideChildNodeTypes" stdset="0">
+        <stringlist notr="true">
+         <string>vtkMRMLDiffusionWeightedVolumeNode</string>
+         <string>vtkMRMLDiffusionTensorVolumeNode</string>
+         <string>vtkMRMLMultiVolumeNode</string>
+        </stringlist>
+       </property>
+       <property name="addEnabled" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="renameEnabled" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="removeEnabled" stdset="0">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacerVolumeNode">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2">
      <item>
@@ -123,37 +172,37 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="qMRMLNodeComboBox" name="outputSegmentationSelector">
+        <widget class="qMRMLNodeComboBox" name="outputSegmentationSelector" native="true">
          <property name="toolTip">
           <string>This will store the segmentation result.</string>
          </property>
-         <property name="nodeTypes">
+         <property name="nodeTypes" stdset="0">
           <stringlist>
            <string>vtkMRMLSegmentationNode</string>
           </stringlist>
          </property>
-         <property name="showChildNodeTypes">
+         <property name="showChildNodeTypes" stdset="0">
           <bool>false</bool>
          </property>
-         <property name="baseName">
+         <property name="baseName" stdset="0">
           <string>Lung</string>
          </property>
-         <property name="noneEnabled">
+         <property name="noneEnabled" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="addEnabled">
+         <property name="addEnabled" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="removeEnabled">
+         <property name="removeEnabled" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="editEnabled">
+         <property name="editEnabled" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="renameEnabled">
+         <property name="renameEnabled" stdset="0">
           <bool>true</bool>
          </property>
-         <property name="noneDisplay">
+         <property name="noneDisplay" stdset="0">
           <string>Create new segmentation on Apply</string>
          </property>
         </widget>
@@ -163,7 +212,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1,0">
      <item>
       <widget class="QPushButton" name="bt_seg_all_run">
        <property name="enabled">
@@ -221,20 +270,33 @@
        </property>
       </widget>
      </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
    <item>
-    <widget class="ctkCollapsibleButton" name="advancedCollapsibleButton">
-     <property name="text">
+    <widget class="ctkCollapsibleButton" name="advancedCollapsibleButton" native="true">
+     <property name="text" stdset="0">
       <string>Results Modifiy</string>
      </property>
-     <property name="checkable">
+     <property name="checkable" stdset="0">
       <bool>true</bool>
      </property>
-     <property name="checked">
+     <property name="checked" stdset="0">
       <bool>false</bool>
      </property>
-     <property name="collapsed">
+     <property name="collapsed" stdset="0">
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
@@ -333,18 +395,21 @@
            </widget>
           </item>
           <item>
-           <widget class="qMRMLSliderWidget" name="radius_slider">
-            <property name="minimum">
+           <widget class="qMRMLSliderWidget" name="radius_slider" native="true">
+            <property name="minimum" stdset="0">
              <double>1.000000000000000</double>
             </property>
-            <property name="maximum">
-             <double>10.000000000000000</double>
+            <property name="maximum" stdset="0">
+             <double>20.000000000000000</double>
             </property>
-            <property name="value">
+            <property name="pageStep" stdset="0">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value" stdset="0">
              <double>3.000000000000000</double>
             </property>
-            <property name="quantity">
-             <string notr="true"/>
+            <property name="quantity" stdset="0">
+             <string notr="true">length</string>
             </property>
            </widget>
           </item>
@@ -393,6 +458,7 @@
    <class>qMRMLNodeComboBox</class>
    <extends>QWidget</extends>
    <header>qMRMLNodeComboBox.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>qMRMLSliderWidget</class>
@@ -411,6 +477,22 @@
   <connection>
    <sender>EvoSeg</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>VolumeNodeComboBox</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EvoSeg</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>outputSegmentationSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
@@ -421,6 +503,102 @@
     <hint type="destinationlabel">
      <x>355</x>
      <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EvoSeg</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>radius_slider</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VolumeNodeComboBox</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>bt_seg_airway</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>170</x>
+     <y>52</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VolumeNodeComboBox</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>bt_seg_artery</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VolumeNodeComboBox</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>bt_seg_all_run</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VolumeNodeComboBox</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>advancedCollapsibleButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outputSegmentationSelector</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>bt_export</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>

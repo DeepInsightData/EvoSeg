@@ -1,3 +1,4 @@
+import qt
 import logging
 import json
 import os
@@ -79,8 +80,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         uiWidget = slicer.util.loadUI(self.resourcePath("UI/EvoSeg.ui"))
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
-        
-        import qt
 
         # Set scene in MRML widgets. Make sure that in Qt designer the top-level qMRMLWidget's
         # "mrmlSceneChanged(vtkMRMLScene*)" signal in is connected to each MRML widget's.
@@ -261,6 +260,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         else:
             self.onCancel()
 
+
     def check_set_modifiy(self,check_it):
 
         if len(self.data_module_list)==0 and check_it==False:
@@ -283,13 +283,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
             for node in originMarkupsDisplayNodes:
                 node.SetVisibility(False)
-            
             self.markup_node=slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
-            self.markup_node.AddControlPoint(0,0,0)
-            self.markup_node.SetNthControlPointLabel(0, "")
+            self.markup_node.SetMarkupLabelFormat("")
             DisplayNode=self.markup_node.GetDisplayNode()
             DisplayNode.SetSelectedColor(1,1,1)
-
+            DisplayNode.SetGlyphSize(self.ui.radius_slider.value)
+            DisplayNode.SetUseGlyphScale(False)
+            self.ui.radius_slider.valueChanged.connect(lambda value: DisplayNode.SetGlyphSize(value))
+            selectionNode = slicer.mrmlScene.GetNodeByID("vtkMRMLSelectionNodeSingleton")
+            if selectionNode:
+                selectionNode.SetReferenceActivePlaceNodeClassName("vtkMRMLMarkupsFiducialNode")
+            interactionNode = slicer.mrmlScene.GetNodeByID("vtkMRMLInteractionNodeSingleton")
+            if interactionNode:
+                interactionNode.SwitchToSinglePlaceMode()
             try:
                 for observedNode, observation in self.observations:
                     observedNode.RemoveObserver(observation)
@@ -305,6 +311,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
                 
         else:
+            interactionNode = slicer.mrmlScene.GetNodeByID("vtkMRMLInteractionNodeSingleton")
+            if interactionNode:
+                interactionNode.SwitchToViewTransformMode()
             if self.markup_node:
                 self.markup_node.RemoveAllControlPoints()
                 slicer.mrmlScene.RemoveNode(self.markup_node)
@@ -477,7 +486,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     #     if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
     #         QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
     #         return
-    #     import qt
     #     copy2dir= os.path.join(self.logic.modelsPath())
     #     print(self.logic.modelsPath())
     #     if not os.path.exists(copy2dir):
@@ -585,12 +593,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onProcessImportStarted(self, customData):
         print(EvoSegWidget.PROCESSING_IMPORT_RESULTS,"PROCESSING_IMPORT_RESULTS")
-        import qt
         qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
         slicer.app.processEvents()
 
     def onProcessImportEnded(self, customData):
-        import qt
         qt.QApplication.restoreOverrideCursor()
         slicer.app.processEvents()
 
@@ -658,7 +664,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._segmentationProcessInfo = None
         
     def onBrowseModelsFolder(self):
-        import qt
         self.logic.createModelsDir()
         qt.QDesktopServices().openUrl(qt.QUrl.fromLocalFile(self.logic.modelsPath()))
 
@@ -1152,7 +1157,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 break
 
         # No more outputs to process now, check again later
-        import qt
         qt.QTimer.singleShot(self.processOutputCheckTimerIntervalMsec, lambda segmentationProcessInfo=segmentationProcessInfo: self.checkSegmentationProcessOutput(segmentationProcessInfo))
 
     def beforeReadResult(self, result_data,result_data_path,model_name):
