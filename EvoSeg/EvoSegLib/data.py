@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Dict
 from skimage.morphology import ball
+from skimage.transform import resize
 
 class DataModule:
 
@@ -9,6 +10,7 @@ class DataModule:
             img : np.ndarray, 
             segmentation_masks : Dict[str, np.ndarray], 
             probability_maps : Dict[str, np.ndarray], 
+            spacing: tuple = (1.0, 1.0, 1.0)
         ):
         '''
             Initialize the image data and segmentation masks, 
@@ -19,7 +21,7 @@ class DataModule:
         self.img = img
         self.probability_maps = probability_maps
         self.segmentation_masks = segmentation_masks
-
+        self.spacing = spacing
         self.history = []
 
     def sphere_addition(
@@ -36,14 +38,22 @@ class DataModule:
         if (radius <= 0):
             return
 
-        ball_array = ball(radius - 1).astype(bool)
+        ball_array = ball(radius).astype(bool)
 
-        change = ball_array ^ (ball_array & self.segmentation_masks[target][x-radius+1:x+radius, y-radius+1:y+radius, z-radius+1:z+radius])
+        scale_shape =[int(radius/self.spacing[0]+0.5),int(radius/self.spacing[1]+0.5),int(radius/self.spacing[2]+0.5)]
+        new_shape = [dim if dim % 2 == 0 else dim - 1 for dim in scale_shape]
+        scale_ball=resize(ball_array, new_shape, mode="edge", order=0)
+
+        radius_x=scale_ball.shape[0]//2
+        radius_y=scale_ball.shape[1]//2
+        radius_z=scale_ball.shape[2]//2
+    
+        change = scale_ball ^ (scale_ball & self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z])
         change = np.stack(change.nonzero(), axis = 1)
-        change += np.array([[x-radius+1, y-radius+1, z-radius+1]])
+        change += np.array([[x-radius_x, y-radius_y, z-radius_z]])
         self.history.append((target, change, []))
 
-        self.segmentation_masks[target][x-radius+1:x+radius, y-radius+1:y+radius, z-radius+1:z+radius] |= ball_array
+        self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z] |= scale_ball
     
 
     def sphere_erasure(
@@ -62,11 +72,19 @@ class DataModule:
 
         ball_array = ball(radius - 1).astype(bool)
 
-        change = (ball_array & self.segmentation_masks[target][x-radius+1:x+radius, y-radius+1:y+radius, z-radius+1:z+radius])
-        self.segmentation_masks[target][x-radius+1:x+radius, y-radius+1:y+radius, z-radius+1:z+radius] ^= change
+        scale_shape =[int(radius/self.spacing[0]+0.5),int(radius/self.spacing[1]+0.5),int(radius/self.spacing[2]+0.5)]
+        new_shape = [dim if dim % 2 == 0 else dim - 1 for dim in scale_shape]
+        scale_ball=resize(ball_array, new_shape, mode="edge", order=0)
+
+        radius_x=scale_ball.shape[0]//2
+        radius_y=scale_ball.shape[1]//2
+        radius_z=scale_ball.shape[2]//2
+
+        change = (scale_ball & self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z])
+        self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z] ^= change
 
         change = np.stack(change.nonzero(), axis = 1)
-        change += np.array([[x-radius+1, y-radius+1, z-radius+1]])
+        change += np.array([[x-radius_x, y-radius_y, z-radius_z]])
         self.history.append((target, [], change))
 
     def undo(self, ):

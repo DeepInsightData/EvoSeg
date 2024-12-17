@@ -675,17 +675,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.deleteAllModels()
         slicer.util.messageBox("Downloaded models are deleted.")
 
-    def onResultSeg(self,myDataModule, model_name):
+    def onResultSeg(self,myDataModule, model_name, minPrecision):
         # 刷新DataModule 回调
-        #print("-------->",model_name,self.data_module_list)
         self.data_module=myDataModule
         for i in self.data_module_list:
             if i["model_name"]==model_name:
                 i["seg_data"]=self.data_module
-                #print("reinit DataModule ok")
                 return
         self.data_module_list.append({"model_name":model_name,"seg_data":self.data_module})
-        #print("init DataModule ok")
+
+        # print(dir(self.ui.radius_slider))
+        # self.ui.radius_slider.singleStep= minPrecision #
+        self.ui.radius_slider.minimum = minPrecision*2 # 最大为2倍最大间距
+        self.ui.radius_slider.maximum = minPrecision*20 # 最大为20倍最大间距
+        self.ui.radius_slider.setValue(minPrecision*5) # 默认为5倍最大间距 
 #
 # EvoSegLogic
 #
@@ -1164,6 +1167,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import nrrd
         import numpy as np
         image_data = result_data.GetImageData()
+        # print(result_data)
         if image_data:
             vtk_array = numpy_support.vtk_to_numpy(image_data.GetPointData().GetScalars())
             dimensions = image_data.GetDimensions()
@@ -1195,12 +1199,18 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             }
 
 
-            self.data_module = DataModule(ct_data, segmentation_masks, probability_maps)
+            self.data_module = DataModule(ct_data, segmentation_masks, probability_maps, result_data.GetSpacing())
             
+            # TODO: 临时，需要设置data.py对模型修改的最小精度,
+            # 可能正确做法是通过某种vtk方法修改模型，然后需要时再从vtk模型中取mask，通过data.py的做法则是通过直接修改mask然后重新生成模型。
+            # 目前的做法半径越小缩放插值带来的误差越大
+            minPrecision = max(result_data.GetSpacing()) # 用三个方向的最大Spacing表示最小半径,单位mm 
+            
+            self.setResultToLabelCallback(self.data_module,model_name,minPrecision)
         else:
             print("no image data!")
 
-        self.setResultToLabelCallback(self.data_module,model_name)
+        
         
     def onSegmentationProcessCompleted(self, segmentationProcessInfo):
         import nrrd
