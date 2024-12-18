@@ -144,10 +144,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
-        # self.ui.bt_color_airway.clicked.connect(lambda: self.onSettingColorButtonClick('airway'))
-        # self.ui.bt_color_artery.clicked.connect(lambda: self.onSettingColorButtonClick('artery'))
-        # self.ui.bt_color_vein.clicked.connect(lambda: self.onSettingColorButtonClick('vein'))
-
     def enter(self):
         pass
         
@@ -193,7 +189,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 slicer.mrmlScene.RemoveNode(export_node)
 
     def onSegButtonClick(self,button_name):
-        # update v2 目前剩一个Nodecombox部分保留原来的
+        
         run_model_name=""
         if "airway"==button_name:
             run_model_name="Airway_nnUnet"
@@ -296,7 +292,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         combined_mask[segmentation_masks["vein"]] = 3    
         
         if self.ui.radio_airway_tag.isChecked():
-            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway structure')
+            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway')
         elif self.ui.radio_artery_tag.isChecked():
             segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
         
@@ -630,7 +626,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.processingCompletedCallback = None
         self.startResultImportCallback = None
         self.endResultImportCallback = None
-        self.useStandardSegmentNames = True
         self.setResultToLabelCallback = None
 
         self.mdf_outputSegmentation=None
@@ -685,76 +680,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if self.modelsPath().exists():
             import shutil
             shutil.rmtree(self.modelsPath())
-
-    def labelDescriptions(self, modelName):
-        """Return mapping from label value to label description.
-        Label description is a dict containing "name" and "terminology".
-        Terminology string uses Slicer terminology entry format - see specification at
-        https://slicer.readthedocs.io/en/latest/developer_guide/modules/segmentations.html#terminologyentry-tag
-        """
-
-        # Helper function to get code string from CSV file row
-        def getCodeString(field, columnNames, row):
-            columnValues = []
-            for fieldName in ["CodingSchemeDesignator", "CodeValue", "CodeMeaning"]:
-                columnIndex = columnNames.index(f"{field}.{fieldName}")
-                try:
-                    columnValue = row[columnIndex]
-                except IndexError:
-                    # Probably the line in the CSV file was not terminated by multiple commas (,)
-                    columnValue = ""
-                columnValues.append(columnValue)
-            return columnValues
-
-        labelDescriptions = { 
-            1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
-            2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
-            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'}
-        }
-        # labelsFilePath = self.modelPath(modelName).joinpath("labels.csv")
-        # print("in this version No should labels.csv",labelsFilePath) # NOTE: label is should define in futrue??
-        
-        return labelDescriptions
-
-    def getSegmentLabelColor(self, terminologyEntryStr):
-        """Get segment label and color from terminology"""
-
-        def labelColorFromTypeObject(typeObject):
-            """typeObject is a terminology type or type modifier"""
-            label = typeObject.GetSlicerLabel() if typeObject.GetSlicerLabel() else typeObject.GetCodeMeaning()
-            rgb = typeObject.GetRecommendedDisplayRGBValue()
-            return label, (rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
-
-        tlogic = slicer.modules.terminologies.logic()
-
-        terminologyEntry = slicer.vtkSlicerTerminologyEntry()
-        if not tlogic.DeserializeTerminologyEntry(terminologyEntryStr, terminologyEntry):
-            raise RuntimeError(f"Failed to deserialize terminology string: {terminologyEntryStr}")
-
-        numberOfTypes = tlogic.GetNumberOfTypesInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject())
-        foundTerminologyEntry = slicer.vtkSlicerTerminologyEntry()
-        for typeIndex in range(numberOfTypes):
-            tlogic.GetNthTypeInTerminologyCategory(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), typeIndex, foundTerminologyEntry.GetTypeObject())
-            if terminologyEntry.GetTypeObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeObject().GetCodingSchemeDesignator():
-                continue
-            if terminologyEntry.GetTypeObject().GetCodeValue() != foundTerminologyEntry.GetTypeObject().GetCodeValue():
-                continue
-            if terminologyEntry.GetTypeModifierObject() and terminologyEntry.GetTypeModifierObject().GetCodeValue():
-                # Type has a modifier, get the color from there
-                numberOfModifiers = tlogic.GetNumberOfTypeModifiersInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject())
-                foundMatchingModifier = False
-                for modifierIndex in range(numberOfModifiers):
-                    tlogic.GetNthTypeModifierInTerminologyType(terminologyEntry.GetTerminologyContextName(), terminologyEntry.GetCategoryObject(), terminologyEntry.GetTypeObject(),
-                        modifierIndex, foundTerminologyEntry.GetTypeModifierObject())
-                    if terminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator() != foundTerminologyEntry.GetTypeModifierObject().GetCodingSchemeDesignator():
-                        continue
-                    if terminologyEntry.GetTypeModifierObject().GetCodeValue() != foundTerminologyEntry.GetTypeModifierObject().GetCodeValue():
-                        continue
-                    return labelColorFromTypeObject(foundTerminologyEntry.GetTypeModifierObject())
-                continue
-            return labelColorFromTypeObject(foundTerminologyEntry.GetTypeObject())
-
-        raise RuntimeError(f"Color was not found for terminology {terminologyEntryStr}")
 
     @staticmethod
     def _findFirstNodeBynamePattern(namePattern, nodes):
@@ -1106,7 +1031,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
     def readSegmentation(self, outputSegmentation, outputSegmentationFile, model):
 
-        labelValueToDescription = self.labelDescriptions(model)
+        labelValueToDescription ={ 
+            1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
+            2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
+            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'}
+        }
         maxLabelValue = max(labelValueToDescription.keys())
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
         rgba = [0, 0, 0, 0]
@@ -1132,26 +1061,3 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         storageNode.ReadData(outputSegmentation)
 
         slicer.mrmlScene.RemoveNode(colorTableNode)
-
-        # Set terminology and color
-        for labelValue in labelValueToDescription:
-            segmentName = labelValueToDescription[labelValue]["name"]
-            terminologyEntryStr = labelValueToDescription[labelValue]["terminology"]
-            segmentId = segmentName
-            self.setTerminology(outputSegmentation, segmentName, segmentId, terminologyEntryStr)
-
-    def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
-        segment = segmentation.GetSegmentation().GetSegment(segmentId)
-        if not segment:
-            self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
-            # Segment is not present in this segmentation
-            return
-        if terminologyEntryStr:
-            segment.SetTag(segment.GetTerminologyEntryTagName(), terminologyEntryStr)
-            try:
-                label, color = self.getSegmentLabelColor(terminologyEntryStr)
-                if self.useStandardSegmentNames:
-                    segment.SetName(label)
-                segment.SetColor(color)
-            except RuntimeError as e:
-                self.log(str(e))
