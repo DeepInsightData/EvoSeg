@@ -555,7 +555,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
     def onBrowseModelsFolder(self):
         self.logic.createModelsDir()
-        qt.QDesktopServices().openUrl(qt.QUrl.fromLocalFile(self.logic.modelsPath()))
+        qt.QDesktopServices().openUrl(qt.QUrl.fromLocalFile(self.logic.fileCachePath.joinpath("models")))
 
     def onResultSeg(self,myDataModule, model_name, minPrecision):
         # 刷新DataModule 回调
