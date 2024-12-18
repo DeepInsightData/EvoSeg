@@ -86,14 +86,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # "setMRMLScene(vtkMRMLScene*)" slot.
         uiWidget.setMRMLScene(slicer.mrmlScene)
 
-        # Create logic class. Logic implements all computations that should be possible to run
-        # in batch mode, without a graphical user interface.
-        # EvoSegLogic()直接copy EvoSegLogic()
+        # 为self.logic设置回调
         self.logic.logCallback = self.addLog
         self.logic.processingCompletedCallback = self.onProcessingCompleted
         self.logic.startResultImportCallback = self.onProcessImportStarted
         self.logic.endResultImportCallback = self.onProcessImportEnded
-        
         self.logic.setResultToLabelCallback = self.onResultSeg
 
         self.ui.advancedCollapsibleButton.connect("contentsCollapsed(bool)", self.check_set_modifiy)
@@ -105,7 +102,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.bt_export.connect("clicked(bool)", self.onExportClick)
 
-        self.ui.bt_seg_all_run.connect("clicked(bool)", self.onCancel)
+        self.ui.bt_cancel_run.connect("clicked(bool)", self.onCancel)
 
         # check box
         self.ui.radio_airway_tag.setChecked(True)
@@ -130,14 +127,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         if self.CrosshairNode:
             self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
-        
-        extensionsPath = slicer.app.extensionsInstallPath
-        #print("Extensions Install Path:", extensionsPath)
-        layoutManager = slicer.app.layoutManager()
-        fourByFourWidget = layoutManager.threeDWidget(0).threeDView()
-
-        # 显示小部件
-        fourByFourWidget.show()
         
         self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/aireway_segmentation.png")))
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
@@ -194,13 +183,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         if "airway"==button_name:
             run_model_name="Airway_nnUnet"
             self.ui.bt_seg_airway.setEnabled(False)
-            #self.ui.bt_seg_artery.setEnabled(False)# 并行时删除
-            self.ui.bt_seg_all_run.setEnabled(True)
+            self.ui.bt_cancel_run.setEnabled(True)
         elif "artery"==button_name:
             run_model_name="Artery_nnUnet"
             self.ui.bt_seg_artery.setEnabled(False)
-            #self.ui.bt_seg_airway.setEnabled(False)
-            self.ui.bt_seg_all_run.setEnabled(True)
+            self.ui.bt_cancel_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
             return
@@ -466,26 +453,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                         slicer.util.messageBox("This model is running.")
                         return
                 
-                self._segmentationProcessInfo = self.logic.process(inputNodes, 
-                                                                output_segmentation_node,
-                                                                model_name,  
-                                                                False,
-                                                                )
-                
+                self._segmentationProcessInfo = self.logic.process(inputNodes, output_segmentation_node, model_name)
                 self._segmentationProcessInfoList.append({
                                                           "name":model_name,
                                                           "process":self._segmentationProcessInfo
                                                          })
 
-                #print("---->",len(self._segmentationProcessInfoList))
-                #print("---->",self._segmentationProcessInfoList)
                 print(EvoSegWidget.PROCESSING_IN_PROGRESS,"PROCESSING_IN_PROGRESS")
 
         except Exception as e:
             print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
             self.ui.bt_seg_airway.setEnabled(True)
             self.ui.bt_seg_artery.setEnabled(True)
-            self.ui.bt_seg_all_run.setEnabled(False)
+            self.ui.bt_cancel_run.setEnabled(False)
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
@@ -570,8 +550,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             # display_node.SetSegmentOpacity3D(segment_id, 0.2)
             # display_node.SetSegmentOverrideColor(segment_id, 0, 0, 1)
         
-        
-        #self.ui.bt_seg_all_run.setEnabled(False)
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
         
@@ -686,6 +664,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if not pythonSlicerExecutablePath:
             raise RuntimeError("Python was not found")
 
+        # 写入缓存目录
         # Write input volume to file
         inputFiles = []
         for inputIndex, inputNode in enumerate(inputNodes):
@@ -702,7 +681,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
 
         outputSegmentationFile = tempDir + "/output-segmentation.nrrd"
-        modelPtFile = modelPath #.joinpath("model.pth") # TODO: 符合nnunetv2_inference.py的输入
+        modelPtFile = modelPath
         inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
         auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
             "--model_folder", str(modelPtFile),
@@ -715,10 +694,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.log(model+": Creating segmentations with EvoSeg AI...")
         self.log(model+f": command: {auto3DSegCommand}")
 
-        additionalEnvironmentVariables = None
-
-        
-        proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=additionalEnvironmentVariables)
+        proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=None)
 
         segmentationProcessInfo["proc"] = proc
         segmentationProcessInfo["procReturnCode"] = EvoSegLogic.EXIT_CODE_DID_NOT_RUN
@@ -737,7 +713,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         else:
             # Debugging
             self.onSegmentationProcessCompleted(segmentationProcessInfo)
-
         return segmentationProcessInfo
 
     def cancelProcessing(self, segmentationProcessInfo):
