@@ -727,8 +727,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.mdf_outputSegmentationFile=None
         self.mdf_model=None
         
-        self.models = ["Airway_nnUnet","Artery_nnUnet"]
-
         # Timer for checking the output of the segmentation process that is running in the background
         self.processOutputCheckTimerIntervalMsec = 1000
 
@@ -742,12 +740,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.debugSkipInferenceTempDir = r"c:\Users\andra\AppData\Local\Temp\Slicer\__SlicerTemp__2024-01-16_15+26+25.624"
 
         self.data_module = []
-
-    def model(self, modelId):
-        for model in self.models:
-            if model["id"] == modelId:
-                return model
-        raise RuntimeError(f"Model {modelId} not found")
 
     @staticmethod
     def humanReadableTimeFromSec(seconds):
@@ -790,57 +782,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     #         print(f"Successfully extracted {archive} to {destination}")
     #     except subprocess.CalledProcessError as e:
     #         print(f"Error during extraction: {e}")
-
-    def downloadModel(self, modelName, withDownload):
-        if not withDownload:
-            return
-
-        url = self.model(modelName)["url"]
-
-        import zipfile
-        import requests
-        import pathlib
-
-        tempDir = pathlib.Path(slicer.util.tempDirectory())
-        modelDir = self.modelsPath().joinpath(modelName)
-        print("Evo model download dir: ",modelDir)
-        if not os.path.exists(modelDir):
-            os.makedirs(modelDir)
-
-        modelZipFile = tempDir.joinpath("autoseg3d_model.zip")
-        self.log(f"Downloading model '{modelName}' from {url}...")
-        logging.debug(f"Downloading from {url} to {modelZipFile}...")
-        
-        
-        try:
-            with open(modelZipFile, 'wb') as f:
-                with requests.get(url, stream=True) as r:
-                    r.raise_for_status()
-                    total_size = int(r.headers.get('content-length', 0))
-                    reporting_increment_percent = 1.0
-                    last_reported_download_percent = -reporting_increment_percent
-                    downloaded_size = 0
-                    for chunk in r.iter_content(chunk_size=8192 * 16):
-                        f.write(chunk)
-                        downloaded_size += len(chunk)
-                        downloaded_percent = 100.0 * downloaded_size / total_size
-                        if downloaded_percent - last_reported_download_percent > reporting_increment_percent:
-                            self.log(f"Downloading model: {downloaded_size/1024/1024:.1f}MB / {total_size/1024/1024:.1f}MB ({downloaded_percent:.1f}%)")
-                            last_reported_download_percent = downloaded_percent
-
-            self.log(f"Download finished. Extracting to {modelDir}... \n EvgSeg can not should down it")
-            with zipfile.ZipFile(modelZipFile, 'r') as zip_f:
-                zip_f.extractall(modelDir)
-        except Exception as e:
-            raise e
-        finally:
-            if self.clearOutputFolder:
-                self.log("Cleaning up temporary model download folder...")
-                if os.path.isdir(tempDir):
-                    import shutil
-                    shutil.rmtree(tempDir)
-            else:
-                self.log(f"Not cleaning up temporary model download folder: {tempDir}")
 
     def _EvoSegTerminologyPropertyTypes(self):
         """Get label terminology property types defined in from EVO Auto3DSeg terminology.
@@ -1005,8 +946,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         try:
             modelPath = self.modelPath(model)
         except:
-            self.downloadModel(model,withDownload)
-            modelPath = self.modelPath(model)
+            return
         #print("modelPath",modelPath)
         segmentationProcessInfo = {}
 

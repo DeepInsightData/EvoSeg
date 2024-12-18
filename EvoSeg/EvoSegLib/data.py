@@ -55,6 +55,69 @@ class DataModule:
 
         self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z] |= scale_ball
     
+    def tube_addition(
+        self,
+        start_point: np.ndarray,  # [x1, y1, z1] 
+        end_point: np.ndarray,    # [x2, y2, z2]
+        target: str,
+        radius: float = 1
+        ):
+        nx, ny, nz = self.img.shape
+        radius = int(radius)
+        
+        start = np.round(start_point).astype(int)
+        end = np.round(end_point).astype(int)
+        
+        direction = end - start
+        length = np.linalg.norm(direction)
+        if length == 0:
+            return
+        
+        direction = direction / length
+
+        num_points = int(length) + 1
+        points = np.array([start + direction * i for i in range(num_points)])
+        points = points.astype(int)
+        
+        all_changes = []
+        
+        for point in points:
+            x, y, z = point
+            
+            if (0 <= x < nx and 0 <= y < ny and 0 <= z < nz):
+                x_min = max(0, x - radius)
+                x_max = min(nx, x + radius + 1)
+                y_min = max(0, y - radius)
+                y_max = min(ny, y + radius + 1)
+                z_min = max(0, z - radius)
+                z_max = min(nz, z + radius + 1)
+                
+                sphere = ball(radius)
+                
+                pad_x_min = max(0, radius - x)
+                pad_x_max = min(2*radius + 1, radius + (nx - x))
+                pad_y_min = max(0, radius - y)
+                pad_y_max = min(2*radius + 1, radius + (ny - y))
+                pad_z_min = max(0, radius - z)
+                pad_z_max = min(2*radius + 1, radius + (nz - z))
+                
+                sphere = sphere[pad_x_min:pad_x_max, 
+                            pad_y_min:pad_y_max, 
+                            pad_z_min:pad_z_max]
+                
+                current_mask = self.segmentation_masks[target][x_min:x_max, y_min:y_max, z_min:z_max]
+                change = sphere & ~current_mask
+                
+                if np.any(change):
+                    change_coords = np.stack(np.where(change), axis=1)
+                    change_coords += np.array([[x_min, y_min, z_min]])
+                    all_changes.extend(change_coords)
+                
+                self.segmentation_masks[target][x_min:x_max, y_min:y_max, z_min:z_max] |= sphere
+        
+        if all_changes:
+            all_changes = np.stack(all_changes)
+            self.history.append((target, all_changes, []))
 
     def sphere_erasure(
             self, 
