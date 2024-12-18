@@ -133,7 +133,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_cancel_run.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Cancel.png")))
         self.ui.bt_export.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Export.png")))
         self.ui.browseToModelsFolderButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Model.png")))
-        self.ui.advancedCollapsibleButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Place.png")))
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
 
