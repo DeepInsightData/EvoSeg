@@ -442,15 +442,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
                 # 配置输入
                 inputNodes = []
-                try:
-                    BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
-                    ThisVolumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
-                except:
-                    slicer.util.messageBox("Pelease import and show date in 3Dslicer")
+                ThisVolumeNode = self.ui.VolumeNodeComboBox.currentNode()
+                if ThisVolumeNode:
+                    inputNodes.append(ThisVolumeNode)
+                else:
+                    slicer.util.messageBox(_("Pelease import a volume file"))
                     self.ui.bt_seg_airway.setEnabled(True)
                     self.ui.bt_seg_artery.setEnabled(True)
                     return
-                inputNodes.append(ThisVolumeNode)
+                slicer.util.setSliceViewerLayers(background=ThisVolumeNode)
 
                 # 配置输出
                 output_segmentation_name=model_name+"_Output_Mask"
