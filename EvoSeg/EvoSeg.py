@@ -93,7 +93,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.endResultImportCallback = self.onProcessImportEnded
         self.logic.setResultToLabelCallback = self.onResultSeg
 
-        self.ui.advancedCollapsibleButton.connect("contentsCollapsed(bool)", self.check_set_modifiy)
+        self.ui.bt_place.connect("clicked(bool)", self.check_set_modifiy)
+        self.bt_place_down = False
 
         # Buttons
         # self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
@@ -136,14 +137,16 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.browseToModelsFolderButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Model.png")))
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
+        
+        self.ui.groupBox_Modify.hide()
 
     def enter(self):
         pass
         
     def exit(self):
         # 切出模块时，关掉advancedCollapsibleButton以还原显示原先存在的markups，并删除EvoSeg专用于辅助模型修改的小球
-        if self.ui.advancedCollapsibleButton.checked:
-            self.ui.advancedCollapsibleButton.checked=False
+        if self.ui.bt_place.checked:
+            self.ui.bt_place.checked=False
         pass
 
     def onButtonGroupClick(self,value_for_group):
@@ -201,16 +204,21 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         else:
             self.onCancel()
 
-    def check_set_modifiy(self,check_it):
-
-        if len(self.data_module_list)==0 and check_it==False:
-            self.ui.advancedCollapsibleButton.checked=False
+    def check_set_modifiy(self):
+        if len(self.data_module_list)==0 and self.bt_place_down==False:
+            self.ui.bt_place.blockSignals(True)
+            self.ui.bt_place.click()
+            self.ui.bt_place.blockSignals(False)
             slicer.util.messageBox("No result output")
             return
 
         originMarkupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
 
-        if not check_it:
+        if not self.bt_place_down:
+
+            self.bt_place_down = True
+            self.ui.groupBox_Modify.show()
+
             self.layoutManager = slicer.app.layoutManager()
         
             views = [
@@ -251,6 +259,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.RightButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
                 
         else:
+
+            self.bt_place_down = False
+            self.ui.groupBox_Modify.hide()
+
             interactionNode = slicer.mrmlScene.GetNodeByID("vtkMRMLInteractionNodeSingleton")
             if interactionNode:
                 interactionNode.SwitchToViewTransformMode()
@@ -607,10 +619,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.startResultImportCallback = None
         self.endResultImportCallback = None
         self.setResultToLabelCallback = None
-
-        self.mdf_outputSegmentation=None
-        self.mdf_outputSegmentationFile=None
-        self.mdf_model=None
         
         # Timer for checking the output of the segmentation process that is running in the background
         self.processOutputCheckTimerIntervalMsec = 1000
@@ -858,9 +866,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     self.log(model+": Importing segmentation results...")
                     #print(outputSegmentation,outputSegmentationFile,model)
                     
-                    self.mdf_outputSegmentation=outputSegmentation
-                    self.mdf_outputSegmentationFile=outputSegmentationFile
-                    self.mdf_model=model
                     #print(type(outputSegmentation), outputSegmentationFile, type(model))
                     self.readSegmentation(outputSegmentation, outputSegmentationFile, model)
                     
