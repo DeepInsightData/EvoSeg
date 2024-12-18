@@ -147,9 +147,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         pass
         
     def exit(self):
-        # 切出模块时，关掉advancedCollapsibleButton以还原显示原先存在的markups，并删除EvoSeg专用于辅助模型修改的小球
-        if self.ui.bt_place.checked:
-            self.ui.bt_place.checked=False
+        # 切出模块时，及时关掉修改
+        if self.bt_place_down:
+            self.ui.bt_place.click()
         pass
 
     def onButtonGroupClick(self,value_for_group):
