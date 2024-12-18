@@ -804,11 +804,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # print(result_data)
         if image_data:
             vtk_array = numpy_support.vtk_to_numpy(image_data.GetPointData().GetScalars())
-            #dimensions = image_data.GetDimensions()
-            # TODO: 这里有一个顺序BUG
-            # numpy_array = vtk_array #.reshape(dimensions[0], dimensions[1],dimensions[2])  # (Z, Y, X)
-            # print("NumPy shape:", numpy_array.shape, dimensions)
-            ct_data = vtk_array
+            # TODO: 这里有一个顺序BUG 不是(Z, Y, X)
+            numpy_array = vtk_array.reshape(image_data.GetDimensions())  
+            # print("NumPy shape:", numpy_array.shape)
+            ct_data = numpy_array
             ct_data = ct_data - ct_data.min() * 1.0
             ct_data = ct_data / ct_data.max()
 
