@@ -468,10 +468,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 
                 self._segmentationProcessInfo = self.logic.process(inputNodes, 
                                                                 output_segmentation_node,
-                                                                model_name, 
-                                                                False, 
-                                                                False, 
-                                                                waitForCompletion=False
+                                                                model_name,  
+                                                                False,
                                                                 )
                 
                 self._segmentationProcessInfoList.append({
@@ -505,16 +503,16 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
            
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
-    def onProcessImportStarted(self, customData):
+    def onProcessImportStarted(self):
         print(EvoSegWidget.PROCESSING_IMPORT_RESULTS,"PROCESSING_IMPORT_RESULTS")
         qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
         slicer.app.processEvents()
 
-    def onProcessImportEnded(self, customData):
+    def onProcessImportEnded(self):
         qt.QApplication.restoreOverrideCursor()
         slicer.app.processEvents()
 
-    def onProcessingCompleted(self, returnCode, customData):
+    def onProcessingCompleted(self, returnCode):
         # self.ui.statusLabel.appendPlainText("\nProcessing finished.")
         print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
 
@@ -635,131 +633,48 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Timer for checking the output of the segmentation process that is running in the background
         self.processOutputCheckTimerIntervalMsec = 1000
 
-        # Disabling this flag preserves input and output data after execution is completed,
-        # which can be useful for troubleshooting.
-        self.clearOutputFolder = True #NOTE: Debug的时候用
-
-        # For testing the logic without actually running inference, set self.debugSkipInferenceTempDir to the location
-        # where inference result is stored and set self.debugSkipInference to True.
-        self.debugSkipInference = False
-        self.debugSkipInferenceTempDir = r"c:\Users\andra\AppData\Local\Temp\Slicer\__SlicerTemp__2024-01-16_15+26+25.624"
+        self.clearOutputFolder = True #NOTE: 清除缓存目录
 
         self.data_module = []
 
-    @staticmethod
-    def humanReadableTimeFromSec(seconds):
-        import math
-        if not seconds:
-            return "N/A"
-        if seconds < 55:
-            # if less than a minute, round up to the nearest 5 seconds
-            return f"{math.ceil(seconds/5) * 5} sec"
-        elif seconds < 60 * 60:
-            # if less then 1 hour, round up to the nearest minute
-            return f"{math.ceil(seconds/60)} min"
-        # Otherwise round up to the nearest 0.1 hour
-        return f"{seconds/3600:.1f} h"
-
-    def modelsPath(self):
-        import pathlib
-        return self.fileCachePath.joinpath("models")
-
     def createModelsDir(self):
-        modelsDir = self.modelsPath()
+        modelsDir = self.fileCachePath.joinpath("models")
         if not os.path.exists(modelsDir):
             os.makedirs(modelsDir)
 
     def modelPath(self, modelName):
         import pathlib
-        modelRoot = self.modelsPath().joinpath(modelName)
+        modelRoot = self.fileCachePath.joinpath("models").joinpath(modelName)
         for path in pathlib.Path(modelRoot).rglob("dataset.json"):
             return path.parent
         raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  |-...\n  ...\n")
-
-    def deleteAllModels(self):
-        if self.modelsPath().exists():
-            import shutil
-            shutil.rmtree(self.modelsPath())
-
-    @staticmethod
-    def _findFirstNodeBynamePattern(namePattern, nodes):
-        import fnmatch
-        for node in nodes:
-            if fnmatch.fnmatchcase(node.GetName(), namePattern):
-                return node
-        return None
-
-    @staticmethod
-    def assignInputNodesByName(inputs, loadedSampleNodes):
-        inputNodes = []
-        for inputIndex, input in enumerate(inputs):
-            namePattern = input.get("namePattern")
-            if namePattern:
-                matchingNode = EvoSegLogic._findFirstNodeBynamePattern(namePattern, loadedSampleNodes)
-            else:
-                matchingNode = loadedSampleNodes[inputIndex] if inputIndex < len(loadedSampleNodes) else loadedSampleNodes[0]
-            inputNodes.append(matchingNode)
-        return inputNodes
 
     def log(self, text):
         logging.info(text)
         if self.logCallback:
             self.logCallback(text)
         
-    def logProcessOutputUntilCompleted(self, segmentationProcessInfo):
-        # Wait for the process to end and forward output to the log
-        from subprocess import CalledProcessError
-        proc = segmentationProcessInfo["proc"]
-        while True:
-            try:
-                line = proc.stdout.readline()
-                if not line:
-                    break
-                self.log(line.rstrip())
-            except UnicodeDecodeError as e:
-                # Code page conversion happens because `universal_newlines=True` sets process output to text mode,
-                # and it fails because probably system locale is not UTF8. We just ignore the error and discard the string,
-                # as we only guarantee correct behavior if an UTF8 locale is used.
-                pass
-        proc.wait()
-        retcode = proc.returncode
-        segmentationProcessInfo["procReturnCode"] = retcode
-        if retcode != 0:
-            raise CalledProcessError(retcode, proc.args, output=proc.stdout, stderr=proc.stderr)
-
-
-    def process(self, 
-                inputNodes, 
-                outputSegmentation, 
-                model=None, 
-                withDownload=True,
-                cpu=False, 
-                waitForCompletion=True, 
-                customData=None):
-
+    def process(self, inputNodes, outputSegmentation, model):
+        """
+        """
         if not inputNodes:
             raise ValueError("Input nodes are invalid")
-
         if not outputSegmentation:
             raise ValueError("Output segmentation is invalid")
 
         try:
             modelPath = self.modelPath(model)
         except:
+            # TODO: 注意这里还需要加清掉之前创建的segment node
             return
-        #print("modelPath",modelPath)
+        
         segmentationProcessInfo = {}
 
         import time
         startTime = time.time()
         self.log(model+": Processing started")
 
-        if self.debugSkipInference:
-            # For debugging, use a fixed temporary folder
-            tempDir = self.debugSkipInferenceTempDir
-        else:
-            # Create new empty folder
-            tempDir = slicer.util.tempDirectory()
+        tempDir = slicer.util.tempDirectory()
 
         import pathlib
         tempDirPath = pathlib.Path(tempDir)
@@ -801,14 +716,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.log(model+f": command: {auto3DSegCommand}")
 
         additionalEnvironmentVariables = None
-        if cpu:
-            additionalEnvironmentVariables = {"CUDA_VISIBLE_DEVICES": "-1"}
-            self.log(model+f": Additional environment variables: {additionalEnvironmentVariables}")
 
-        if self.debugSkipInference:
-            proc = None
-        else:
-            proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=additionalEnvironmentVariables)
+        
+        proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=additionalEnvironmentVariables)
 
         segmentationProcessInfo["proc"] = proc
         segmentationProcessInfo["procReturnCode"] = EvoSegLogic.EXIT_CODE_DID_NOT_RUN
@@ -820,16 +730,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         segmentationProcessInfo["outputSegmentation"] = outputSegmentation
         segmentationProcessInfo["outputSegmentationFile"] = outputSegmentationFile
         segmentationProcessInfo["model"] = model
-        segmentationProcessInfo["customData"] = customData
 
         if proc:
-            if waitForCompletion:
-                # Wait for the process to end before returning
-                self.logProcessOutputUntilCompleted(segmentationProcessInfo)
-                self.onSegmentationProcessCompleted(segmentationProcessInfo)
-            else:
-                # Run the process in the background
-                self.startSegmentationProcessMonitoring(segmentationProcessInfo)
+            # Run the process in the background
+            self.startSegmentationProcessMonitoring(segmentationProcessInfo)
         else:
             # Debugging
             self.onSegmentationProcessCompleted(segmentationProcessInfo)
@@ -958,7 +862,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         outputSegmentation = segmentationProcessInfo["outputSegmentation"]
         outputSegmentationFile = segmentationProcessInfo["outputSegmentationFile"]
         model = segmentationProcessInfo["model"]
-        customData = segmentationProcessInfo["customData"]
         procReturnCode = segmentationProcessInfo["procReturnCode"]
         cancelRequested = segmentationProcessInfo["cancelRequested"]
 
@@ -968,7 +871,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         else:
             if procReturnCode == 0:
                 if self.startResultImportCallback:
-                    self.startResultImportCallback(customData)
+                    self.startResultImportCallback()
                 try:
                     #print("------------------->Befor read")
                     self.beforeReadResult(inputNodes[0], tempDir,model) # NOTE:临时
@@ -999,7 +902,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 finally:
 
                     if self.endResultImportCallback:
-                        self.endResultImportCallback(customData)
+                        self.endResultImportCallback()
 
             else:
                 self.log(model+f": Processing failed with return code {procReturnCode}")
@@ -1026,8 +929,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 self.log(model+f": Processing failed after {elapsedTime:.2f} seconds.")
 
         if self.processingCompletedCallback:
-            self.processingCompletedCallback(procReturnCode, customData)
-
+            self.processingCompletedCallback(procReturnCode)
 
     def readSegmentation(self, outputSegmentation, outputSegmentationFile, model):
 
