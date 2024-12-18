@@ -363,14 +363,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0">
-        <item>
-         <widget class="QLabel" name="label_img">
-          <property name="text">
-           <string>Position or Label</string>
-          </property>
-         </widget>
-        </item>
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
         <item>
          <widget class="QLabel" name="label_6">
           <property name="text">

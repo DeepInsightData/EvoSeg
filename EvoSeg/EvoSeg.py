@@ -124,11 +124,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.button_group2.addButton(self.ui.radioButton32)
         self.button_group2.addButton(self.ui.radioButton42)
 
+        # 不从DataProbe里直接取值是因为3DView里DataProbe默认不生效,否则使用DataProbe
         self.CrosshairNode = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLCrosshairNode')
-        
         if self.CrosshairNode:
             self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
-        
+        self.strDataProbeEx = ""
+
+
         self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/aireway_segmentation.png")))
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
         self.ui.bt_cancel_run.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Cancel.png")))
@@ -209,9 +211,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def check_set_modifiy(self):
         if len(self.data_module_list)==0 and self.bt_place_down==False:
-            self.ui.bt_place.blockSignals(True)
-            self.ui.bt_place.click()
-            self.ui.bt_place.blockSignals(False)
+            self.ui.bt_place.setChecked(False)
             slicer.util.messageBox("No result output")
             return
 
@@ -343,12 +343,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         #try:
         import ast
-        position_=self.ui.label_img.text.split("<b>")
+        position_=self.strDataProbeEx.split("<b>")
         x,y,z=point_Ijk#ast.literal_eval(position_[0])
         #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
         #print("Press")
         if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-            self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+            self.strDataProbeEx = self.strDataProbeEx+" Erro: data module no init!"
         else:
             #print(self.data_module.get_masks())
             optin_select=self.button_group2.checkedButton().text
@@ -364,7 +364,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             #print(self.button_group.checkedButton().text)
             #self.data_module.
             self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
-            self.ui.label_img.setText(self.ui.label_img.text+" ")
+            self.strDataProbeEx = self.strDataProbeEx+" "
 
             
         # except:
@@ -412,12 +412,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             #for layer in ("B", "F", "L", "S"):
                 #print(infoWidget.layerNames[layer].text, infoWidget.layerIJKs[layer].text, infoWidget.layerValues[layer].text)
             
-            self.ui.label_img.setText(infoWidget.layerIJKs["B"].text+" "+infoWidget.layerValues["B"].text)
+            self.strDataProbeEx = infoWidget.layerIJKs["B"].text+" "+infoWidget.layerValues["B"].text
             if aggregatedDisplayableManagerInfo != '':
                 #print(myManagerInfo)
-                self.ui.label_img.setText(self.ui.label_img.text+"<br>"+myManagerInfo.split('</font>')[-1])
+                self.strDataProbeEx = self.strDataProbeEx+"<br>"+myManagerInfo.split('</font>')[-1]
             else:
-                self.ui.label_img.setText(self.ui.label_img.text+"<br> ")
+                self.strDataProbeEx = self.strDataProbeEx+"<br> "
         except:
             pass
         # collect information from displayable managers
