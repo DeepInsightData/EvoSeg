@@ -289,6 +289,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             # print(self.markup_node.GetNumberOfControlPoints())
             if self.markup_node.GetNumberOfControlPoints()==0:
                 self.ui.bt_place.click()
+                event.RemoveObserver(self.interactionNodeObserver)
 
 
 
