@@ -145,6 +145,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         self.ui.groupBox_Modify.hide()
 
+        self.interactionNodeObserver=None
+
     def enter(self):
         pass
         
@@ -247,6 +249,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             interactionNode = slicer.mrmlScene.GetNodeByID("vtkMRMLInteractionNodeSingleton")
             if interactionNode:
                 interactionNode.SwitchToSinglePlaceMode()
+
+                if self.interactionNodeObserver:
+                    interactionNode.RemoveObserver(self.interactionNodeObserver)
+                self.interactionNodeObserver = interactionNode.AddObserver(slicer.vtkMRMLInteractionNode.InteractionModeChangedEvent, self.onInteractionModeChanged)
+
             try:
                 for observedNode, observation in self.observations:
                     observedNode.RemoveObserver(observation)
@@ -276,6 +283,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             for node in originMarkupsDisplayNodes:
                 node.SetVisibility(True)
             
+    def onInteractionModeChanged(self, event, _):
+        # print(event.GetCurrentInteractionMode())
+        if event.GetCurrentInteractionMode()==2:
+            # print(self.markup_node.GetNumberOfControlPoints())
+            if self.markup_node.GetNumberOfControlPoints()==0:
+                self.ui.bt_place.click()
+
+
 
     def onButtonUndoClick(self):
         self.data_module.undo()
