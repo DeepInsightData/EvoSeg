@@ -108,6 +108,14 @@ nptyping==2.5.0 --hash=sha256:764e51836faae33a7ae2e928af574cfb701355647accadcc89
 # [psutil]
 psutil==6.1.0 --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32fd7a377d996be
 # [/psutil]
+
+#[TotalSegmentator]
+TotalSegmentator==2.4.0 --hash=sha256:41974e5d61958a679aead73890c72e0ec79f504e7cca0965d609f1ff11678fdc
+p-tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529
+xvfbwrapper==0.2.9 --hash=sha256:bcf4ae571941b40254faf7a73432dfc119ad21ce688f1fdec533067037ecfc24
+rt-utils==1.2.7 --hash=sha256:85615c5186e55dc84bdee65abf81b0b7d6f65599bfdf2506ebebb5a80c538059
+pyarrow==18.1.0 --hash=sha256:a1880dd6772b685e803011a6b43a230c23b566859a6e0c9a276c1e0faf4f4052
+#[/TotalSegmentator]
 ]===])
 
 ExternalProject_Add(${proj}
