@@ -147,6 +147,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.interactionNodeObserver=None
 
+        self.ui.btn_lobe.clicked.connect(lambda: self.onSegButtonClick('lobe'))
+
     def enter(self):
         pass
         
@@ -161,6 +163,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             model_name_must_is = "Airway_nnUnet"
         elif value_for_group.text=="artery":
             model_name_must_is = "Artery_nnUnet"
+            
         output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
         for i in self.data_module_list:
             if i["model_name"]==model_name_must_is:
@@ -201,6 +204,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         elif "artery"==button_name:
             run_model_name="Artery_nnUnet"
             self.ui.bt_seg_artery.setEnabled(False)
+            self.ui.bt_cancel_run.setEnabled(True)
+        elif "lobe"==button_name:
+            run_model_name="LungLobe_nnUnet"
+            self.ui.btn_lobe.setEnabled(False)
             self.ui.bt_cancel_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
@@ -515,6 +522,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     self.ui.bt_seg_airway.setEnabled(True)
                 if i["name"]=="Artery_nnUnet":
                     self.ui.bt_seg_artery.setEnabled(True)
+                if i["name"]=="LungLobe_nnUnet":
+                    self.ui.btn_lobe.setEnabled(True)
            
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
@@ -555,7 +564,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # 现在使用Slicer Setting所设置的颜色
         for name in end_model_name_list:
-            
+
             # 同时把按钮setenbled true
             if name=="Airway_nnUnet":
                 self.ui.bt_seg_airway.setEnabled(True)
@@ -563,6 +572,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if name=="Artery_nnUnet":
                 self.ui.bt_seg_artery.setEnabled(True)
                 self.ui.radio_artery_tag.setChecked(True)
+            if name=="LungLobe_nnUnet":
+                self.ui.btn_lobe.setEnabled(True)
+
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
             segmentation = node.GetSegmentation()
@@ -570,14 +582,30 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if display_node==None:
                 continue
             display_node.SetOpacity3D(0.8)
+
             for i in range(segmentation.GetNumberOfSegments()):
                 segment = segmentation.GetNthSegment(i)
                 
                 # import random
                 # segment.SetColor(random.random(), random.random(), random.random())
-                color = EvoSegModels.get(name.split('_')[0]).color()
-                rgb = (color.red()/255, color.green()/255, color.blue()/255)
-                
+                try:
+                    color = EvoSegModels.get(name.split('_')[0]).color()
+                    rgb = (color.red()/255, color.green()/255, color.blue()/255)
+                except:
+                    seg_name=segment.GetName()
+                    #固定颜色参考：
+                    #https://github.com/Slicer/SlicerLungCTAnalyzer/blob/e2f23dafb6994421ad65606050979b10e8a932aa/LungCTSegmenter/LungCTSegmenter.py#L1266
+                    if seg_name=="right upper lobe":
+                        rgb = (177./255., 122./255., 101./255. )
+                    if seg_name=="right middle lobe":
+                        rgb = (111./255., 184./255., 210./255.)
+                    if seg_name=="right lower lobe":
+                        rgb = (216./255., 101./255., 79./255.)
+                    if seg_name=="left upper lobe":
+                        rgb = (128./255., 174./255., 128./255.)
+                    if seg_name=="left lower lobe":
+                        rgb = (241./255., 214./255., 145./255.)
+
                 segment.SetColor(rgb)
             
             self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
@@ -939,7 +967,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         labelValueToDescription ={ 
             1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
             2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
-            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'}
+            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'},
+            10:{"name": "left upper lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^45653009^Upper lobe of Lung~SCT^7771000^Left~Anatomic codes - DICOM master list~^^~^^"},
+            11:{"name": "left lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^7771000^Left~Anatomic codes - DICOM master list~^^~^^"},
+            12:{"name": "right upper lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^45653009^Upper lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
+            13:{"name": "right middle lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^72481006^Middle lobe of right lung~^^~Anatomic codes - DICOM master list~^^~^^"},
+            14:{"name": "right lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"}
         }
         maxLabelValue = max(labelValueToDescription.keys())
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
