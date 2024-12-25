@@ -14,8 +14,6 @@ import SimpleITK as sitk
 
 import nrrd
 
-simulated_data=False
-
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
     output_dimension = len(properties['sitk_stuff']['spacing'])
@@ -81,19 +79,19 @@ def main(model_folder,
     #                                                 [prop],
     #                                                 None, 3, save_probabilities=False,
     #                                                 num_processes_segmentation_export=2)
-    if not simulated_data:
-        seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
-        # TODO: 根据model_folder->确定当前模型->修改mask值
-        if os.path.basename(model_folder)=="Artery_nnUnet":
-            val, val_prob = seg_results
-            val=val*2
-            seg_results=(val, val_prob)
-        elif os.path.basename(model_folder)=="LungLobe_nnUnet":
-            val, val_prob = seg_results
-            val[(val < 10) | (val > 14)] = 0
-            seg_results=(val, val_prob)
-        else: # 注意之后添加vein模型
-            pass
+    
+    seg_results = predictor.predict_single_npy_array(img, prop, None, None, save_prob_maps)
+    # TODO: 根据model_folder->确定当前模型->修改mask值
+    if os.path.basename(model_folder)=="Artery_nnUnet":
+        val, val_prob = seg_results
+        val=val*2
+        seg_results=(val, val_prob)
+    elif os.path.basename(model_folder)=="LungLobe_nnUnet":
+        val, val_prob = seg_results
+        val[(val < 10) | (val > 14)] = 0
+        seg_results=(val, val_prob)
+    else: # 注意之后添加vein模型
+        pass
     # import pdb; pdb.set_trace()
     timing_checkpoints.append(('Inference', time.time()))
 
@@ -103,47 +101,19 @@ def main(model_folder,
     # nrrd.write(result_file, seg_results, nrrd_header)
     
     # load NIFTI header
-    if simulated_data:
-        print("->copy:"+model_folder+"/output-segmentation.nrrd to"+result_file)
-        with open(model_folder+"/output-segmentation.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
-            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
-                while True:
-                    # 每次读取 1024 字节
-                    chunk = f_src.read(1024)
-                    if not chunk:
-                        break
-                    f_dest.write(chunk)
-        if os.path.basename(model_folder)=="Artery_nnUnet":
-            data, header = nrrd.read(result_file)
-            data = data * 2
-            nrrd.write(result_file, data, header)
-        elif os.path.basename(model_folder)=="LungLobe_nnUnet":
-            data, header = nrrd.read(result_file)
-            data[(data < 10) | (data > 14)] = 0
-            nrrd.write(result_file, data, header)
-        if save_prob_maps:
-            print("->copy:"+model_folder+"/output-segmentation_prob.nrrd to"+result_file.replace('.nrrd', '_prob.nrrd'))
-            with open(model_folder+"/output-segmentation_prob.nrrd", 'rb') as f_src:  # 以二进制模式打开源文件
-                with open(result_file.replace('.nrrd', '_prob.nrrd'), 'wb') as f_dest:  # 以二进制模式写入目标文件
-                    while True:
-                        # 每次读取 1024 字节
-                        chunk = f_src.read(1024)
-                        if not chunk:
-                            break
-                        f_dest.write(chunk)
+    
+    if save_prob_maps:
+        SimpleITKIO().write_seg(seg_results[0], result_file, prop)
+        prob_maps = seg_results[1][1]
+        # normalize prob_maps to 0-255
+        prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+        # SimpleITKIO().write_seg(prob_maps, result_file.replace('.nrrd', '_prob.nrrd'), prop)
+        # write_prob_maps(seg_results[1][1], result_file.replace('.nrrd', '_prob.nrrd'), prop)
+        # prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
+        SimpleITKIO().write_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+        # # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
     else:
-        if save_prob_maps:
-            SimpleITKIO().write_seg(seg_results[0], result_file, prop)
-            prob_maps = seg_results[1][1]
-            # normalize prob_maps to 0-255
-            prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
-            SimpleITKIO().write_seg(prob_maps, result_file.replace('.nrrd', '_prob.nrrd'), prop)
-            # write_prob_maps(seg_results[1][1], result_file.replace('.nrrd', '_prob.nrrd'), prop)
-            # prob_maps = (prob_mps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
-            # SimpleITKIO().writea_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
-            # # write_prob_maps(seg_results[1][1], result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
-        else:
-            SimpleITKIO().write_seg(seg_results, result_file, prop)
+        SimpleITKIO().write_seg(seg_results, result_file, prop)
     
     timing_checkpoints.append(("Save", time.time()))
     

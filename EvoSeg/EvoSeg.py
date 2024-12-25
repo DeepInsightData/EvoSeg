@@ -728,7 +728,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         inputFiles = []
         for inputIndex, inputNode in enumerate(inputNodes):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                inputImageFile = tempDir + f"/input-volume{inputIndex}.nrrd"
+                inputImageFile = tempDir + f"/input-volume{inputIndex}.nii.gz"
                 self.log(model+f": Writing input file to {inputImageFile}")
                 volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
                 volumeStorageNode.SetFileName(inputImageFile)
@@ -739,7 +739,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             else:
                 raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
 
-        outputSegmentationFile = tempDir + "/output-segmentation.nrrd"
+        outputSegmentationFile = tempDir + "/output-segmentation.nii.gz"
         modelPtFile = modelPath
         inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
         auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
@@ -842,7 +842,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     def beforeReadResult(self, result_data,result_data_path,model_name):
         # 刷新DataModule
         from vtk.util import numpy_support
-        import nrrd
+        import nibabel as nib
         import numpy as np
         image_data = result_data.GetImageData()
         # print(result_data)
@@ -855,7 +855,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             ct_data = ct_data - ct_data.min() * 1.0
             ct_data = ct_data / ct_data.max()
 
-            data, options = nrrd.read(result_data_path+"/output-segmentation.nrrd")
+            nii_image = nib.load(result_data_path+"/output-segmentation.nii.gz")
+            data = nii_image.get_data()
+            
             if data.ndim>3:
                 print("4 dim array!!")
                 segmentation_masks = {
@@ -889,7 +891,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             print("no image data!")
         
     def onSegmentationProcessCompleted(self, segmentationProcessInfo):
-        import nrrd
         startTime = segmentationProcessInfo["startTime"]
         tempDir = segmentationProcessInfo["tempDir"]
         inputNodes = segmentationProcessInfo["inputNodes"]
