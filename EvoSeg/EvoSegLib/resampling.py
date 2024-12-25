@@ -214,7 +214,6 @@ def change_spacing(img_in, new_spacing=1.25, target_shape=None, order=0, nr_cpus
 
     return nib.Nifti1Image(new_data, new_affine)
 
-
 # def resample_img_nifti(file_in, file_out, spacing, order, dtype):
 #     img_in = nib.load(file_in)
 #     img_out = change_spacing(img_in, spacing, order=order, dtype=dtype)

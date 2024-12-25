@@ -670,7 +670,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Timer for checking the output of the segmentation process that is running in the background
         self.processOutputCheckTimerIntervalMsec = 1000
 
-        self.clearOutputFolder = True #NOTE: 清除缓存目录
+        self.clearOutputFolder = False #NOTE: 清除缓存目录
 
         self.data_module = []
 
@@ -856,8 +856,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             ct_data = ct_data / ct_data.max()
 
             nii_image = nib.load(result_data_path+"/output-segmentation.nii.gz")
-            data = nii_image.get_data()
-            
+            data = nii_image.get_fdata()
+
             if data.ndim>3:
                 print("4 dim array!!")
                 segmentation_masks = {
