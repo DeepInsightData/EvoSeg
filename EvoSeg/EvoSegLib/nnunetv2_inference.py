@@ -34,7 +34,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 def main(model_folder,
          image_file,
          result_file,
-         save_prob_maps=True,
+         save_prob_maps=False,
          resample=None, # 目前暂时相当“模拟数据功能”来使用
          **kwargs):
 
@@ -123,7 +123,11 @@ def main(model_folder,
         elif os.path.basename(model_folder)=="LungLobe_nnUnet":
             # 特殊处理2, LungLobe_nnUnet执行结果中只保留值在[10,14]区间的lung lobe部分
             val[(val < 10) | (val > 14)] = 0 
-        #else: # 注意之后添加vein模型特殊处理
+        elif os.path.basename(model_folder)=="Rib_nnUnet":
+            # 特殊处理3, 保留值在[92,115]区间的Rib部分
+            val[(val < 92) | (val > 115)] = 0
+            val[val != 0] = 20 # 统一成一种结果
+        #else: 
         seg_results=(val, val_prob)
 
         # 转成nii
@@ -136,8 +140,12 @@ def main(model_folder,
             seg_results=seg_results*2
         elif os.path.basename(model_folder)=="LungLobe_nnUnet":
             # 特殊处理2, LungLobe_nnUnet执行结果中只保留值在[10,14]区间的lung lobe部分
-            seg_results[(seg_results < 10) | (seg_results > 14)] = 0    
-        #else: # 注意之后添加vein模型特殊处理
+            seg_results[(seg_results < 10) | (seg_results > 14)] = 0  
+        elif os.path.basename(model_folder)=="Rib_nnUnet":
+            # 特殊处理3, 保留值在[92,115]区间的Rib部分
+            seg_results[(seg_results < 92) | (seg_results > 115)] = 0
+            seg_results[seg_results != 0] = 20 # 统一成一种结果  
+        #else: 其它
 
         # 转成nii
         seg_results_nib = nib.Nifti1Image(seg_results.astype(np.uint8), affine)

@@ -133,6 +133,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/aireway_segmentation.png")))
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
+        self.ui.btn_seg_lobe.setIcon(qt.QIcon(self.resourcePath("Icons/lunglobe_segmentation.png")))
+        self.ui.btn_seg_rib.setIcon(qt.QIcon(self.resourcePath("Icons/rib_segmentation.png")))
         self.ui.bt_cancel_run.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Cancel.png")))
         self.ui.bt_place.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Place.png")))
         self.ui.bt_place.toggled.connect(lambda checked: self.ui.bt_place.setIcon(
@@ -142,12 +144,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.browseToModelsFolderButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Model.png")))
         self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
+        self.ui.btn_seg_lobe.clicked.connect(lambda: self.onSegButtonClick('lobe'))
+        self.ui.btn_seg_rib.clicked.connect(lambda: self.onSegButtonClick('rib'))
         
         self.ui.groupBox_Modify.hide()
 
         self.interactionNodeObserver=None
 
-        self.ui.btn_lobe.clicked.connect(lambda: self.onSegButtonClick('lobe'))
+        
 
     def enter(self):
         pass
@@ -207,7 +211,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.bt_cancel_run.setEnabled(True)
         elif "lobe"==button_name:
             run_model_name="LungLobe_nnUnet"
-            self.ui.btn_lobe.setEnabled(False)
+            self.ui.btn_seg_lobe.setEnabled(False)
+            self.ui.bt_cancel_run.setEnabled(True)
+        elif "rib"==button_name:
+            run_model_name="Rib_nnUnet"
+            self.ui.btn_seg_rib.setEnabled(False)
             self.ui.bt_cancel_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
@@ -472,13 +480,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # 配置输入
                 inputNodes = []
                 ThisVolumeNode = self.ui.VolumeNodeComboBox.currentNode()
-                if ThisVolumeNode:
-                    inputNodes.append(ThisVolumeNode)
-                else:
-                    slicer.util.messageBox(_("Pelease import a volume file"))
-                    self.ui.bt_seg_airway.setEnabled(True)
-                    self.ui.bt_seg_artery.setEnabled(True)
-                    return
+                inputNodes.append(ThisVolumeNode)
                 slicer.util.setSliceViewerLayers(background=ThisVolumeNode)
 
                 # 配置输出
@@ -523,7 +525,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 if i["name"]=="Artery_nnUnet":
                     self.ui.bt_seg_artery.setEnabled(True)
                 if i["name"]=="LungLobe_nnUnet":
-                    self.ui.btn_lobe.setEnabled(True)
+                    self.ui.btn_seg_lobe.setEnabled(True)
+                if i["name"]=="Rib_nnUnet":
+                    self.ui.btn_seg_rib.setEnabled(True)
            
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
@@ -573,7 +577,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.ui.bt_seg_artery.setEnabled(True)
                 self.ui.radio_artery_tag.setChecked(True)
             if name=="LungLobe_nnUnet":
-                self.ui.btn_lobe.setEnabled(True)
+                self.ui.btn_seg_lobe.setEnabled(True)
+            if name=="Rib_nnUnet":
+                self.ui.btn_seg_rib.setEnabled(True)
 
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
@@ -605,6 +611,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                         rgb = (128./255., 174./255., 128./255.)
                     if seg_name=="left lower lobe":
                         rgb = (241./255., 214./255., 145./255.)
+                    if seg_name=="rib":
+                        rgb = (0.95, 0.84, 0.57)
 
                 segment.SetColor(rgb)
             
@@ -973,7 +981,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             11:{"name": "left lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^7771000^Left~Anatomic codes - DICOM master list~^^~^^"},
             12:{"name": "right upper lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^45653009^Upper lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
             13:{"name": "right middle lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^72481006^Middle lobe of right lung~^^~Anatomic codes - DICOM master list~^^~^^"},
-            14:{"name": "right lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"}
+            14:{"name": "right lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
+            20:{"name": "rib", "terminology":"None"}
         }
         maxLabelValue = max(labelValueToDescription.keys())
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
