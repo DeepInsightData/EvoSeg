@@ -109,6 +109,10 @@ nptyping==2.5.0 --hash=sha256:764e51836faae33a7ae2e928af574cfb701355647accadcc89
 psutil==6.1.0 --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32fd7a377d996be
 # [/psutil]
 
+#[resample]
+resample==1.10.1 --hash=sha256:30d0cc159230a66a3880dc9083308590c8f0e8403e25b9b9f238c074475fe88f
+#[/resample]
+
 #[TotalSegmentator]
 TotalSegmentator==2.4.0 --hash=sha256:41974e5d61958a679aead73890c72e0ec79f504e7cca0965d609f1ff11678fdc
 p-tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529

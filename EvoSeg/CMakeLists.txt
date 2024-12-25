@@ -19,6 +19,8 @@ set(MODULE_PYTHON_RESOURCES
   Resources/Icons/EvoSeg_Place.png
   Resources/Icons/artery_segmentation.png
   Resources/Icons/aireway_segmentation.png
+  Resources/Icons/lunglobe_segmentation.png
+  Resources/Icons/rib_segmentation.png
   Resources/UI/${MODULE_NAME}.ui
   )
 
