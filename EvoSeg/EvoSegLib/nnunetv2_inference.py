@@ -70,7 +70,7 @@ def main(model_folder,
         use_mirroring=True,
         perform_everything_on_device=True,
         device=device,
-        verbose=True,
+        verbose=False,
         verbose_preprocessing=True,
         allow_tqdm=True
     )
@@ -122,9 +122,13 @@ def main(model_folder,
             val=val*2
         elif os.path.basename(model_folder)=="LungLobe_nnUnet":
             # 特殊处理2, LungLobe_nnUnet执行结果中只保留值在[10,14]区间的lung lobe部分
-            val[(val < 10) | (val > 14)] = 0    
+            val[(val < 10) | (val > 14)] = 0 
         #else: # 注意之后添加vein模型特殊处理
         seg_results=(val, val_prob)
+
+        # 转成nii
+        seg_results_nib = nib.Nifti1Image(seg_results[0].astype(np.uint8), affine)
+
     else:
         seg_results = seg_results.transpose(2, 1, 0)
         if os.path.basename(model_folder)=="Artery_nnUnet":
@@ -135,8 +139,9 @@ def main(model_folder,
             seg_results[(seg_results < 10) | (seg_results > 14)] = 0    
         #else: # 注意之后添加vein模型特殊处理
 
-    # 转成nii
-    seg_results_nib = nib.Nifti1Image(seg_results.astype(np.uint8), affine)
+        # 转成nii
+        seg_results_nib = nib.Nifti1Image(seg_results.astype(np.uint8), affine)
+
     if resample is not None:
         print("Resampling...")
         print(f"  back to original shape: {img_in_shape}")
@@ -161,7 +166,7 @@ def main(model_folder,
             prob_maps = seg_results[1][1]
             # normalize prob_maps to 0-255
             prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
-            SimpleITKIO().write_seg(prob_maps, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
+            SimpleITKIO().write_seg({'sitk_stuff':np.expand_dims(prob_maps, axis=0)}, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
     
     # 统一用nib保存nii.gz
     nib.save(end_seg_results, result_file)
