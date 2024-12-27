@@ -10,6 +10,8 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}Lib/EvoSegSettingsPanel.py
   ${MODULE_NAME}Lib/nnunetv2_inference.py
   ${MODULE_NAME}Lib/resampling.py
+  ${MODULE_NAME}Lib/modify_total_nnunet.py
+  ${MODULE_NAME}Lib/modify_total_python_api.py
   )
 
 set(MODULE_PYTHON_RESOURCES
