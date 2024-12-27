@@ -16,11 +16,12 @@ file(WRITE ${requirements_file} [===[
 torch==2.4.0 --hash=sha256:0da13570771e09f6d754196aa865a690222d683df07b62f20922a3f27546faf5  \
              --hash=sha256:e0a73c7384d3e0a09fea5c2a10afc95bac9386e7360fe0bddd167b09697f59a8 
 torchvision==0.19.0  --hash=sha256:03fc97a9058bb489aee898d2b7cef7e2e7636ecda1d9afbadf03e5b7268ae07a \
-                     --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7
+        --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7
 # [/torch]
 # [fire]
 fire==0.6.0 --hash=sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66
 termcolor==2.5.0 --hash=sha256:37b17b5fc1e604945c2642c872a3764b5d547a48009871aea3edd3afa180afb8
+six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
 # [/fire]
 # [SimpleITK]
 SimpleITK==2.2.1 --hash=sha256:7e20bbc467a8fff15978fee34a97c851ec3d0caed2d01929f600a13a0ff2f955
@@ -29,12 +30,15 @@ SimpleITK==2.2.1 --hash=sha256:7e20bbc467a8fff15978fee34a97c851ec3d0caed2d01929f
 nibabel==5.3.2 --hash=sha256:52970a5a8a53b1b55249cba4d9bcfaa8cc57e3e5af35a29d7352237e8680a6f8
 importlib_resources==6.4.5 --hash=sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717
 zipp==3.20.2 --hash=sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350
+numpy==1.23 --hash=sha256:fc431493df245f3c627c0c05c2bd134535e7929dbe2e602b80e42bf52ff760bc
+packaging==24.2 --hash=sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759
 # [/nibabel]
 # [scikit-image]
 scikit-image==0.24.0 --hash=sha256:56dab751d20b25d5d3985e95c9b4e975f55573554bd76b0aedf5875217c93e69
 lazy_loader==0.4 --hash=sha256:342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc
 imageio==2.36.0 --hash=sha256:471f1eda55618ee44a3c9960911c35e647d9284c68f077e868df633398f137f0
 tifffile==2024.8.30 --hash=sha256:8bc59a8f02a2665cd50a910ec64961c5373bee0b8850ec89d3b7b485bf7be7ad
+scipy==1.13.1 --hash=sha256:392e4ec766654852c25ebad4f64e4e584cf19820b980bc04960bca0b0cd6eaa2
 # [/scikit-image]
 # [jinja2]
 jinja2==3.1.4 --hash=sha256:bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d
@@ -98,6 +102,13 @@ fft_conv_pytorch==1.2.0 --hash=sha256:17b9bd616df86da25e4820473698eb4831c2f2f6e7
 argparse==1.4.0 --hash=sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314
 traceback2==1.4.0 --hash=sha256:8253cebec4b19094d67cc5ed5af99bf1dba1285292226e98a31929f87a5d6b23
 linecache2==1.0.0 --hash=sha256:e78be9c0a0dfcbac712fe04fbf92b96cddae80b1b842f24248214c8496f006ef
+requests==2.27.1 --hash=sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d
+pydicom==2.4.4 --hash=sha256:f9f8e19b78525be57aa6384484298833e4d06ac1d6226c79459131ddb0bd7c42
+pyparsing==3.2.0 --hash=sha256:93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84
+idna==3.10 --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
+urllib3==1.26.0 --hash=sha256:bad31cb622ceee0ab46c4c884cf61957def0ff2e644de0a7a093678844c9ccac
+certifi==2024.12.14 --hash=sha256:1275f7a45be9464efc1173084eaa30f866fe2e47d389406136d332ed4967ec56
+charset_normalizer==2.0.12 --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
 # [/nnunetv2]
 
 # [pynrrd]
@@ -111,10 +122,17 @@ psutil==6.1.0 --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32f
 
 #[TotalSegmentator]
 TotalSegmentator==2.4.0 --hash=sha256:41974e5d61958a679aead73890c72e0ec79f504e7cca0965d609f1ff11678fdc
-p-tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529
+p_tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529
 xvfbwrapper==0.2.9 --hash=sha256:bcf4ae571941b40254faf7a73432dfc119ad21ce688f1fdec533067037ecfc24
-rt-utils==1.2.7 --hash=sha256:85615c5186e55dc84bdee65abf81b0b7d6f65599bfdf2506ebebb5a80c538059
+rt_utils==1.2.7 --hash=sha256:85615c5186e55dc84bdee65abf81b0b7d6f65599bfdf2506ebebb5a80c538059
 pyarrow==18.1.0 --hash=sha256:a1880dd6772b685e803011a6b43a230c23b566859a6e0c9a276c1e0faf4f4052
+pathos==0.2.5 --hash=sha256:21ae2cb1d5a76dcf57d5fe93ae8719c7339f467e246163650c08ccf35b87c846
+opencv_python==4.10.0.84 --hash=sha256:32dbbd94c26f611dc5cc6979e6b7aa1f55a64d6b463cc1dcd3c95505a63e48fe
+dataclasses==0.6 --hash=sha256:454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f
+ppft==1.6.6.1 --hash=sha256:9e2173042edd5cc9c7bee0d7731873f17fcdce0e42e4b7ab68857d0de7b631fc
+dill==0.3.2 --hash=sha256:6e12da0d8e49c220e8d6e97ee8882002e624f1160289ce85ec2cc0a5246b3a2e
+pox==0.2.7 --hash=sha256:06afe1a4a1dbf8b47f7ad5a3c1d8ada9104c64933a1da11338269a2bd8642778
+multiprocess==0.70.9 --hash=sha256:9fd5bd990132da77e73dec6e9613408602a4612e1d73caf2e2b813d2b61508e5
 #[/TotalSegmentator]
 ]===])
 
@@ -125,7 +143,7 @@ ExternalProject_Add(${proj}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
-  INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --extra-index-url https://download.pytorch.org/whl/cu118 -r ${requirements_file}
+  INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --ignore-installed --extra-index-url https://download.pytorch.org/whl/cu118 -r ${requirements_file}
   LOG_INSTALL 1
   DEPENDS
     ${${proj}_DEPENDENCIES}
