@@ -30,7 +30,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
-simulated_data=True
+simulated_data=False
 
 @torch.no_grad()
 def main(model_folder,
@@ -38,8 +38,27 @@ def main(model_folder,
          result_file,
          save_prob_maps=False,
          resample=None,
-         use_totalSegmentator=False,
+         use_total=False,
          **kwargs):
+
+    if use_total:
+        from modify_total_python_api import modifiy_totalsegmentator
+
+        input_img = nib.load(image_file)
+        output_img = modifiy_totalsegmentator(model_folder,input_img,fast=True)
+
+        val = output_img.get_fdata()
+        # 特殊处理
+        if os.path.basename(model_folder) == "LungLobe_nnUnet":
+            val[(val < 10) | (val > 14)] = 0 
+        elif os.path.basename(model_folder) == "Rib_nnUnet":
+            val[(val < 92) | (val > 115)] = 0
+            val[val != 0] = 20
+
+        output_img = nib.Nifti1Image(val, output_img.affine)
+        nib.save(output_img, result_file)
+
+        return
 
     if simulated_data:
         print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
@@ -53,9 +72,6 @@ def main(model_folder,
                     f_dest.write(chunk)
         print(f'ALL DONE, result saved in {result_file}')
         return
-    
-    if use_totalSegmentator:
-        pass
 
     if resample is not None: # 目前resample下对prob_maps该如何处理未知
         save_prob_maps=False

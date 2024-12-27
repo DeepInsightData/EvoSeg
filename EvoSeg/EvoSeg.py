@@ -768,10 +768,17 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         outputSegmentationFile = tempDir + "/output-segmentation.nii.gz"
         modelPtFile = modelPath
         inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
+
+        is_total_model=False
+        if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe":
+            is_total_model=True
+
         auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
             "--model_folder", str(modelPtFile),
             "--image_file", inputFiles[0],
-            "--result_file", str(outputSegmentationFile) ]
+            "--result_file", str(outputSegmentationFile),
+            "--use_total", str(is_total_model)
+            ]
         for inputIndex in range(1, len(inputFiles)):
             auto3DSegCommand.append(f"--image-file-{inputIndex+1}")
             auto3DSegCommand.append(inputFiles[inputIndex])
