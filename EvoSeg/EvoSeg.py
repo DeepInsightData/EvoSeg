@@ -126,13 +126,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.button_group2.addButton(self.ui.radioButton32)
         self.button_group2.addButton(self.ui.radioButton42)
 
-        # 不从DataProbe里直接取值是因为3DView里DataProbe默认不生效,否则使用DataProbe
-        self.CrosshairNode = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLCrosshairNode')
-        if self.CrosshairNode:
-            self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
-        self.strDataProbeEx = ""
-
-
         self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/aireway_segmentation.png")))
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
         self.ui.btn_seg_lobe.setIcon(qt.QIcon(self.resourcePath("Icons/lunglobe_segmentation.png")))
@@ -384,7 +377,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         segmentationNode.CreateClosedSurfaceRepresentation()
 
 
-    def someCustomAction(self,caller, eventId):
+    def someCustomAction(self, caller, eventId):
         import numpy as np
         markupsDisplayNode = caller
         #print(type(markupsDisplayNode))
@@ -415,127 +408,66 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Print output
         #print(point_Ijk)
         #TODO:临时， 测试当选择lobe模型时，自动选择吸附表面的mask种类，效果还行需要优化:根据球大小重新设置一个范围的ras坐标进行匹配，现在是单点
+        # 获取所选模型name 目前这段代码应该有多处重复
         select_radio_tag_text=self.button_group.checkedButton().text
-        print("-->",select_radio_tag_text)
-
         if select_radio_tag_text=="airway":
             model_name_must_is = "Airway_nnUnet"
-            segment_name=["Airway"]
         elif select_radio_tag_text=="artery":
             model_name_must_is = "Artery_nnUnet"
-            segment_name=["Artery"]
         elif select_radio_tag_text=="rib":
             model_name_must_is = "Rib_nnUnet"
-            segment_name=["rib"]
         elif select_radio_tag_text=="lobe":
             model_name_must_is = "LungLobe_nnUnet"
-            segment_name=["left upper lobe","left lower lobe","right upper lobe","right middle lobe","right lower lobe"]
         segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
 
         if segmentationNode is None:
             print("No have "+model_name_must_is+"_Output_Mask")
             return
 
-        sliceViewWidget = slicer.app.layoutManager().sliceWidget("Red")#Red view辅助
-        segmentationsDisplayableManager = sliceViewWidget.sliceView().displayableManagerByClassName("vtkMRMLSegmentationsDisplayableManager2D")
-        ras = point_Ras
-        pointListNode.GetNthControlPointPositionWorld(0, ras)
-        segmentIds = vtk.vtkStringArray()
-        segmentationsDisplayableManager.GetVisibleSegmentsForPosition(ras, segmentationNode.GetDisplayNode(), segmentIds)
+        #使用Red view的vtkMRMLSegmentationsDisplayableManager2D辅助查找seg id
+        segmentationsDisplayableManager = slicer.app.layoutManager().sliceWidget("Red").sliceView().displayableManagerByClassName("vtkMRMLSegmentationsDisplayableManager2D")
+        x_t,y_t,z_t=point_Ras
+        radiu_t=self.ui.radius_slider.value
+        # 先检查point_Ras，再检查point_Ras前后左右上下距离为radiu_t的一个点,尽可能找到mukup粘到的模型
+        for ras in [point_Ras,[x_t+radiu_t,y_t,z_t],[x_t-radiu_t,y_t,z_t],[x_t,y_t+radiu_t,z_t],[x_t,y_t-radiu_t,z_t],[x_t,y_t,z_t+radiu_t],[x_t,y_t,z_t-radiu_t]]:
+            pointListNode.GetNthControlPointPositionWorld(0, ras)
+            segmentIds = vtk.vtkStringArray()
+            segmentationsDisplayableManager.GetVisibleSegmentsForPosition(ras, segmentationNode.GetDisplayNode(), segmentIds)
 
-        segment=None
-        for idIndex in range(segmentIds.GetNumberOfValues()):
-            segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
-            print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
+            segment=None
+            for idIndex in range(segmentIds.GetNumberOfValues()):
+                segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
+                print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
+                break
+            if segment!=None:
+                break
+
         
 
-        #try:
         import ast
-        position_=self.strDataProbeEx.split("<b>")
-        x,y,z=point_Ijk#ast.literal_eval(position_[0])
-        #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
-        #print("Press",self.strDataProbeEx)
-        if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
-            self.strDataProbeEx = self.strDataProbeEx+" Erro: data module no init!"
-        else:
-            #print(self.data_module.get_masks())
-            optin_select=self.button_group2.checkedButton().text
-            seg_net_select=self.button_group.checkedButton().text
-            if seg_net_select=="lobe":
-                if segment !=None:
-                    seg_net_select=segment.GetName()# 改成临近label类型
-                else:
-                    # 不处理
-                    return
-            param = ast.literal_eval("{'radius':"+str(int(self.ui.radius_slider.value))+",}")
-            #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
-            if optin_select=="Sphere Addition":
-                self.data_module.sphere_addition(x, y, z, seg_net_select, **param)
-            elif optin_select=="Sphere Erasure":
-                self.data_module.sphere_erasure(x, y, z, seg_net_select, **param)
-            else:
-                return
-            self.FasterUpdateSegForonPress(self.data_module.get_masks(),seg_net_select)
-            #print(self.button_group.checkedButton().text)
-            #self.data_module.
-            self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
-            self.strDataProbeEx = self.strDataProbeEx+" "
-
-            
-        # except:
-        #     print("No segmentation")
-        #     pass
-
-        #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
-
-
-    def processEvent(self,observee,event):
-
-        insideView = False
-        ras = [0.0,0.0,0.0]
-        xyz = [0.0,0.0,0.0]
-        sliceNode = None
-        if self.CrosshairNode:
-            insideView = self.CrosshairNode.GetCursorPositionRAS(ras)
-            sliceNode = self.CrosshairNode.GetCursorPositionXYZ(xyz)
-        sliceLogic = None
-        if sliceNode:
-            appLogic = slicer.app.applicationLogic()
-            if appLogic:
-                sliceLogic = appLogic.GetSliceLogic(sliceNode)
-
-        if not insideView or not sliceNode or not sliceLogic:
-            return
-        displayableManagerCollection = vtk.vtkCollection()
-        if sliceNode:
-            sliceWidget = slicer.app.layoutManager().sliceWidget(sliceNode.GetName())
-            if sliceWidget:
-                # sliceWidget is owned by the layout manager
-                sliceView = sliceWidget.sliceView()
-                sliceView.getDisplayableManagers(displayableManagerCollection)
-        aggregatedDisplayableManagerInfo = ''
-        myManagerInfo=""
-        for index in range(displayableManagerCollection.GetNumberOfItems()):
-            displayableManager = displayableManagerCollection.GetItemAsObject(index)
-            infoString = displayableManager.GetDataProbeInfoStringForPosition(xyz)
-            if infoString != "":
-                aggregatedDisplayableManagerInfo += infoString + "<br>"
-                myManagerInfo=infoString
+        x,y,z=point_Ijk
         
-        try:
-            infoWidget = slicer.modules.DataProbeInstance.infoWidget
-            #for layer in ("B", "F", "L", "S"):
-                #print(infoWidget.layerNames[layer].text, infoWidget.layerIJKs[layer].text, infoWidget.layerValues[layer].text)
-            
-            self.strDataProbeEx = infoWidget.layerIJKs["B"].text+" "+infoWidget.layerValues["B"].text
-            if aggregatedDisplayableManagerInfo != '':
-                #print(myManagerInfo)
-                self.strDataProbeEx = self.strDataProbeEx+"<br>"+myManagerInfo.split('</font>')[-1]
+        #print(self.data_module.get_masks())
+        optin_select=self.button_group2.checkedButton().text
+        seg_net_select=self.button_group.checkedButton().text
+        if seg_net_select=="lobe":
+            if segment !=None:
+                seg_net_select=segment.GetName()# 改成临近label类型
             else:
-                self.strDataProbeEx = self.strDataProbeEx+"<br> "
-        except:
-            pass
-        # collect information from displayable managers
+                # 不处理
+                return
+        param = ast.literal_eval("{'radius':"+str(int(self.ui.radius_slider.value))+",}")
+        #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+        if optin_select=="Sphere Addition":
+            self.data_module.sphere_addition(x, y, z, seg_net_select, **param)
+        elif optin_select=="Sphere Erasure":
+            self.data_module.sphere_erasure(x, y, z, seg_net_select, **param)
+        else:
+            return
+        self.FasterUpdateSegForonPress(self.data_module.get_masks(),seg_net_select)
+        #print(self.button_group.checkedButton().text)
+        #self.data_module.
+        self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
         
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
@@ -933,11 +865,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # No more outputs to process now, check again later
         qt.QTimer.singleShot(self.processOutputCheckTimerIntervalMsec, lambda segmentationProcessInfo=segmentationProcessInfo: self.checkSegmentationProcessOutput(segmentationProcessInfo))
 
-    def beforeReadResult(self, result_data,result_data_path,model_name):
-        # 刷新DataModule
+    def dataModuleReadResult(self, result_data, result_data_path, model_name):
+        # 刷新DataModule, 这会清除data.py之前的修改，也就是每次模型输出结果后都会覆盖原结果
+        # 现在的逻辑不改变的话，推荐在重新运行模型前务必对修改结果，优化方向：可以检查"modifiy queue lenth"不为1时，再次重运行模型前进行提示保存
         from vtk.util import numpy_support
         import nibabel as nib
         import numpy as np
+
         image_data = result_data.GetImageData()
         # print(result_data)
         if image_data:
@@ -945,6 +879,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             # TODO: 这里有一个顺序BUG 不是(Z, Y, X)
             numpy_array = vtk_array.reshape(image_data.GetDimensions())  
             # print("NumPy shape:", numpy_array.shape)
+
             ct_data = numpy_array
             ct_data = ct_data - ct_data.min() * 1.0
             ct_data = ct_data / ct_data.max()
@@ -953,7 +888,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             data = nii_image.get_fdata()
 
             if data.ndim>3:
-                print("4 dim array!!")
+                print("4 dim array!!") #未出现该情况
                 segmentation_masks = {
                     "airway" : data[0, :, :, :] == 1, 
                     "artery": data[2, :, :, :] == 1, 
@@ -992,7 +927,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             # 目前的做法半径越小缩放插值带来的误差越大
             minPrecision = max(result_data.GetSpacing()) # 用三个方向的最大Spacing表示最小半径,单位mm 
             
-            self.setResultToLabelCallback(self.data_module,model_name,minPrecision)
+            self.setResultToLabelCallback(self.data_module, model_name, minPrecision)
         else:
             print("no image data!")
         
@@ -1014,11 +949,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 if self.startResultImportCallback:
                     self.startResultImportCallback()
                 try:
-                    #print("------------------->Befor read")
-                    self.beforeReadResult(inputNodes[0], tempDir,model) # NOTE:临时
+                    # data.py module class add result
+                    self.dataModuleReadResult(inputNodes[0], tempDir, model)
+
                     # Load result
                     self.log(model+": Importing segmentation results...")
-                    #print(outputSegmentation,outputSegmentationFile,model)
                     
                     #print(type(outputSegmentation), outputSegmentationFile, type(model))
                     self.readSegmentation(outputSegmentation, outputSegmentationFile, model)
