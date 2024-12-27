@@ -30,13 +30,32 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
+simulated_data=True
+
 @torch.no_grad()
 def main(model_folder,
          image_file,
          result_file,
          save_prob_maps=False,
-         resample=None, # 目前暂时相当“模拟数据功能”来使用
+         resample=None,
+         use_totalSegmentator=False,
          **kwargs):
+
+    if simulated_data:
+        print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
+        with open(model_folder+"/output-segmentation.nii.gz", 'rb') as f_src:  # 以二进制模式打开源文件
+            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
+                while True:
+                    # 每次读取 1024 字节
+                    chunk = f_src.read(1024)
+                    if not chunk:
+                        break
+                    f_dest.write(chunk)
+        print(f'ALL DONE, result saved in {result_file}')
+        return
+    
+    if use_totalSegmentator:
+        pass
 
     if resample is not None: # 目前resample下对prob_maps该如何处理未知
         save_prob_maps=False

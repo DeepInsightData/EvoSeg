@@ -47,7 +47,7 @@ class DataModule:
         radius_x=scale_ball.shape[0]//2
         radius_y=scale_ball.shape[1]//2
         radius_z=scale_ball.shape[2]//2
-    
+        print("--->",target)
         change = scale_ball ^ (scale_ball & self.segmentation_masks[target][x-radius_x:x+radius_x, y-radius_y:y+radius_y, z-radius_z:z+radius_z])
         change = np.stack(change.nonzero(), axis = 1)
         change += np.array([[x-radius_x, y-radius_y, z-radius_z]])

@@ -67,7 +67,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,2,2,2,4">
          <item>
-          <widget class="QPushButton" name="bt_seg_artery">
+          <widget class="QPushButton" name="bt_seg_airway">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -75,7 +75,7 @@
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>Artery Segment</string>
+            <string>Airway Segment</string>
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton { background-color: transparent; border: 0px }</string>
@@ -95,7 +95,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="bt_seg_airway">
+          <widget class="QPushButton" name="bt_seg_artery">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -103,7 +103,7 @@
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>Airway Segment</string>
+            <string>Artery Segment</string>
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton { background-color: transparent; border: 0px }</string>
@@ -371,6 +371,20 @@
           <widget class="QRadioButton" name="radio_artery_tag">
            <property name="text">
             <string>artery</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_lobe_tag">
+           <property name="text">
+            <string>lobe</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_rib_tag">
+           <property name="text">
+            <string>rib</string>
            </property>
           </widget>
          </item>

@@ -116,6 +116,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.button_group.addButton(self.ui.radio_airway_tag)
         self.button_group.addButton(self.ui.radio_artery_tag)
         self.button_group.addButton(self.ui.radio_vein_tag)
+        self.button_group.addButton(self.ui.radio_lobe_tag)
+        self.button_group.addButton(self.ui.radio_rib_tag)
         self.button_group.buttonToggled.connect(self.onButtonGroupClick)
 
         self.button_group2 = QButtonGroup()
@@ -152,6 +154,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.interactionNodeObserver=None
 
         
+        
 
     def enter(self):
         pass
@@ -163,24 +166,35 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         pass
 
     def onButtonGroupClick(self,value_for_group):
+        model_name_must_is=""
         if value_for_group.text=="airway":
             model_name_must_is = "Airway_nnUnet"
         elif value_for_group.text=="artery":
             model_name_must_is = "Artery_nnUnet"
-            
-        output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
-        for i in self.data_module_list:
-            if i["model_name"]==model_name_must_is:
-                self.data_module=i["seg_data"]
-                #print("set DataModule for:"+model_name_must_is)
-                return
+        elif value_for_group.text=="rib":
+            model_name_must_is = "Rib_nnUnet"
+        elif value_for_group.text=="lobe":
+            model_name_must_is = "LungLobe_nnUnet"
+        
+        if model_name_must_is==" ":
+            return
+        else:
+            output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+            for i in self.data_module_list:
+                if i["model_name"]==model_name_must_is:
+                    self.data_module=i["seg_data"]
+                    #print("set DataModule for:"+model_name_must_is)
+                    return
+        
 
     def onExportClick(self):
         dataModuleWidget = slicer.modules.data.widgetRepresentation()
         subjectHierarchyTreeView = dataModuleWidget.findChild(slicer.qMRMLSubjectHierarchyTreeView)
 
         export_labelmap_node = [slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask"),
-                                slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")]
+                                slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask"),
+                                slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask"),
+                                slicer.mrmlScene.GetFirstNodeByName("Rig_nnUnet_Output_Mask")]
         for node in export_labelmap_node:
             if node and node.GetSegmentation().GetNumberOfSegments()!=0:
                 NodeShItem = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene).GetItemByDataNode(node)
@@ -313,25 +327,54 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
         self.FasterUpdateSegForonPress(self.data_module.get_masks())
 
-    def FasterUpdateSegForonPress(self, segmentation_masks):
+    def FasterUpdateSegForonPress(self, segmentation_masks,select_radio_tag_text):
         import numpy as np
-        if self.ui.radio_airway_tag.isChecked():
-            segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
-            combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8)  
-        elif self.ui.radio_artery_tag.isChecked():
-            segmentationNode=slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
-            combined_mask = np.zeros(segmentation_masks["artery"].shape, dtype=np.uint8) 
+
+        if select_radio_tag_text=="airway":
+            model_name_must_is = "Airway_nnUnet"
+            segment_name=["airway"]
+        elif select_radio_tag_text=="artery":
+            model_name_must_is = "Artery_nnUnet"
+            segment_name=["artery"]
+        elif select_radio_tag_text=="rib":
+            model_name_must_is = "Rib_nnUnet"
+            segment_name=["rib"]
+        else: #select_radio_tag_text=="lobe":
+            model_name_must_is = "LungLobe_nnUnet"
+            
+            segment_name=[select_radio_tag_text]#临时["left upper lobe","left lower lobe","right upper lobe","right middle lobe","right lower lobe"]
+            
+            k=10
+            for i in ["left upper lobe","left lower lobe","right upper lobe","right middle lobe","right lower lobe"]:
+                if select_radio_tag_text==i:
+                    break
+                else:
+                    k+=1
+            seg_number_for_this_node=k
+            print("(lung lobe unique)-->",seg_number_for_this_node)
+
+        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+
+
+        combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8) #TODO: 临时,shape都一样直接使用segmentation_masks["airway"].shape 虽然可读性不强
+
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
         volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
 
-        combined_mask[segmentation_masks["airway"]] = 1  
-        combined_mask[segmentation_masks["artery"]] = 2  
-        combined_mask[segmentation_masks["vein"]] = 3    
+        # combined_mask[segmentation_masks["airway"]] = 1  
+        # combined_mask[segmentation_masks["artery"]] = 2  
+        # combined_mask[segmentation_masks["vein"]] = 3   
+
+        combined_mask[segmentation_masks[segment_name[0]]] = seg_number_for_this_node
+
+        # print(np.sum(combined_mask == 10),np.sum(combined_mask == 11),np.sum(combined_mask == 12),np.sum(combined_mask == 13),np.sum(combined_mask == 14))
+        # combined_mask[segmentation_masks["rib"]] = 20
         
-        if self.ui.radio_airway_tag.isChecked():
-            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Airway')
-        elif self.ui.radio_artery_tag.isChecked():
-            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
+
+        if len(segment_name)==1:
+            segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0])
+        # else:
+        #     segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName('Artery')
         
         # Get segment as numpy array
         segmentArray = slicer.util.arrayFromSegmentBinaryLabelmap(segmentationNode, segmentId, volumeNode)
@@ -371,27 +414,68 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Print output
         #print(point_Ijk)
+        #TODO:临时， 测试当选择lobe模型时，自动选择吸附表面的mask种类，效果还行需要优化:根据球大小重新设置一个范围的ras坐标进行匹配，现在是单点
+        select_radio_tag_text=self.button_group.checkedButton().text
+        print("-->",select_radio_tag_text)
+
+        if select_radio_tag_text=="airway":
+            model_name_must_is = "Airway_nnUnet"
+            segment_name=["Airway"]
+        elif select_radio_tag_text=="artery":
+            model_name_must_is = "Artery_nnUnet"
+            segment_name=["Artery"]
+        elif select_radio_tag_text=="rib":
+            model_name_must_is = "Rib_nnUnet"
+            segment_name=["rib"]
+        elif select_radio_tag_text=="lobe":
+            model_name_must_is = "LungLobe_nnUnet"
+            segment_name=["left upper lobe","left lower lobe","right upper lobe","right middle lobe","right lower lobe"]
+        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+
+        if segmentationNode is None:
+            print("No have "+model_name_must_is+"_Output_Mask")
+            return
+
+        sliceViewWidget = slicer.app.layoutManager().sliceWidget("Red")#Red view辅助
+        segmentationsDisplayableManager = sliceViewWidget.sliceView().displayableManagerByClassName("vtkMRMLSegmentationsDisplayableManager2D")
+        ras = point_Ras
+        pointListNode.GetNthControlPointPositionWorld(0, ras)
+        segmentIds = vtk.vtkStringArray()
+        segmentationsDisplayableManager.GetVisibleSegmentsForPosition(ras, segmentationNode.GetDisplayNode(), segmentIds)
+
+        segment=None
+        for idIndex in range(segmentIds.GetNumberOfValues()):
+            segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
+            print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
+        
 
         #try:
         import ast
         position_=self.strDataProbeEx.split("<b>")
         x,y,z=point_Ijk#ast.literal_eval(position_[0])
         #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
-        #print("Press")
+        #print("Press",self.strDataProbeEx)
         if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
             self.strDataProbeEx = self.strDataProbeEx+" Erro: data module no init!"
         else:
             #print(self.data_module.get_masks())
             optin_select=self.button_group2.checkedButton().text
+            seg_net_select=self.button_group.checkedButton().text
+            if seg_net_select=="lobe":
+                if segment !=None:
+                    seg_net_select=segment.GetName()# 改成临近label类型
+                else:
+                    # 不处理
+                    return
             param = ast.literal_eval("{'radius':"+str(int(self.ui.radius_slider.value))+",}")
             #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
             if optin_select=="Sphere Addition":
-                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+                self.data_module.sphere_addition(x, y, z, seg_net_select, **param)
             elif optin_select=="Sphere Erasure":
-                self.data_module.sphere_erasure(x, y, z, self.button_group.checkedButton().text, **param)
+                self.data_module.sphere_erasure(x, y, z, seg_net_select, **param)
             else:
                 return
-            self.FasterUpdateSegForonPress(self.data_module.get_masks())
+            self.FasterUpdateSegForonPress(self.data_module.get_masks(),seg_net_select)
             #print(self.button_group.checkedButton().text)
             #self.data_module.
             self.ui.label_6.setText("Target Modifiy Queue Len:"+str(self.data_module.get_history_len()))
@@ -578,8 +662,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 self.ui.radio_artery_tag.setChecked(True)
             if name=="LungLobe_nnUnet":
                 self.ui.btn_seg_lobe.setEnabled(True)
+                self.ui.radio_lobe_tag.setChecked(True)
             if name=="Rib_nnUnet":
                 self.ui.btn_seg_rib.setEnabled(True)
+                self.ui.radio_rib_tag.setChecked(True)
 
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
@@ -877,15 +963,27 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 segmentation_masks = {
                     "airway" : data[:, :, :] == 1, 
                     "artery": data[:, :, :] == 2, 
-                    "vein": data[:, :, :] == 3
+                    "vein": data[:, :, :] == 3,
+                    "left upper lobe": data[:, :, :] == 10,
+                    "left lower lobe": data[:, :, :] == 11,
+                    "right upper lobe": data[:, :, :] == 12,
+                    "right middle lobe": data[:, :, :] == 13,
+                    "right lower lobe": data[:, :, :] == 14,
+                    "rib": data[:, :, :] == 20,
                 }
 
             probability_maps = {
                 "airway": segmentation_masks["airway"].astype(np.float32),
                 "artery": segmentation_masks["artery"].astype(np.float32),
                 "vein": segmentation_masks["vein"].astype(np.float32),
-            }
 
+                "left upper lobe": segmentation_masks["left upper lobe"].astype(np.float32),
+                "left lower lobe": segmentation_masks["left lower lobe"].astype(np.float32),
+                "right upper lobe": segmentation_masks["right upper lobe"].astype(np.float32),
+                "right middle lobe": segmentation_masks["right middle lobe"].astype(np.float32),
+                "right lower lobe": segmentation_masks["right lower lobe"].astype(np.float32),
+                "rib": segmentation_masks["rib"].astype(np.float32),
+            }
 
             self.data_module = DataModule(ct_data, segmentation_masks, probability_maps, result_data.GetSpacing())
             
