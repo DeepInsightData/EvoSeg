@@ -21,11 +21,8 @@ torchvision==0.19.0  --hash=sha256:03fc97a9058bb489aee898d2b7cef7e2e7636ecda1d9a
 # [fire]
 fire==0.6.0 --hash=sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66
 termcolor==2.5.0 --hash=sha256:37b17b5fc1e604945c2642c872a3764b5d547a48009871aea3edd3afa180afb8
-six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+six==1.16.0 --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
 # [/fire]
-# [SimpleITK]
-SimpleITK==2.2.1 --hash=sha256:7e20bbc467a8fff15978fee34a97c851ec3d0caed2d01929f600a13a0ff2f955
-# [/SimpleITK]
 # [nibabel]
 nibabel==5.3.2 --hash=sha256:52970a5a8a53b1b55249cba4d9bcfaa8cc57e3e5af35a29d7352237e8680a6f8
 importlib_resources==6.4.5 --hash=sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717
@@ -71,7 +68,7 @@ pillow==10.3.0 --hash=sha256:0ba26351b137ca4e0db0342d5d00d2e355eb29372c05afd544e
 nnunetv2==2.5.1 --hash=sha256:8dca9e6b49a443ad144774245340ada0c6fe84007930c3ba4c4467e12c510cdc
 acvl_utils==0.2 --hash=sha256:d58636b5049b0ba698b6cbac27cdff9350458c40329555051083758c35e7da36
 dynamic_network_architectures==0.3.1 --hash=sha256:e3702b451891c01ccdcbd468aea309ae7301ab706e27394a438f3edba3fd9acd
-tqdm==4.66.6 --hash=sha256:223e8b5359c2efc4b30555531f09e9f2f3589bcd7fdd389271191031b49b7a63
+tqdm==4.67.1 --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2
 dicom2nifti==2.5.0 --hash=sha256:9518dcc12a3d92c2415deca7dccf4606ec37b57dcecf716dbca53a7852efdaa5
 batchgenerators==0.25 --hash=sha256:38a67413e847ff367e64abac36331fcb065494202d526ae96f7644de3a0e5495
 scikit_learn==1.5.2 --hash=sha256:3bed4909ba187aca80580fe2ef370d9180dcf18e621a27c4cf2ef10d279a7efe
@@ -102,13 +99,14 @@ fft_conv_pytorch==1.2.0 --hash=sha256:17b9bd616df86da25e4820473698eb4831c2f2f6e7
 argparse==1.4.0 --hash=sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314
 traceback2==1.4.0 --hash=sha256:8253cebec4b19094d67cc5ed5af99bf1dba1285292226e98a31929f87a5d6b23
 linecache2==1.0.0 --hash=sha256:e78be9c0a0dfcbac712fe04fbf92b96cddae80b1b842f24248214c8496f006ef
-requests==2.27.1 --hash=sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d
+requests==2.32.3 --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
 pydicom==2.4.4 --hash=sha256:f9f8e19b78525be57aa6384484298833e4d06ac1d6226c79459131ddb0bd7c42
-pyparsing==3.2.0 --hash=sha256:93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84
-idna==3.10 --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
-urllib3==1.26.20 --hash=sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e
-certifi==2024.12.14 --hash=sha256:1275f7a45be9464efc1173084eaa30f866fe2e47d389406136d332ed4967ec56
-charset_normalizer==2.0.12 --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
+pyparsing==3.1.2 --hash=sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742
+idna==3.7 --hash=sha256:82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0
+urllib3==2.3.0 --hash=sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df
+chardet==5.2.0 --hash=sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970
+certifi==2024.2.2 --hash=sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1
+charset_normalizer==3.3.2 --hash=sha256:b01b88d45a6fcb69667cd6d2f7a9aeb4bf53760d7fc536bf679ec94fe9f3ff3d
 # [/nnunetv2]
 
 # [pynrrd]
@@ -143,7 +141,7 @@ ExternalProject_Add(${proj}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
-  INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --ignore-installed --extra-index-url https://download.pytorch.org/whl/cu118 -r ${requirements_file}
+  INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --no-deps --ignore-installed --extra-index-url https://download.pytorch.org/whl/cu118 -r ${requirements_file}
   LOG_INSTALL 1
   DEPENDS
     ${${proj}_DEPENDENCIES}
