@@ -45,14 +45,14 @@ def main(model_folder,
         from modify_total_python_api import modifiy_totalsegmentator
 
         input_img = nib.load(image_file)
-        output_img = modifiy_totalsegmentator(model_folder,input_img,fast=True)
+        output_img = modifiy_totalsegmentator(model_folder, input_img)#, fast=True)
 
         val = output_img.get_fdata()
         # 特殊处理
         if os.path.basename(model_folder) == "LungLobe_nnUnet":
             val[(val < 10) | (val > 14)] = 0 
         elif os.path.basename(model_folder) == "Rib_nnUnet":
-            val[(val < 92) | (val > 115)] = 0
+            val[(val < 1) | (val > 24)] = 0
             val[val != 0] = 20
 
         output_img = nib.Nifti1Image(val, output_img.affine)
@@ -155,13 +155,6 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Artery_nnUnet":
             # 特殊处理1, Artery_nnUnet执行结果*2
             val=val*2
-        elif os.path.basename(model_folder)=="LungLobe_nnUnet":
-            # 特殊处理2, LungLobe_nnUnet执行结果中只保留值在[10,14]区间的lung lobe部分
-            val[(val < 10) | (val > 14)] = 0 
-        elif os.path.basename(model_folder)=="Rib_nnUnet":
-            # 特殊处理3, 保留值在[92,115]区间的Rib部分
-            val[(val < 92) | (val > 115)] = 0
-            val[val != 0] = 20 # 统一成一种结果
         #else: 
         seg_results=(val, val_prob)
 
@@ -173,13 +166,6 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Artery_nnUnet":
             # 特殊处理1, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
-        elif os.path.basename(model_folder)=="LungLobe_nnUnet":
-            # 特殊处理2, LungLobe_nnUnet执行结果中只保留值在[10,14]区间的lung lobe部分
-            seg_results[(seg_results < 10) | (seg_results > 14)] = 0  
-        elif os.path.basename(model_folder)=="Rib_nnUnet":
-            # 特殊处理3, 保留值在[92,115]区间的Rib部分
-            seg_results[(seg_results < 92) | (seg_results > 115)] = 0
-            seg_results[seg_results != 0] = 20 # 统一成一种结果  
         #else: 其它
 
         # 转成nii

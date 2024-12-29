@@ -146,6 +146,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.interactionNodeObserver=None
 
+        self.rightUpperLobeColor = (177./255., 122./255., 101./255. )
+        self.rightMiddleLobeColor = (111./255., 184./255., 210./255.)
+        self.rightLowerLobeColor = (216./255., 101./255., 79./255.)
+        self.leftUpperLobeColor = (128./255., 174./255., 128./255.)
+        self.leftLowerLobeColor = (241./255., 214./255., 145./255.)
+        self.ribColor = (0.95, 0.84, 0.57)
+
         
         
 
@@ -620,17 +627,17 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     #固定颜色参考：
                     #https://github.com/Slicer/SlicerLungCTAnalyzer/blob/e2f23dafb6994421ad65606050979b10e8a932aa/LungCTSegmenter/LungCTSegmenter.py#L1266
                     if seg_name=="right upper lobe":
-                        rgb = (177./255., 122./255., 101./255. )
+                        rgb = self.rightUpperLobeColor
                     if seg_name=="right middle lobe":
-                        rgb = (111./255., 184./255., 210./255.)
+                        rgb = self.rightMiddleLobeColor
                     if seg_name=="right lower lobe":
-                        rgb = (216./255., 101./255., 79./255.)
+                        rgb = self.rightLowerLobeColor
                     if seg_name=="left upper lobe":
-                        rgb = (128./255., 174./255., 128./255.)
+                        rgb = self.leftUpperLobeColor
                     if seg_name=="left lower lobe":
-                        rgb = (241./255., 214./255., 145./255.)
+                        rgb = self.leftLowerLobeColor
                     if seg_name=="rib":
-                        rgb = (0.95, 0.84, 0.57)
+                        rgb = self.ribColor
 
                 segment.SetColor(rgb)
             

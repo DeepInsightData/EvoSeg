@@ -142,7 +142,10 @@ def modifiy_totalsegmentator(model_folder_set,input: Union[str, Path, Nifti1Imag
             crop = None
             if not quiet: print("Using 'fastest' option: resampling to lower resolution (6mm)")
         else:
-            task_id = [291, 292, 293, 294, 295]
+            if os.path.basename(model_folder_set) == "LungLobe_nnUnet":
+                task_id = 291
+            else: # TODO:临时
+                task_id = 295
             resample = 1.5
             trainer = "nnUNetTrainerNoMirroring"
             crop = None
