@@ -143,18 +143,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.btn_seg_rib.clicked.connect(lambda: self.onSegButtonClick('rib'))
         
         self.ui.groupBox_Modify.hide()
-
         self.interactionNodeObserver=None
-
-        self.rightUpperLobeColor = (177./255., 122./255., 101./255. )
-        self.rightMiddleLobeColor = (111./255., 184./255., 210./255.)
-        self.rightLowerLobeColor = (216./255., 101./255., 79./255.)
-        self.leftUpperLobeColor = (128./255., 174./255., 128./255.)
-        self.leftLowerLobeColor = (241./255., 214./255., 145./255.)
-        self.ribColor = (0.95, 0.84, 0.57)
-
-        
-        
 
     def enter(self):
         pass
@@ -618,25 +607,29 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # segment.SetColor(random.random(), random.random(), random.random())
                 try:
                     color = EvoSegModels.get(name.split('_')[0]).color()
-                    rgb = (color.red()/255, color.green()/255, color.blue()/255)
+                    segment.SetColor(color.redF(), color.greenF(), color.blueF())
                 except:
                     seg_name=segment.GetName()
                     #固定颜色参考：
                     #https://github.com/Slicer/SlicerLungCTAnalyzer/blob/e2f23dafb6994421ad65606050979b10e8a932aa/LungCTSegmenter/LungCTSegmenter.py#L1266
                     if seg_name=="right upper lobe":
-                        rgb = self.rightUpperLobeColor
+                        color = EvoSegModels.get('Lobe').rightUpperLobeColor
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="right middle lobe":
-                        rgb = self.rightMiddleLobeColor
+                        color = EvoSegModels.get('Lobe').rightMiddleLobeColor
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="right lower lobe":
-                        rgb = self.rightLowerLobeColor
+                        color = EvoSegModels.get('Lobe').rightLowerLobeColor
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="left upper lobe":
-                        rgb = self.leftUpperLobeColor
+                        color = EvoSegModels.get('Lobe').leftUpperLobeColor
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="left lower lobe":
-                        rgb = self.leftLowerLobeColor
+                        color = EvoSegModels.get('Lobe').leftLowerLobeColor
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="rib":
-                        rgb = self.ribColor
-
-                segment.SetColor(rgb)
+                        color = EvoSegModels.get('Rib').color()
+                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
             
             self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
             #segment_id = segment.GetName()
