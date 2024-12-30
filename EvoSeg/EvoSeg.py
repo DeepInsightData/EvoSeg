@@ -333,12 +333,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         if select_radio_tag_text=="airway":
             model_name_must_is = "Airway_nnUnet"
             segment_name=["airway"]
+            seg_number_for_this_node=1
         elif select_radio_tag_text=="artery":
             model_name_must_is = "Artery_nnUnet"
             segment_name=["artery"]
+            seg_number_for_this_node=2
         elif select_radio_tag_text=="rib":
             model_name_must_is = "Rib_nnUnet"
             segment_name=["rib"]
+            seg_number_for_this_node=20
         else: #select_radio_tag_text=="lobe":
             model_name_must_is = "LungLobe_nnUnet"
             
@@ -351,7 +354,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 else:
                     k+=1
             seg_number_for_this_node=k
-            print("(lung lobe unique)-->",seg_number_for_this_node)
+            #print("(lung lobe unique)-->",seg_number_for_this_node)
 
         segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
 
@@ -361,14 +364,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
         volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
 
-        # combined_mask[segmentation_masks["airway"]] = 1  
-        # combined_mask[segmentation_masks["artery"]] = 2  
-        # combined_mask[segmentation_masks["vein"]] = 3   
-
+        
         combined_mask[segmentation_masks[segment_name[0]]] = seg_number_for_this_node
-
-        # print(np.sum(combined_mask == 10),np.sum(combined_mask == 11),np.sum(combined_mask == 12),np.sum(combined_mask == 13),np.sum(combined_mask == 14))
-        # combined_mask[segmentation_masks["rib"]] = 20
         
 
         if len(segment_name)==1:
@@ -388,7 +385,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         import numpy as np
         markupsDisplayNode = caller
         #print(type(markupsDisplayNode))
-        print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
+        #print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
         
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
         # inputNodeName = self.ui.inputNodeSelector0.currentNode().GetName()
@@ -444,7 +441,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             segment=None
             for idIndex in range(segmentIds.GetNumberOfValues()):
                 segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
-                print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
+                #print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
                 break
             if segment!=None:
                 break
