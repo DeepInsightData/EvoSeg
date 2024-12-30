@@ -613,19 +613,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     #固定颜色参考：
                     #https://github.com/Slicer/SlicerLungCTAnalyzer/blob/e2f23dafb6994421ad65606050979b10e8a932aa/LungCTSegmenter/LungCTSegmenter.py#L1266
                     if seg_name=="right upper lobe":
-                        color = EvoSegModels.get('Lobe').rightUpperLobeColor
+                        color = EvoSegModels.get('Lobe').rightUpperLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="right middle lobe":
-                        color = EvoSegModels.get('Lobe').rightMiddleLobeColor
+                        color = EvoSegModels.get('Lobe').rightMiddleLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="right lower lobe":
-                        color = EvoSegModels.get('Lobe').rightLowerLobeColor
+                        color = EvoSegModels.get('Lobe').rightLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="left upper lobe":
-                        color = EvoSegModels.get('Lobe').leftUpperLobeColor
+                        color = EvoSegModels.get('Lobe').leftUpperLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="left lower lobe":
-                        color = EvoSegModels.get('Lobe').leftLowerLobeColor
+                        color = EvoSegModels.get('Lobe').leftLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     if seg_name=="rib":
                         color = EvoSegModels.get('Rib').color()

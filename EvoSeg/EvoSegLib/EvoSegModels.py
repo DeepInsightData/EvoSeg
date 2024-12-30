@@ -13,18 +13,23 @@ class EvoSegModel:
         return slicer.util.settingsValue(f'EvoSeg/{self.name}OutputVolumeNodeName', f'{self.name}_Output_Mask')
     
 class LungLobeModel(EvoSegModel):
-    def __init__(self, modelName: str, color: qt.QColor
-                 , leftUpperLobeColor: qt.QColor=qt.QColor("#80ae80")
-                 , leftLowerLobeColor: qt.QColor=qt.QColor("#f1d691")
-                 , rightUpperLobeColor: qt.QColor=qt.QColor("#b17a65")
-                 , rightMiddleLobeColor: qt.QColor=qt.QColor("#6fb8d2")
-                 , rightLowerLobeColor: qt.QColor=qt.QColor("#d8654f")):
+    def __init__(self, modelName: str, color: qt.QColor):
         super().__init__(modelName, color)
-        self.leftUpperLobeColor=leftUpperLobeColor
-        self.leftLowerLobeColor=leftLowerLobeColor
-        self.rightUpperLobeColor=rightUpperLobeColor
-        self.rightMiddleLobeColor=rightMiddleLobeColor
-        self.rightLowerLobeColor=rightLowerLobeColor
+    
+    def leftUpperLobeColor(self):
+        return slicer.util.settingsValue(f'EvoSeg/LeftUpperLobeColor', qt.QColor("#80ae80"))
+    
+    def leftLowerLobeColor(self):
+        return slicer.util.settingsValue(f'EvoSeg/LeftLowerLobeColor', qt.QColor("#f1d691"))
+    
+    def rightUpperLobeColor(self):
+        return slicer.util.settingsValue(f'EvoSeg/RightUpperLobeColor', qt.QColor("#b17a65"))
+    
+    def rightMiddleLobeColor(self):
+        return slicer.util.settingsValue(f'EvoSeg/RightMiddleLobeColor', qt.QColor("#6fb8d2"))
+    
+    def rightLowerLobeColor(self):
+        return slicer.util.settingsValue(f'EvoSeg/RightLowerLobeColor', qt.QColor("#d8654f"))
 
 class EvoSegModels:
     MODELS = [
