@@ -47,7 +47,7 @@ def main(model_folder,
         input_img = nib.load(image_file)
         output_img = modifiy_totalsegmentator(model_folder, input_img)#, fast=True)
 
-        val = output_img.get_fdata()
+        val = output_img.dataobj[:]
         # 特殊处理
         if os.path.basename(model_folder) == "LungLobe_nnUnet":
             val[(val < 10) | (val > 14)] = 0 
