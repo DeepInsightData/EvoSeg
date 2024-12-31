@@ -30,7 +30,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
-simulated_data=False
+simulated_data=True
 
 @torch.no_grad()
 def main(model_folder,
@@ -40,6 +40,19 @@ def main(model_folder,
          resample=None,
          use_total=False,
          **kwargs):
+
+    if simulated_data:
+        print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
+        with open(model_folder+"/output-segmentation.nii.gz", 'rb') as f_src:  # 以二进制模式打开源文件
+            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
+                while True:
+                    # 每次读取 1024 字节
+                    chunk = f_src.read(1024)
+                    if not chunk:
+                        break
+                    f_dest.write(chunk)
+        print(f'ALL DONE, result saved in {result_file}')
+        return
 
     if use_total:
         from modify_total_python_api import modifiy_totalsegmentator
@@ -58,19 +71,6 @@ def main(model_folder,
         output_img = nib.Nifti1Image(val, output_img.affine)
         nib.save(output_img, result_file)
 
-        return
-
-    if simulated_data:
-        print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
-        with open(model_folder+"/output-segmentation.nii.gz", 'rb') as f_src:  # 以二进制模式打开源文件
-            with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
-                while True:
-                    # 每次读取 1024 字节
-                    chunk = f_src.read(1024)
-                    if not chunk:
-                        break
-                    f_dest.write(chunk)
-        print(f'ALL DONE, result saved in {result_file}')
         return
 
     if resample is not None: # 目前resample下对prob_maps该如何处理未知

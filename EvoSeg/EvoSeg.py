@@ -68,6 +68,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.observations = None
         self.markup_node=None
         self.data_module=None
+        self.data_module_name=None
         self.data_module_list=[]
         self.logic = EvoSegLogic()
 
@@ -165,13 +166,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         elif value_for_group.text=="lobe":
             model_name_must_is = "LungLobe_nnUnet"
         
-        if model_name_must_is==" ":
+        if model_name_must_is=="":
             return
         else:
             output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
             for i in self.data_module_list:
                 if i["model_name"]==model_name_must_is:
                     self.data_module=i["seg_data"]
+                    self.data_module_name=model_name_must_is
                     #print("set DataModule for:"+model_name_must_is)
                     return
         
@@ -320,19 +322,15 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         import numpy as np
 
         if select_radio_tag_text=="airway":
-            model_name_must_is = "Airway_nnUnet"
             segment_name=["airway"]
             seg_number_for_this_node=1
         elif select_radio_tag_text=="artery":
-            model_name_must_is = "Artery_nnUnet"
             segment_name=["artery"]
             seg_number_for_this_node=2
         elif select_radio_tag_text=="rib":
-            model_name_must_is = "Rib_nnUnet"
             segment_name=["rib"]
             seg_number_for_this_node=20
         else: #select_radio_tag_text=="lobe":
-            model_name_must_is = "LungLobe_nnUnet"
             
             segment_name=[select_radio_tag_text]#临时["left upper lobe","left lower lobe","right upper lobe","right middle lobe","right lower lobe"]
             
@@ -345,7 +343,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             seg_number_for_this_node=k
             #print("(lung lobe unique)-->",seg_number_for_this_node)
 
-        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(self.data_module_name+"_Output_Mask")
 
 
         combined_mask = np.zeros(segmentation_masks["airway"].shape, dtype=np.uint8) #TODO: 临时,shape都一样直接使用segmentation_masks["airway"].shape 虽然可读性不强
@@ -400,38 +398,36 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Print output
         #print(point_Ijk)
-        #TODO:临时， 测试当选择lobe模型时，自动选择吸附表面的mask种类，效果还行需要优化:根据球大小重新设置一个范围的ras坐标进行匹配，现在是单点
-        # 获取所选模型name 目前这段代码应该有多处重复
-        select_radio_tag_text=self.button_group.checkedButton().text
-        if select_radio_tag_text=="airway":
-            model_name_must_is = "Airway_nnUnet"
-        elif select_radio_tag_text=="artery":
-            model_name_must_is = "Artery_nnUnet"
-        elif select_radio_tag_text=="rib":
-            model_name_must_is = "Rib_nnUnet"
-        elif select_radio_tag_text=="lobe":
-            model_name_must_is = "LungLobe_nnUnet"
-        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
+        # 获取所选模型name
+        segmentationNode=slicer.mrmlScene.GetFirstNodeByName(self.data_module_name+"_Output_Mask")
 
         if segmentationNode is None:
-            print("No have "+model_name_must_is+"_Output_Mask")
+            print("No have "+self.data_module_name+"_Output_Mask")
             return
 
-        #使用Red view的vtkMRMLSegmentationsDisplayableManager2D辅助查找seg id
-        segmentationsDisplayableManager = slicer.app.layoutManager().sliceWidget("Red").sliceView().displayableManagerByClassName("vtkMRMLSegmentationsDisplayableManager2D")
-        x_t,y_t,z_t=point_Ras
-        radiu_t=self.ui.radius_slider.value
-        # 先检查point_Ras，再检查point_Ras前后左右上下距离为radiu_t的一个点,尽可能找到mukup粘到的模型
-        for ras in [point_Ras,[x_t+radiu_t,y_t,z_t],[x_t-radiu_t,y_t,z_t],[x_t,y_t+radiu_t,z_t],[x_t,y_t-radiu_t,z_t],[x_t,y_t,z_t+radiu_t],[x_t,y_t,z_t-radiu_t]]:
-            pointListNode.GetNthControlPointPositionWorld(0, ras)
-            segmentIds = vtk.vtkStringArray()
-            segmentationsDisplayableManager.GetVisibleSegmentsForPosition(ras, segmentationNode.GetDisplayNode(), segmentIds)
+        r,a,s = point_Ras
+        print(r,a,s,"------------------")
+        radiu=self.ui.radius_slider.value/2 # TODO: 这里也许有个BUG需要进一步检查, 在调试下面代码时发现在RGY图中的mukup半径与slider值差1倍，这里暂且/2
 
-            segment=None
-            for idIndex in range(segmentIds.GetNumberOfValues()):
-                segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
-                #print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
-                break
+        # 三个视图都检查 理论上必找到mukup附近的label类别，TODO:可能只需要一个窗口并且4个方向即可
+        for sliceViewName in ["Red","Green","Yellow"]: 
+            segmentationsDisplayableManager = slicer.app.layoutManager().sliceWidget(sliceViewName).sliceView().displayableManagerByClassName("vtkMRMLSegmentationsDisplayableManager2D")
+            # 先检查point_Ras，再检查point_Ras周围六个方向为radiu的一个点,尽可能找到mukup粘到的模型
+            for ras in [point_Ras,[r+radiu,a,s],[r-radiu,a,s],[r,a+radiu,s],[r,a-radiu,s],[r,a,s+radiu],[r,a,s-radiu]]:
+                # print(sliceViewName,ras)
+                # pointListNode.GetNthControlPointPositionWorld(0, ras) # TODO: 之前查找失败的原因是这一句重新赋值了所遍历的ras坐标
+                # print(sliceViewName,ras)
+                segmentIds = vtk.vtkStringArray()
+                segmentationsDisplayableManager.GetVisibleSegmentsForPosition(ras, segmentationNode.GetDisplayNode(), segmentIds)
+
+                segment=None
+                for idIndex in range(segmentIds.GetNumberOfValues()):
+                    segment = segmentationNode.GetSegmentation().GetSegment(segmentIds.GetValue(idIndex))
+                    #print("Segment found at position {0}: {1}".format(ras, segment.GetName()))
+                    print("^")
+                    break
+                if segment!=None:
+                    break
             if segment!=None:
                 break
 
@@ -447,7 +443,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if segment !=None:
                 seg_net_select=segment.GetName()# 改成临近label类型
             else:
-                # 不处理
+                # 不处理, 注意现在的lobe选项的时候不可能会离开模型表面太远添加模型, 其它标签则可以凭空添加
                 return
         param = ast.literal_eval("{'radius':"+str(int(self.ui.radius_slider.value))+",}")
         #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
@@ -627,7 +623,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     if seg_name=="left lower lobe":
                         color = EvoSegModels.get('Lobe').leftLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="rib":
+                    if seg_name=="rib": # TODO: 这个if可能无法执行
                         color = EvoSegModels.get('Rib').color()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
             
