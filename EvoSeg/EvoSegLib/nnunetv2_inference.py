@@ -38,7 +38,7 @@ def main(model_folder,
          result_file,
          save_prob_maps=False,
          resample=None,
-         use_total=False
+         use_total=False,
          **kwargs):
 
     if simulated_data:
