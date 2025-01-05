@@ -30,7 +30,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
-simulated_data=True
+simulated_data=False
 
 @torch.no_grad()
 def main(model_folder,
@@ -38,7 +38,7 @@ def main(model_folder,
          result_file,
          save_prob_maps=False,
          resample=None,
-         use_total=False,
+         use_total=False
          **kwargs):
 
     if simulated_data:
@@ -67,8 +67,15 @@ def main(model_folder,
         elif os.path.basename(model_folder) == "Rib_nnUnet":
             val[(val < 1) | (val > 24)] = 0
             val[val != 0] = 20
+        elif os.path.basename(model_folder) == "Vein_nnUnet":
+            val[val != 3] = 0
 
         output_img = nib.Nifti1Image(val, output_img.affine)
+
+        output_dir = os.path.dirname(result_file)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
         nib.save(output_img, result_file)
 
         return
@@ -197,6 +204,10 @@ def main(model_folder,
             prob_maps = (prob_maps - prob_maps.min()) / (prob_maps.max() - prob_maps.min()) * 255
             SimpleITKIO().write_seg({'sitk_stuff':np.expand_dims(prob_maps, axis=0)}, result_file.replace('.nii.gz', '_prob.nii.gz'), prop)
     
+    output_dir = os.path.dirname(result_file)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     # 统一用nib保存nii.gz
     nib.save(end_seg_results, result_file)
     timing_checkpoints.append(("Save", time.time()))

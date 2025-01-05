@@ -51,6 +51,9 @@ networkx==3.2.1 --hash=sha256:f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95
 # [filelock]
 filelock==3.16.1 --hash=sha256:2082e5703d51fbf98ea75855d9d5527e33d8ff23099bec374a134febee6946b0
 # [/filelock]
+# [h5py]
+h5py==3.12.1 --hash=sha256:62be1fc0ef195891949b2c627ec06bc8e837ff62d5b911b6e42e38e0f20a897d
+# [/h5py]
 
 # [typing-extensions]
 typing-extensions==4.12.1 --hash=sha256:6024b58b69089e5a89c347397254e35f1bf02a907728ec7fee9bf0fe837d203a

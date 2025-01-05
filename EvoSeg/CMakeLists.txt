@@ -24,6 +24,7 @@ set(MODULE_PYTHON_RESOURCES
   Resources/Icons/aireway_segmentation.png
   Resources/Icons/lunglobe_segmentation.png
   Resources/Icons/rib_segmentation.png
+  Resources/Icons/vein_segmentation.png
   Resources/UI/${MODULE_NAME}.ui
   )
 

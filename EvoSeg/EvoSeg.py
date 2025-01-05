@@ -131,6 +131,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))
         self.ui.btn_seg_lobe.setIcon(qt.QIcon(self.resourcePath("Icons/lunglobe_segmentation.png")))
         self.ui.btn_seg_rib.setIcon(qt.QIcon(self.resourcePath("Icons/rib_segmentation.png")))
+        self.ui.btn_seg_vein.setIcon(qt.QIcon(self.resourcePath("Icons/vein_segmentation.png")))
         self.ui.bt_cancel_run.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Cancel.png")))
         self.ui.bt_place.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Place.png")))
         self.ui.bt_place.toggled.connect(lambda checked: self.ui.bt_place.setIcon(
@@ -142,6 +143,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
         self.ui.btn_seg_lobe.clicked.connect(lambda: self.onSegButtonClick('lobe'))
         self.ui.btn_seg_rib.clicked.connect(lambda: self.onSegButtonClick('rib'))
+        self.ui.btn_seg_vein.clicked.connect(lambda: self.onSegButtonClick('vein'))
         
         self.ui.groupBox_Modify.hide()
         self.interactionNodeObserver=None
@@ -165,6 +167,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             model_name_must_is = "Rib_nnUnet"
         elif value_for_group.text=="lobe":
             model_name_must_is = "LungLobe_nnUnet"
+        elif value_for_group.text=="vein":
+            model_name_must_is = "Vein_nnUnet"
         
         if model_name_must_is=="":
             return
@@ -185,7 +189,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         export_labelmap_node = [slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask"),
                                 slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask"),
                                 slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask"),
-                                slicer.mrmlScene.GetFirstNodeByName("Rig_nnUnet_Output_Mask")]
+                                slicer.mrmlScene.GetFirstNodeByName("Rig_nnUnet_Output_Mask"),
+                                slicer.mrmlScene.GetFirstNodeByName("Vein_nnUnet_Output_Mask")]
         for node in export_labelmap_node:
             if node and node.GetSegmentation().GetNumberOfSegments()!=0:
                 NodeShItem = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene).GetItemByDataNode(node)
@@ -221,6 +226,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         elif "rib"==button_name:
             run_model_name="Rib_nnUnet"
             self.ui.btn_seg_rib.setEnabled(False)
+            self.ui.bt_cancel_run.setEnabled(True)
+        elif "vein"==button_name:
+            run_model_name="Vein_nnUnet"
+            self.ui.btn_seg_vein.setEnabled(False)
             self.ui.bt_cancel_run.setEnabled(True)
         else:
             slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
@@ -327,6 +336,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         elif select_radio_tag_text=="artery":
             segment_name=["artery"]
             seg_number_for_this_node=2
+        elif select_radio_tag_text=="vein":
+            segment_name=["vein"]
+            seg_number_for_this_node=3
         elif select_radio_tag_text=="rib":
             segment_name=["rib"]
             seg_number_for_this_node=20
@@ -407,7 +419,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         r,a,s = point_Ras
         print(r,a,s,"------------------")
-        radiu=self.ui.radius_slider.value/2 # TODO: 这里也许有个BUG需要进一步检查, 在调试下面代码时发现在RGY图中的mukup半径与slider值差1倍，这里暂且/2
+        radiu=self.ui.radius_slider.value/2 # UI上slider的值确认为为直径
 
         # 三个视图都检查 理论上必找到mukup附近的label类别，TODO:可能只需要一个窗口并且4个方向即可
         for sliceViewName in ["Red","Green","Yellow"]: 
@@ -533,6 +545,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     self.ui.btn_seg_lobe.setEnabled(True)
                 if i["name"]=="Rib_nnUnet":
                     self.ui.btn_seg_rib.setEnabled(True)
+                if i["name"]=="Vein_nnUnet":
+                    self.ui.btn_seg_vein.setEnabled(True)
            
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
@@ -587,6 +601,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             if name=="Rib_nnUnet":
                 self.ui.btn_seg_rib.setEnabled(True)
                 self.ui.radio_rib_tag.setChecked(True)
+            if name=="Vein_nnUnet":
+                self.ui.btn_seg_vein.setEnabled(True)
+                self.ui.radio_vein_tag.setChecked(True)
 
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
@@ -623,9 +640,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     if seg_name=="left lower lobe":
                         color = EvoSegModels.get('Lobe').leftLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="rib": # TODO: 这个if可能无法执行
-                        color = EvoSegModels.get('Rib').color()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
+                    # if seg_name=="rib": # 应该不需要这个if, TODO 待检查
+                    #     color = EvoSegModels.get('Rib').color()
+                    #     segment.SetColor(color.redF(), color.greenF(), color.blueF())
             
             self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
             #segment_id = segment.GetName()
@@ -718,10 +735,17 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if not outputSegmentation:
             raise ValueError("Output segmentation is invalid")
 
+        # TODO: 下载Vein_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有total模型和调整好的新模型
+        # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Vein_EvoSeg.zip
+        is_self_deploy_model=False
+        if model.split("_")[0]=="Vein": # 改用total 293模型 注释掉该if
+            is_self_deploy_model=True
+
+        #if not is_self_deploy_model: 
         try:
             modelPath = self.modelPath(model)
         except:
-            # TODO: 注意这里还需要加清掉之前创建的segment node
+            # TODO: 需要重构
             return
         
         segmentationProcessInfo = {}
@@ -747,7 +771,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         inputFiles = []
         for inputIndex, inputNode in enumerate(inputNodes):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                inputImageFile = tempDir + f"/input-volume{inputIndex}.nii.gz"
+                inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
                 self.log(model+f": Writing input file to {inputImageFile}")
                 volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
                 volumeStorageNode.SetFileName(inputImageFile)
@@ -758,26 +782,43 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             else:
                 raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
 
-        outputSegmentationFile = tempDir + "/output-segmentation.nii.gz"
-        modelPtFile = modelPath
-        inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
+        # make Command
+        if not is_self_deploy_model:
+            # 执行nnunet
+            outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
+            modelPtFile = modelPath
+            inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
+            is_total_model=False
+            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" or model.split("_")[0]=="Vein":
+                is_total_model=True
 
-        is_total_model=False
-        if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe":
-            is_total_model=True
+            auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+                "--model_folder", str(modelPtFile),
+                "--image_file", inputFiles[0],
+                "--result_file", str(outputSegmentationFile),
+                "--use_total", str(is_total_model)
+                ]
 
-        auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
-            "--model_folder", str(modelPtFile),
-            "--image_file", inputFiles[0],
-            "--result_file", str(outputSegmentationFile),
-            "--use_total", str(is_total_model)
-            ]
-        for inputIndex in range(1, len(inputFiles)):
-            auto3DSegCommand.append(f"--image-file-{inputIndex+1}")
-            auto3DSegCommand.append(inputFiles[inputIndex])
+            for inputIndex in range(1, len(inputFiles)):
+                auto3DSegCommand.append(f"--image-file-{inputIndex+1}")
+                auto3DSegCommand.append(inputFiles[inputIndex])
 
-        self.log(model+": Creating segmentations with EvoSeg AI...")
-        self.log(model+f": command: {auto3DSegCommand}")
+            self.log(model+": Creating segmentations with EvoSeg AI...")
+            self.log(model+f": command: {auto3DSegCommand}")
+        else:
+            # 这里执行自建模型，当前版本仅取它对Vein的分割结果
+            outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
+
+            inferenceScriptPyFile = os.path.join(modelPath, "artery_vein_code" , "run.py")
+
+            auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+                "--input", tempDir+"/input",
+                "--output", tempDir+"/output",
+                "--slicer_python_path", pythonSlicerExecutablePath
+                ]
+
+            self.log(model+": Creating segmentations with New EvoSeg AI...")
+            self.log(model+f": command: {auto3DSegCommand}")
 
         proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=None)
 
@@ -884,7 +925,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             ct_data = ct_data - ct_data.min() * 1.0
             ct_data = ct_data / ct_data.max()
 
-            nii_image = nib.load(result_data_path+"/output-segmentation.nii.gz")
+            nii_image = nib.load(result_data_path+"/output/output-segmentation.nii.gz")
             data = nii_image.get_fdata()
 
             if data.ndim>3:

@@ -144,8 +144,10 @@ def modifiy_totalsegmentator(model_folder_set,input: Union[str, Path, Nifti1Imag
         else:
             if os.path.basename(model_folder_set) == "LungLobe_nnUnet":
                 task_id = 291
-            else: # TODO:临时
+            elif os.path.basename(model_folder_set) == "Rib_nnUnet":
                 task_id = 295
+            else:
+                task_id = 293
             resample = 1.5
             trainer = "nnUNetTrainerNoMirroring"
             crop = None

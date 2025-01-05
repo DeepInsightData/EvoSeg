@@ -65,7 +65,7 @@
      <item>
       <layout class="QVBoxLayout" name="vlayout_running_log" stretch="0,18">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,2,2,2,4">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,2,2,2,2,4">
          <item>
           <widget class="QPushButton" name="bt_seg_airway">
            <property name="sizePolicy">
@@ -119,6 +119,28 @@
            </property>
            <property name="flat">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_seg_vein">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton { background-color: transparent; border: 0px }</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
            </property>
           </widget>
          </item>
@@ -634,6 +656,22 @@
     <hint type="destinationlabel">
      <x>317</x>
      <y>49</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VolumeNodeComboBox</sender>
+   <signal>currentNodeChanged(bool)</signal>
+   <receiver>btn_seg_vein</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>174</x>
+     <y>19</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>51</y>
     </hint>
    </hints>
   </connection>
