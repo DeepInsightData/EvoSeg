@@ -413,10 +413,13 @@
          <item>
           <widget class="QRadioButton" name="radio_vein_tag">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>vein</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
