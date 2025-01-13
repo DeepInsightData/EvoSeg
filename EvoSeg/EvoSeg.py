@@ -146,6 +146,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.btn_seg_vein.clicked.connect(lambda: self.onSegButtonClick('vein'))
         
         self.ui.groupBox_Modify.hide()
+        self.ui.groupBox_Detection.hide()
+        self.ui.btn_nodule_detection.hide()
         self.interactionNodeObserver=None
 
     def enter(self):
