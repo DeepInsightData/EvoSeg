@@ -1100,50 +1100,66 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         # 打开 JSON 文件
                         with open(os.path.dirname(outputSegmentationFile) + "/output.json", 'r') as file:
                             json_data = json.load(file)
-
-                        # 遍历每个包围盒
-                        for item_index, item in enumerate(json_data):
-                            for box_index, box in enumerate(item.get('box', [])):
-                                # TODO: 打算在这里处理json
+                        for box_index, box in enumerate(json_data):
+                                # TODO: 新json直接使用mask.py重新生成可以保证mask区域，推测可能和mask.py椭圆位置的计算有关，mask.py处理了横面可能会翻转的问题
                                 print(box)
-                                # center_x, center_y, center_z, width, height, depth = box
+                                center_x, center_y, center_z, width, height, depth = box
 
-                                # # 创建 ROI 节点
-                                # roi = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsROINode")
-                                # roi.SetName(f"ROI_{item_index}_{box_index}")
+                                use_roi = True
 
-                                # # 设置 ROI 大小
-                                # roi.SetSize([
-                                #     width * volumeSpacing[0],
-                                #     height * volumeSpacing[1],
-                                #     depth * volumeSpacing[2]
-                                # ])
+                                if use_roi:
 
-                                # # 转换中心点到 RAS
-                                # obb_center_ijk = np.array([center_x, center_y, center_z, 1])
-                                # obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
+                                    # 创建 ROI 节点
+                                    roi = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsROINode")
+                                    roi.SetName(f"Nodule_"+str(round(width * volumeSpacing[0],1))+"mm*"+str(round(height * volumeSpacing[1],1))+"mm*"+str(round(depth * volumeSpacing[2],1))+"mm")
 
-                                # # 修正翻转方向
-                                # obb_center_ras[0] = -obb_center_ras[0]
-                                # obb_center_ras[1] = -obb_center_ras[1]
+                                    # 设置 ROI 大小
+                                    roi.SetSize([
+                                        width * volumeSpacing[0],
+                                        height * volumeSpacing[1],
+                                        depth * volumeSpacing[2]
+                                    ])
 
-                                # # 应用比例因子
-                                # obb_center_ras[0] *= abs(volumeMatrix.GetElement(0, 0))
-                                # obb_center_ras[1] *= abs(volumeMatrix.GetElement(1, 1))
-                                # obb_center_ras[2] *= volumeMatrix.GetElement(2, 2)
+                                    # 转换中心点到 RAS
+                                    obb_center_ijk = np.array([center_x, center_y, center_z, 1])
+                                    obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
 
-                                # # 应用偏移量
-                                # obb_center_ras[0] += volumeMatrix.GetElement(0, 3)
-                                # obb_center_ras[1] += volumeMatrix.GetElement(1, 3)
-                                # obb_center_ras[2] += volumeMatrix.GetElement(2, 3)
+                                    # 设置 ROI 位置
+                                    roi.SetCenter(obb_center_ras)
 
-                                # # 设置 ROI 位置
-                                # roi.SetCenter(obb_center_ras)
+                                    # 隐藏交互点和中心小球
+                                    roi.GetDisplayNode().SetHandlesInteractive(False)
+                                    roi.SetNthControlPointVisibility(0, False)
 
-                                # # 禁用交互句柄
-                                # roi.GetDisplayNode().SetHandlesInteractive(False)
+                                    # 添加到shNode
+                                    roiItemID = shNode.GetItemByDataNode(roi)
+                                    shNode.SetItemParent(roiItemID,studyShItem)
 
-                                # print(f"ROI created with center at {obb_center_ras} and size {roi.GetSize()}")
+                                    print(f"ROI created with center at {obb_center_ras} and size {roi.GetSize()}")
+                                else:
+
+                                    pointNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode", "FiducialPoint")
+                                    
+                                    # 转换中心点到 RAS
+                                    obb_center_ijk = np.array([center_x, center_y, center_z, 1])
+                                    obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
+                                    # 设置点的位置
+                                    pointNode.AddControlPoint([obb_center_ras[0], obb_center_ras[1], obb_center_ras[2]])
+
+                                    # 获取显示节点
+                                    displayNode = pointNode.GetDisplayNode()
+                                    if displayNode:
+                                        displayNode.SetUseGlyphScale(False)
+                                        # 设置点的大小
+                                        displayNode.SetGlyphScale(max(width*2 * volumeSpacing[0],height*2 * volumeSpacing[1],depth*2 * volumeSpacing[2]))  # 设置点的大小，单位为毫米
+                                        
+                                        # 设置透明度
+                                        displayNode.SetOpacity(0.5)  # 透明度为 0 表示完全透明
+                                        
+                                        
+                                        # 隐藏标签（点的文本）
+                                        displayNode.SetTextScale(0)  # 将文本缩放为 0，使其不可见
+                                
                 finally:
 
                     if self.endResultImportCallback:
