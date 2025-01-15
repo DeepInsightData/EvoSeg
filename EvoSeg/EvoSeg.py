@@ -786,18 +786,54 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # 写入缓存目录
         # Write input volume to file
         inputFiles = []
-        for inputIndex, inputNode in enumerate(inputNodes):
-            if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
-                self.log(model+f": Writing input file to {inputImageFile}")
-                volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
-                volumeStorageNode.SetFileName(inputImageFile)
-                volumeStorageNode.UseCompressionOff()
-                volumeStorageNode.WriteData(inputNode)
-                slicer.mrmlScene.RemoveNode(volumeStorageNode)
-                inputFiles.append(inputImageFile)
-            else:
-                raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
+        if model.split("_")[0]=="Nodule": # Nodule的时候Volume要保存成多个dicom文件
+            for inputIndex, inputNode in enumerate(inputNodes):
+                if inputNode.IsA('vtkMRMLScalarVolumeNode'):
+                    inputImageFile = tempDir + f"/input/"
+                    os.makedirs(inputImageFile, exist_ok=True)
+                    
+                    self.log(model+f": Writing input file to {inputImageFile}")
+                    
+                    # Create patient and study and put the volume under the study
+                    shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
+                    # set IDs. Note: these IDs are not specifying DICOM tags, but only the names that appear in the hierarchy tree
+                    patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "temp patient")
+                    studyItemID = shNode.CreateStudyItem(patientItemID, "temp study")
+                    volumeShItemID = shNode.GetItemByDataNode(inputNode)
+                    shNode.SetItemParent(volumeShItemID, studyItemID)
+
+                    import DICOMScalarVolumePlugin
+                    exporter = DICOMScalarVolumePlugin.DICOMScalarVolumePluginClass()
+                    exportables = exporter.examineForExport(volumeShItemID)
+                    for exp in exportables:
+                        # set output folder
+                        exp.directory = inputImageFile
+                        # here we set DICOM PatientID and StudyID tags
+                        exp.setTag('PatientID', "temp patient")
+                        exp.setTag('StudyID', "temp study")
+
+                    exporter.export(exportables)
+
+                    # slicer.mrmlScene.RemoveNode(shNode)
+                    shNode.RemoveItem(patientItemID)
+
+                    inputFiles.append(inputImageFile)
+                else:
+                    raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")    
+
+        else: # 其它情况的保存
+            for inputIndex, inputNode in enumerate(inputNodes):
+                if inputNode.IsA('vtkMRMLScalarVolumeNode'):
+                    inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
+                    self.log(model+f": Writing input file to {inputImageFile}")
+                    volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
+                    volumeStorageNode.SetFileName(inputImageFile)
+                    volumeStorageNode.UseCompressionOff()
+                    volumeStorageNode.WriteData(inputNode)
+                    slicer.mrmlScene.RemoveNode(volumeStorageNode)
+                    inputFiles.append(inputImageFile)
+                else:
+                    raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
 
         # make Command
         if not is_self_deploy_model:
@@ -824,17 +860,19 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             self.log(model+f": command: {auto3DSegCommand}")
         else:
             if model.split("_")[0]=="Nodule":
+                print("---------------> to this")
                 # 这里执行自建模型Nodule
-                # outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
-                # inferenceScriptPyFile = os.path.join(modelPath, "artery_vein_code" , "run.py")
-                # auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
-                #     "--input", tempDir+"/input",
-                #     "--output", tempDir+"/output",
-                #     "--slicer_python_path", pythonSlicerExecutablePath
-                #     ]
+                outputDir = tempDir + "/output/"
+                inferenceScriptPyFile = os.path.join(modelPath, "lung_nodule_ct_detection/scripts" , "generate_mask.py")
+                auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+                    "--i", tempDir+"/input",
+                    "--o", tempDir+"/output",
+                    "--t", 0.86,
+                    "--spp", pythonSlicerExecutablePath
+                    ]
 
-                # self.log(model+": Creating segmentations with New EvoSeg AI...")
-                # self.log(model+f": command: {auto3DSegCommand}")
+                self.log(model+": Creating segmentations with New EvoSeg AI...")
+                self.log(model+f": command: {auto3DSegCommand}")
             else:
                 # 这里执行自建模型Vein，当前版本仅取它对Vein的分割结果
                 outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
