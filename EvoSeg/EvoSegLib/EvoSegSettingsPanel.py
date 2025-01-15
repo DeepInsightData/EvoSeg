@@ -117,6 +117,20 @@ class _ui_EvoSegSettingsPanel:
         parent.registerProperty('EvoSeg/RibColor', self.ribColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Rib Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
+        
+        noduleColorGroupBox = qt.QGroupBox(_('Pulmonary Nodule'))
+        noduleColorGroupBoxFormLayout = qt.QFormLayout(noduleColorGroupBox)
+        self.noduleColorPickerButton = ctk.ctkColorPickerButton()
+        self.noduleColorPickerButton.objectName = 'noduleColorPickerButton'
+        self.noduleColorPickerButton.color=EvoSegModels.get('Nodule').color()
+        self.noduleColorPickerButton.dialogOptions=qt.QColorDialog.DontUseNativeDialog
+        self.noduleColorPickerButton.setMinimumSize(0, 0)
+        self.noduleColorPickerButton.setMaximumSize(16777215, 16777215)
+        noduleColorGroupBoxFormLayout.addRow(_("Color"), self.noduleColorPickerButton)
+        vBoxLayout.addWidget(noduleColorGroupBox)
+        parent.registerProperty('EvoSeg/PulmonaryNoduleColor', self.noduleColorPickerButton,
+            "color", str(qt.SIGNAL("colorChanged(QColor)")),
+            _("Pulmonary Nodule Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
 
 class EvoSegSettingsPanel(ctk.ctkSettingsPanel):
     def __init__(self, *args, **kwargs):
