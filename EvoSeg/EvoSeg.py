@@ -654,6 +654,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     if seg_name=="left lower lobe":
                         color = EvoSegModels.get('Lobe').leftLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
+                    if seg_name=="nodule":
+                        # color = EvoSegModels.get('Lobe').leftLowerLobeColor()
+                        segment.SetColor(0.5, 0.5, 0.5)
                     # if seg_name=="rib": # 应该不需要这个if, TODO 待检查
                     #     color = EvoSegModels.get('Rib').color()
                     #     segment.SetColor(color.redF(), color.greenF(), color.blueF())
@@ -792,13 +795,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     inputImageFile = tempDir + f"/input/"
                     os.makedirs(inputImageFile, exist_ok=True)
                     
+                    # copyVolumeNode = slicer.mrmlScene.CopyNode(inputNode)
+                    # copyVolumeNode.SetName(inputNode.GetName())
                     self.log(model+f": Writing input file to {inputImageFile}")
                     
                     # Create patient and study and put the volume under the study
                     shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
                     # set IDs. Note: these IDs are not specifying DICOM tags, but only the names that appear in the hierarchy tree
-                    patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "temp patient")
-                    studyItemID = shNode.CreateStudyItem(patientItemID, "temp study")
+                    patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "Nodule patient")
+                    studyItemID = shNode.CreateStudyItem(patientItemID, "Nodule study")
                     volumeShItemID = shNode.GetItemByDataNode(inputNode)
                     shNode.SetItemParent(volumeShItemID, studyItemID)
 
@@ -809,13 +814,14 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         # set output folder
                         exp.directory = inputImageFile
                         # here we set DICOM PatientID and StudyID tags
-                        exp.setTag('PatientID', "temp patient")
-                        exp.setTag('StudyID', "temp study")
+                        exp.setTag('PatientID', "Nodule patient")
+                        exp.setTag('StudyID', "Nodule study")
 
                     exporter.export(exportables)
 
                     # slicer.mrmlScene.RemoveNode(shNode)
-                    shNode.RemoveItem(patientItemID)
+                    # shNode.RemoveItem(patientItemID)
+                    # slicer.mrmlScene.AddNode(copyVolumeNode)
 
                     inputFiles.append(inputImageFile)
                 else:
@@ -860,14 +866,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             self.log(model+f": command: {auto3DSegCommand}")
         else:
             if model.split("_")[0]=="Nodule":
-                print("---------------> to this")
                 # 这里执行自建模型Nodule
-                outputDir = tempDir + "/output/"
+                outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
                 inferenceScriptPyFile = os.path.join(modelPath, "lung_nodule_ct_detection/scripts" , "generate_mask.py")
                 auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
                     "--i", tempDir+"/input",
                     "--o", tempDir+"/output",
-                    "--t", 0.86,
+                    "--t", str(0.86),
                     "--spp", pythonSlicerExecutablePath
                     ]
 
@@ -1012,6 +1017,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     "right middle lobe": data[:, :, :] == 13,
                     "right lower lobe": data[:, :, :] == 14,
                     "rib": data[:, :, :] == 20,
+                    "nodule": data[:, :, :] == 201
                 }
 
             probability_maps = {
@@ -1025,6 +1031,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "right middle lobe": segmentation_masks["right middle lobe"].astype(np.float32),
                 "right lower lobe": segmentation_masks["right lower lobe"].astype(np.float32),
                 "rib": segmentation_masks["rib"].astype(np.float32),
+                "nodule": segmentation_masks["rib"].astype(np.float32),
             }
 
             self.data_module = DataModule(ct_data, segmentation_masks, probability_maps, result_data.GetSpacing())
@@ -1079,6 +1086,64 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     segmentationShItem = shNode.GetItemByDataNode(outputSegmentation)
                     shNode.SetItemParent(segmentationShItem, studyShItem)
 
+                    # Noudle
+                    if model == "Nodule_nnUnet":
+                        # 获取体积的矩阵和参数
+                        volumeMatrix = vtk.vtkMatrix4x4()
+                        inputVolume.GetIJKToRASMatrix(volumeMatrix)
+                        for i in range(4):
+                            print([volumeMatrix.GetElement(i, j) for j in range(4)])
+
+                        volumeOrigin = np.array(inputVolume.GetOrigin())
+                        volumeSpacing = np.array(inputVolume.GetSpacing())
+
+                        # 打开 JSON 文件
+                        with open(os.path.dirname(outputSegmentationFile) + "/output.json", 'r') as file:
+                            json_data = json.load(file)
+
+                        # 遍历每个包围盒
+                        for item_index, item in enumerate(json_data):
+                            for box_index, box in enumerate(item.get('box', [])):
+                                # TODO: 打算在这里处理json
+                                print(box)
+                                # center_x, center_y, center_z, width, height, depth = box
+
+                                # # 创建 ROI 节点
+                                # roi = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsROINode")
+                                # roi.SetName(f"ROI_{item_index}_{box_index}")
+
+                                # # 设置 ROI 大小
+                                # roi.SetSize([
+                                #     width * volumeSpacing[0],
+                                #     height * volumeSpacing[1],
+                                #     depth * volumeSpacing[2]
+                                # ])
+
+                                # # 转换中心点到 RAS
+                                # obb_center_ijk = np.array([center_x, center_y, center_z, 1])
+                                # obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
+
+                                # # 修正翻转方向
+                                # obb_center_ras[0] = -obb_center_ras[0]
+                                # obb_center_ras[1] = -obb_center_ras[1]
+
+                                # # 应用比例因子
+                                # obb_center_ras[0] *= abs(volumeMatrix.GetElement(0, 0))
+                                # obb_center_ras[1] *= abs(volumeMatrix.GetElement(1, 1))
+                                # obb_center_ras[2] *= volumeMatrix.GetElement(2, 2)
+
+                                # # 应用偏移量
+                                # obb_center_ras[0] += volumeMatrix.GetElement(0, 3)
+                                # obb_center_ras[1] += volumeMatrix.GetElement(1, 3)
+                                # obb_center_ras[2] += volumeMatrix.GetElement(2, 3)
+
+                                # # 设置 ROI 位置
+                                # roi.SetCenter(obb_center_ras)
+
+                                # # 禁用交互句柄
+                                # roi.GetDisplayNode().SetHandlesInteractive(False)
+
+                                # print(f"ROI created with center at {obb_center_ras} and size {roi.GetSize()}")
                 finally:
 
                     if self.endResultImportCallback:
@@ -1122,8 +1187,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             12:{"name": "right upper lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^45653009^Upper lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
             13:{"name": "right middle lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^72481006^Middle lobe of right lung~^^~Anatomic codes - DICOM master list~^^~^^"},
             14:{"name": "right lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
-            20:{"name": "rib", "terminology":"None"}
+            20:{"name": "rib", "terminology":"None"},
+            201:{"name": "nodule", "terminology":"None"}
         }
+        # 临时
+        for key in range(202, 255):
+            labelValueToDescription[key] = {"name": "nodule", "terminology": "None"}
+
         maxLabelValue = max(labelValueToDescription.keys())
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
         rgba = [0, 0, 0, 0]
