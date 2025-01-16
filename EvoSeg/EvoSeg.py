@@ -757,7 +757,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         is_self_deploy_model=False
         if model.split("_")[0]=="Vein": # 改用total 293模型 注释掉该if
             is_self_deploy_model=True
-        
+
+        # TODO: 下载Nodule_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有Nodule模型运行文件
+        # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Nodule_EvoSeg.zip
         if model.split("_")[0]=="Nodule": # 同Vein
             is_self_deploy_model=True
 
@@ -1086,79 +1088,52 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     segmentationShItem = shNode.GetItemByDataNode(outputSegmentation)
                     shNode.SetItemParent(segmentationShItem, studyShItem)
 
-                    # Noudle
+                    # Nodule
                     if model == "Nodule_nnUnet":
-                        # 获取体积的矩阵和参数
-                        volumeMatrix = vtk.vtkMatrix4x4()
-                        inputVolume.GetIJKToRASMatrix(volumeMatrix)
-                        for i in range(4):
-                            print([volumeMatrix.GetElement(i, j) for j in range(4)])
+                        # 初始化 Segment Editor
+                        segmentEditorWidget = slicer.qMRMLSegmentEditorWidget()
+                        segmentEditorWidget.setMRMLScene(slicer.mrmlScene)
+                        segmentEditorNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentEditorNode")
+                        segmentEditorWidget.setMRMLSegmentEditorNode(segmentEditorNode)
 
-                        volumeOrigin = np.array(inputVolume.GetOrigin())
-                        volumeSpacing = np.array(inputVolume.GetSpacing())
+                        # 使用 outputSegmentation 作为分割节点
+                        segmentEditorWidget.setSegmentationNode(outputSegmentation)
 
-                        # 打开 JSON 文件
-                        with open(os.path.dirname(outputSegmentationFile) + "/output.json", 'r') as file:
-                            json_data = json.load(file)
-                        for box_index, box in enumerate(json_data):
-                                # TODO: 新json直接使用mask.py重新生成可以保证mask区域，推测可能和mask.py椭圆位置的计算有关，mask.py处理了横面可能会翻转的问题
-                                print(box)
-                                center_x, center_y, center_z, width, height, depth = box
+                        # 遍历 outputSegmentation 的所有段
+                        segmentIDs = vtk.vtkStringArray()
+                        outputSegmentation.GetSegmentation().GetSegmentIDs(segmentIDs)
+                        for i in range(segmentIDs.GetNumberOfValues()):
+                            segmentID = segmentIDs.GetValue(i)
+                            print(f"Processing segment: {segmentID}")
 
-                                use_roi = True
+                            # 设置当前段为选中状态
+                            segmentEditorNode.SetSelectedSegmentID(segmentID)
 
-                                if use_roi:
+                            # 设置 MaskMode（支持动态检查）
+                            if hasattr(slicer.vtkMRMLSegmentEditorNode, 'PaintAllowedEverywhere'):
+                                segmentEditorNode.SetMaskMode(slicer.vtkMRMLSegmentEditorNode.PaintAllowedEverywhere)
+                            else:
+                                segmentEditorNode.SetMaskMode(0)  # 无掩码限制
 
-                                    # 创建 ROI 节点
-                                    roi = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsROINode")
-                                    roi.SetName(f"Nodule_"+str(round(width * volumeSpacing[0],1))+"mm*"+str(round(height * volumeSpacing[1],1))+"mm*"+str(round(depth * volumeSpacing[2],1))+"mm")
+                            # 激活 Islands 工具并设置参数
+                            segmentEditorWidget.setActiveEffectByName("Islands")
+                            effect = segmentEditorWidget.activeEffect()
+                            if effect:
+                                effect.setParameter("MinimumSize", "5")
+                                effect.setParameter("Operation", "SPLIT_ISLANDS_TO_SEGMENTS")
+                                effect.self().onApply()
+                                print(f"  Applied KEEP_LARGEST_ISLAND to segment: {segmentID}")
+                            else:
+                                print(f"  Failed to activate Islands effect for segment: {segmentID}")
 
-                                    # 设置 ROI 大小
-                                    roi.SetSize([
-                                        width * volumeSpacing[0],
-                                        height * volumeSpacing[1],
-                                        depth * volumeSpacing[2]
-                                    ])
+                        # 清理资源
+                        segmentEditorWidget.setActiveEffect(None)
+                        segmentEditorWidget = None
+                        slicer.mrmlScene.RemoveNode(segmentEditorNode)
 
-                                    # 转换中心点到 RAS
-                                    obb_center_ijk = np.array([center_x, center_y, center_z, 1])
-                                    obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
+                        print("Finished processing outputSegmentation.")
 
-                                    # 设置 ROI 位置
-                                    roi.SetCenter(obb_center_ras)
-
-                                    # 隐藏交互点和中心小球
-                                    roi.GetDisplayNode().SetHandlesInteractive(False)
-                                    roi.SetNthControlPointVisibility(0, False)
-
-                                    # 添加到shNode
-                                    roiItemID = shNode.GetItemByDataNode(roi)
-                                    shNode.SetItemParent(roiItemID,studyShItem)
-
-                                    print(f"ROI created with center at {obb_center_ras} and size {roi.GetSize()}")
-                                else:
-
-                                    pointNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode", "FiducialPoint")
-                                    
-                                    # 转换中心点到 RAS
-                                    obb_center_ijk = np.array([center_x, center_y, center_z, 1])
-                                    obb_center_ras = np.array(volumeMatrix.MultiplyPoint(obb_center_ijk))[:3]
-                                    # 设置点的位置
-                                    pointNode.AddControlPoint([obb_center_ras[0], obb_center_ras[1], obb_center_ras[2]])
-
-                                    # 获取显示节点
-                                    displayNode = pointNode.GetDisplayNode()
-                                    if displayNode:
-                                        displayNode.SetUseGlyphScale(False)
-                                        # 设置点的大小
-                                        displayNode.SetGlyphScale(max(width*2 * volumeSpacing[0],height*2 * volumeSpacing[1],depth*2 * volumeSpacing[2]))  # 设置点的大小，单位为毫米
-                                        
-                                        # 设置透明度
-                                        displayNode.SetOpacity(0.5)  # 透明度为 0 表示完全透明
-                                        
-                                        
-                                        # 隐藏标签（点的文本）
-                                        displayNode.SetTextScale(0)  # 将文本缩放为 0，使其不可见
+                        
                                 
                 finally:
 
@@ -1206,9 +1181,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             20:{"name": "rib", "terminology":"None"},
             201:{"name": "nodule", "terminology":"None"}
         }
-        # 临时
-        for key in range(202, 255):
-            labelValueToDescription[key] = {"name": "nodule", "terminology": "None"}
 
         maxLabelValue = max(labelValueToDescription.keys())
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
