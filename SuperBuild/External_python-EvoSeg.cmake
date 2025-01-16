@@ -133,6 +133,10 @@ dill==0.3.2 --hash=sha256:6e12da0d8e49c220e8d6e97ee8882002e624f1160289ce85ec2cc0
 pox==0.2.7 --hash=sha256:06afe1a4a1dbf8b47f7ad5a3c1d8ada9104c64933a1da11338269a2bd8642778
 multiprocess==0.70.9 --hash=sha256:9fd5bd990132da77e73dec6e9613408602a4612e1d73caf2e2b813d2b61508e5
 #[/TotalSegmentator]
+
+#[monai]
+monai==1.4.0 --hash=sha256:a715ca9ff8a068e36efdd147420f0ff02ead744909e7ea0998f31129c4997c9b
+#[/monai]
 ]===])
 
 ExternalProject_Add(${proj}
