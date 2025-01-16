@@ -654,7 +654,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     if seg_name=="left lower lobe":
                         color = EvoSegModels.get('Lobe').leftLowerLobeColor()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="nodule":
+                    if "nodule" in seg_name:
                         color = EvoSegModels.get('Nodule').color()
                         segment.SetColor(color.redF(), color.greenF(), color.blueF())
                     # if seg_name=="rib": # 应该不需要这个if, TODO 待检查
