@@ -136,6 +136,8 @@ multiprocess==0.70.9 --hash=sha256:9fd5bd990132da77e73dec6e9613408602a4612e1d73c
 
 #[monai]
 monai==1.4.0 --hash=sha256:a715ca9ff8a068e36efdd147420f0ff02ead744909e7ea0998f31129c4997c9b
+ignite==1.1.0 --hash=sha256:5cd41149d45ba6f7924492052070cb65109b5d15e24185e0c01ead37e8c2c06d
+pytorch-ignite==0.5.1 --hash=sha256:08c289f59c4185448cf0d97c0ef35f409f640fe1e7355f8fa13e504dcbe47b6d
 #[/monai]
 ]===])
 
