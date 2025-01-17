@@ -1131,7 +1131,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         segmentation.GetSegmentIDs(segmentIDs)
                         for i in range(segmentIDs.GetNumberOfValues()):
                             segmentID = segmentIDs.GetValue(i)
-                            diameter = max_diameter_of_segmentation(outputSegmentation, segmentID)
+                            diameter = obbDiameterMm(outputSegmentation, segmentID)
                             segment = segmentation.GetSegment(segmentID)
                             segmentName = segment.GetName()
                             segment.SetName(f"{segmentName}_d{diameter:.1f}mm")
