@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>757</height>
+    <height>821</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,5,0,0,0,0,0,0,0,0,5">
@@ -619,7 +619,7 @@
       <item>
        <widget class="ctkSliderWidget" name="sliderOpacityAirway">
         <property name="toolTip">
-         <string>Opacity of airway</string>
+         <string>Opacity of the airway</string>
         </property>
         <property name="singleStep">
          <double>0.100000000000000</double>
@@ -699,7 +699,7 @@
       <item>
        <widget class="ctkSliderWidget" name="sliderOpacityArtery">
         <property name="toolTip">
-         <string>Opacity of artery</string>
+         <string>Opacity of the artery</string>
         </property>
         <property name="singleStep">
          <double>0.100000000000000</double>
@@ -782,7 +782,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Opacity of vein</string>
+         <string>Opacity of the vein</string>
         </property>
         <property name="singleStep">
          <double>0.100000000000000</double>
@@ -861,7 +861,7 @@
         <item>
          <widget class="ctkSliderWidget" name="sliderOpacityLobe">
           <property name="toolTip">
-           <string>Opacity of lobe</string>
+           <string>Opacity of the lobe</string>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
@@ -886,13 +886,37 @@
        <layout class="QFormLayout" name="formLayoutLobe">
         <item row="0" column="0">
          <widget class="QLabel" name="labelLeftLung">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
           <property name="text">
            <string>Left Lung</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="margin">
+           <number>0</number>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
          <widget class="ctkSliderWidget" name="sliderOpacityLeftLung">
+          <property name="toolTip">
+           <string>Opacity of the left lung</string>
+          </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
           </property>
@@ -909,13 +933,31 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="labelRightLung">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>24</height>
+           </size>
+          </property>
           <property name="text">
            <string>Right Lung</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
          <widget class="ctkSliderWidget" name="sliderOpacityRightLung">
+          <property name="toolTip">
+           <string>Opacity of the right lung</string>
+          </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
           </property>
@@ -990,7 +1032,7 @@
       <item>
        <widget class="ctkSliderWidget" name="sliderOpacityRibs">
         <property name="toolTip">
-         <string>Opacity of ribs</string>
+         <string>Opacity of the ribs</string>
         </property>
         <property name="singleStep">
          <double>0.100000000000000</double>
@@ -1072,7 +1114,7 @@
         <item>
          <widget class="ctkSliderWidget" name="sliderOpacityNodule">
           <property name="toolTip">
-           <string>Opacity of nodule</string>
+           <string>Opacity of the nodule</string>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
