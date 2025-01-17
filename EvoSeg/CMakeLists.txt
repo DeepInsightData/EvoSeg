@@ -12,6 +12,7 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}Lib/resampling.py
   ${MODULE_NAME}Lib/modify_total_nnunet.py
   ${MODULE_NAME}Lib/modify_total_python_api.py
+  ${MODULE_NAME}Lib/utils.py
   )
 
 set(MODULE_PYTHON_RESOURCES

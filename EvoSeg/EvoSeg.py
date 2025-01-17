@@ -1101,7 +1101,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                         # 遍历 outputSegmentation 的所有段
                         segmentIDs = vtk.vtkStringArray()
-                        outputSegmentation.GetSegmentation().GetSegmentIDs(segmentIDs)
+                        segmentation = outputSegmentation.GetSegmentation()
+                        segmentation.GetSegmentIDs(segmentIDs)
                         for i in range(segmentIDs.GetNumberOfValues()):
                             segmentID = segmentIDs.GetValue(i)
                             print(f"Processing segment: {segmentID}")
@@ -1125,6 +1126,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                                 print(f"  Applied KEEP_LARGEST_ISLAND to segment: {segmentID}")
                             else:
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
+                        
+                        segmentIDs = vtk.vtkStringArray()
+                        segmentation.GetSegmentIDs(segmentIDs)
+                        for i in range(segmentIDs.GetNumberOfValues()):
+                            segmentID = segmentIDs.GetValue(i)
+                            diameter = max_diameter_of_segmentation(outputSegmentation, segmentID)
+                            segment = segmentation.GetSegment(segmentID)
+                            segmentName = segment.GetName()
+                            segment.SetName(f"{segmentName}_d{diameter:.1f}mm")
 
                         # 清理资源
                         segmentEditorWidget.setActiveEffect(None)
