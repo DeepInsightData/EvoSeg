@@ -1130,7 +1130,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
                         
                         segStatLogic = SegmentStatistics.SegmentStatisticsLogic()
-                        segStatLogic.getParameterNode().SetParameter("Segmentation", segmentation.GetID())
+                        segStatLogic.getParameterNode().SetParameter("Segmentation", outputSegmentation.GetID())
                         segStatLogic.getParameterNode().SetParameter("LabelmapSegmentStatisticsPlugin.obb_diameter_mm.enabled",str(True))
                         segStatLogic.computeStatistics()
                         stats = segStatLogic.getStatistics()
@@ -1139,10 +1139,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         segmentation.GetSegmentIDs(segmentIDs)
                         for i in range(segmentIDs.GetNumberOfValues()):
                             segmentID = segmentIDs.GetValue(i)
-                            diameterMm = np.array(stats[segmentID,"LabelmapSegmentStatisticsPlugin.obb_diameter_mm"])
+                            diameterMm = np.max(np.array(stats[segmentID,"LabelmapSegmentStatisticsPlugin.obb_diameter_mm"]))
                             segment = segmentation.GetSegment(segmentID)
                             segmentName = segment.GetName()
-                            segment.SetName(f"{segmentName}_d{diameterMm:.1f}mm")
+                            segment.SetName(f"{segmentName}_d{diameterMm:.2f}mm")
 
                         # 清理资源
                         segmentEditorWidget.setActiveEffect(None)
