@@ -16,6 +16,8 @@ from slicer.parameterNodeWrapper import (
 from slicer import vtkMRMLScalarVolumeNode
 from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
 import subprocess
+import SegmentStatistics
+import numpy as np
 from EvoSegLib import *
 #
 # EvoSeg
@@ -1127,14 +1129,20 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                             else:
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
                         
+                        segStatLogic = SegmentStatistics.SegmentStatisticsLogic()
+                        segStatLogic.getParameterNode().SetParameter("Segmentation", segmentation.GetID())
+                        segStatLogic.getParameterNode().SetParameter("LabelmapSegmentStatisticsPlugin.obb_diameter_mm.enabled",str(True))
+                        segStatLogic.computeStatistics()
+                        stats = segStatLogic.getStatistics()
+                        
                         segmentIDs = vtk.vtkStringArray()
                         segmentation.GetSegmentIDs(segmentIDs)
                         for i in range(segmentIDs.GetNumberOfValues()):
                             segmentID = segmentIDs.GetValue(i)
-                            diameter = obbDiameterMm(outputSegmentation, segmentID)
+                            diameterMm = np.array(stats[segmentID,"LabelmapSegmentStatisticsPlugin.obb_diameter_mm"])
                             segment = segmentation.GetSegment(segmentID)
                             segmentName = segment.GetName()
-                            segment.SetName(f"{segmentName}_d{diameter:.1f}mm")
+                            segment.SetName(f"{segmentName}_d{diameterMm:.1f}mm")
 
                         # 清理资源
                         segmentEditorWidget.setActiveEffect(None)
