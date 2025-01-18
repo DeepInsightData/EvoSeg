@@ -110,7 +110,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # check box
         self.ui.radio_airway_tag.setChecked(True)
-        self.ui.radioButton12.setChecked(True)
+        self.ui.radioButtonSphereAddition.setChecked(True)
 
         # new button click
         self.ui.button_undo.connect("clicked(bool)", self.onButtonUndoClick)
@@ -124,10 +124,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.button_group.buttonToggled.connect(self.onButtonGroupClick)
 
         self.button_group2 = QButtonGroup()
-        self.button_group2.addButton(self.ui.radioButton12) 
-        self.button_group2.addButton(self.ui.radioButton22)
-        self.button_group2.addButton(self.ui.radioButton32)
-        self.button_group2.addButton(self.ui.radioButton42)
+        self.button_group2.addButton(self.ui.radioButtonSphereAddition) 
+        self.button_group2.addButton(self.ui.radioButtonSphereErasure)
+        self.button_group2.addButton(self.ui.radioButtonTubeAddition)
+        self.button_group2.addButton(self.ui.radioButtonMagicAddition)
+        self.button_group2.addButton(self.ui.radioButtonMagicErasure)
 
         self.ui.bt_seg_airway.setIcon(qt.QIcon(self.resourcePath("Icons/airway_segmentation.png")))
         self.ui.bt_seg_artery.setIcon(qt.QIcon(self.resourcePath("Icons/artery_segmentation.png")))

@@ -442,6 +442,19 @@
           </widget>
          </item>
          <item>
+          <widget class="QRadioButton" name="radio_vein_tag">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>vein</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QRadioButton" name="radio_lobe_tag">
            <property name="text">
             <string>lobe</string>
@@ -455,19 +468,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QRadioButton" name="radio_vein_tag">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>vein</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -478,14 +478,14 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QRadioButton" name="radioButton12">
+          <widget class="QRadioButton" name="radioButtonSphereAddition">
            <property name="text">
             <string>Sphere Addition</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton22">
+          <widget class="QRadioButton" name="radioButtonSphereErasure">
            <property name="text">
             <string>Sphere Erasure</string>
            </property>
@@ -499,7 +499,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton32">
+          <widget class="QRadioButton" name="radioButtonMagicAddition">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -509,7 +509,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton42">
+          <widget class="QRadioButton" name="radioButtonMagicErasure">
            <property name="enabled">
             <bool>false</bool>
            </property>
