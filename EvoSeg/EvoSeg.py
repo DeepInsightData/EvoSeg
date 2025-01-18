@@ -870,27 +870,31 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 if inputNode.IsA('vtkMRMLScalarVolumeNode'):
                     inputImageFile = tempDir + f"/input/"
                     os.makedirs(inputImageFile, exist_ok=True)
-                    
-                    # copyVolumeNode = slicer.mrmlScene.CopyNode(inputNode)
-                    # copyVolumeNode.SetName(inputNode.GetName())
                     self.log(model+f": Writing input file to {inputImageFile}")
-                    
-                    # Create patient and study and put the volume under the study
+
                     shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
-                    # set IDs. Note: these IDs are not specifying DICOM tags, but only the names that appear in the hierarchy tree
-                    patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "Nodule patient")
-                    studyItemID = shNode.CreateStudyItem(patientItemID, "Nodule study")
+
                     volumeShItemID = shNode.GetItemByDataNode(inputNode)
-                    shNode.SetItemParent(volumeShItemID, studyItemID)
+                    patientItemID = shNode.GetItemParent(volumeShItemID)
+
+                    if patientItemID != shNode.GetSceneItemID():
+                        parentName = shNode.GetItemName(patientItemID)
+                        self.log(f"{inputNode.GetName()} is already under subject hierarchy: {parentName}")
+                    else:
+                        patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "Nodule patient")
+                        parentName = "Nodule patient"
+                        studyItemID = shNode.CreateStudyItem(patientItemID, "Nodule study")
+                        shNode.SetItemParent(volumeShItemID, studyItemID)
+                        self.log(f"Added {inputNode.GetName()} to new hierarchy under 'Nodule patient' and 'Nodule study'")
+                    
+                    
 
                     import DICOMScalarVolumePlugin
                     exporter = DICOMScalarVolumePlugin.DICOMScalarVolumePluginClass()
                     exportables = exporter.examineForExport(volumeShItemID)
                     for exp in exportables:
-                        # set output folder
                         exp.directory = inputImageFile
-                        # here we set DICOM PatientID and StudyID tags
-                        exp.setTag('PatientID', "Nodule patient")
+                        exp.setTag(patientItemID, parentName)
                         exp.setTag('StudyID', "Nodule study")
 
                     exporter.export(exportables)
