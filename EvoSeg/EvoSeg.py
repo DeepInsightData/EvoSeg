@@ -722,7 +722,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             node = slicer.mrmlScene.GetFirstNodeByName("Nodule_nnUnet_Output_Mask")
         
         if node:
-            node.GetDisplayNode().SetVisibility3D(toggled)
+            displayNode = node.GetDisplayNode()
+            displayNode.SetVisibility3D(toggled)
+            displayNode.SetVisibility2DFill(toggled)
+            displayNode.SetVisibility2DOutline(toggled)
 
     def onSegmentationOpacityChanged(self, value, slider) -> None:
         if slider == self.ui.sliderOpacityAirway:
@@ -739,7 +742,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             node = slicer.mrmlScene.GetFirstNodeByName("Nodule_nnUnet_Output_Mask")
 
         if node:
-            node.GetDisplayNode().SetOpacity3D(value)
+            displayNode = node.GetDisplayNode()
+            displayNode.SetOpacity3D(value)
+            displayNode.SetOpacity2DFill(value)
 
     def onSegmentOpacityChanged(self, value, slider) -> None:
         node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
