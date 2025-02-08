@@ -43,7 +43,6 @@ class EvoSeg(ScriptedLoadableModule):
         slicer.app.connect("startupCompleted()", self.EvoSegHello)
 
     def EvoSegHello(self):
-        #print("EvoSeg Init.")
         pass
 #
 # EvoSegWidget
@@ -157,6 +156,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.arteryVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.arteryVisibilityButton))
         self.ui.veinVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.veinVisibilityButton))
         self.ui.lobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lobeVisibilityButton))
+        self.ui.leftUpperLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftUpperLobeVisibilityButton))
+        self.ui.leftLowerLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftLowerLobeVisibilityButton))
+        self.ui.rightUpperLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightUpperLobeVisibilityButton))
+        self.ui.rightMidLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightMidLobeVisibilityButton))
+        self.ui.rightLowerLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightLowerLobeVisibilityButton))
         self.ui.ribsVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.ribsVisibilityButton))
         self.ui.noduleVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.noduleVisibilityButton))
 
@@ -164,10 +168,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.sliderOpacityArtery.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityArtery))
         self.ui.sliderOpacityVein.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityVein))
         self.ui.sliderOpacityLobe.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityLobe))
+        self.ui.sliderOpacityLeftUpperLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftUpperLobe))
+        self.ui.sliderOpacityLeftLowerLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftLowerLobe))
+        self.ui.sliderOpacityRightUpperLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightUpperLobe))
+        self.ui.sliderOpacityRightMiddleLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightMiddleLobe))
+        self.ui.sliderOpacityRightLowerLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightLowerLobe))
         self.ui.sliderOpacityRibs.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityRibs))
         self.ui.sliderOpacityNodule.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityNodule))
-        self.ui.sliderOpacityLeftLung.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftLung))
-        self.ui.sliderOpacityRightLung.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightLung))
+        
 
     def enter(self):
         pass
@@ -720,12 +728,38 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             node = slicer.mrmlScene.GetFirstNodeByName("Rib_nnUnet_Output_Mask")
         elif visibilityButton == self.ui.noduleVisibilityButton:
             node = slicer.mrmlScene.GetFirstNodeByName("Nodule_nnUnet_Output_Mask")
-        
+        elif visibilityButton == self.ui.leftUpperLobeVisibilityButton:
+            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
+        elif visibilityButton == self.ui.leftLowerLobeVisibilityButton:
+            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
+        elif visibilityButton == self.ui.rightUpperLobeVisibilityButton:
+            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
+        elif visibilityButton == self.ui.rightMidLobeVisibilityButton:
+            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
+        elif visibilityButton == self.ui.rightLowerLobeVisibilityButton:
+            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
+
         if node:
             displayNode = node.GetDisplayNode()
-            displayNode.SetVisibility3D(toggled)
-            displayNode.SetVisibility2DFill(toggled)
-            displayNode.SetVisibility2DOutline(toggled)
+            if visibilityButton == self.ui.leftUpperLobeVisibilityButton:
+              displayNode.SetSegmentVisibility("left upper lobe", toggled)
+              displayNode.SetSegmentVisibility3D("left upper lobe", toggled)
+            elif visibilityButton == self.ui.leftLowerLobeVisibilityButton:
+              displayNode.SetSegmentVisibility("left lower lobe", toggled)
+              displayNode.SetSegmentVisibility3D("left lower lobe", toggled)
+            elif visibilityButton == self.ui.rightUpperLobeVisibilityButton:
+              displayNode.SetSegmentVisibility("right upper lobe", toggled)
+              displayNode.SetSegmentVisibility3D("right upper lobe", toggled)
+            elif visibilityButton == self.ui.rightMidLobeVisibilityButton:
+              displayNode.SetSegmentVisibility("right middle lobe", toggled)
+              displayNode.SetSegmentVisibility3D("right middle lobe", toggled)
+            elif visibilityButton == self.ui.rightLowerLobeVisibilityButton:
+              displayNode.SetSegmentVisibility("right lower lobe", toggled)
+              displayNode.SetSegmentVisibility3D("right lower lobe", toggled)
+            else:
+              displayNode.SetVisibility3D(toggled)
+              displayNode.SetVisibility2DFill(toggled)
+              displayNode.SetVisibility2DOutline(toggled)
 
     def onSegmentationOpacityChanged(self, value, slider) -> None:
         if slider == self.ui.sliderOpacityAirway:
@@ -745,27 +779,26 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             displayNode = node.GetDisplayNode()
             displayNode.SetOpacity3D(value)
             displayNode.SetOpacity2DFill(value)
-
+                
     def onSegmentOpacityChanged(self, value, slider) -> None:
         node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
         if node:
-            segmentIDs = vtk.vtkStringArray()
-            segmentation = node.GetSegmentation()
-            segmentation.GetSegmentIDs(segmentIDs)
-            
-            if slider == self.ui.sliderOpacityLeftLung:
-                keyword = "left"
-            elif slider == self.ui.sliderOpacityRightLung:
-                keyword = "right"
-            else:
-                return
             displayNode = node.GetDisplayNode()
-            for i in range(segmentIDs.GetNumberOfValues()):
-                segmentID = segmentIDs.GetValue(i)
-                segment = segmentation.GetSegment(segmentID)
-                segmentName = segment.GetName()
-                if segmentName.lower().find(keyword) != -1:
-                    displayNode.SetSegmentOpacity(segmentID, value)
+            if slider == self.ui.sliderOpacityLeftUpperLobe:
+                displayNode.SetSegmentOpacity3D("left upper lobe", value)
+                displayNode.SetSegmentOpacity2DFill("left upper lobe", value)
+            elif slider == self.ui.sliderOpacityLeftLowerLobe:
+                displayNode.SetSegmentOpacity3D("left lower lobe", value)
+                displayNode.SetSegmentOpacity2DFill("left lower lobe", value)
+            elif slider == self.ui.sliderOpacityRightUpperLobe:
+                displayNode.SetSegmentOpacity3D("right upper lobe", value)
+                displayNode.SetSegmentOpacity2DFill("right upper lobe", value)
+            elif slider == self.ui.sliderOpacityRightMiddleLobe:
+                displayNode.SetSegmentOpacity3D("right middle lobe", value)
+                displayNode.SetSegmentOpacity2DFill("right middle lobe", value)
+            elif slider == self.ui.sliderOpacityRightLowerLobe:
+                displayNode.SetSegmentOpacity3D("right lower lobe", value)
+                displayNode.SetSegmentOpacity2DFill("right lower lobe", value)
         
 #
 # EvoSegLogic

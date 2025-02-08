@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>821</height>
+    <height>986</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,5,0,0,0,0,0,0,0,0,5">
@@ -574,20 +574,26 @@
        <widget class="QToolButton" name="airwayVisibilityButton">
         <property name="minimumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="icon">
          <iconset>
           <normaloff>:/Icons/VisibleOff.png</normaloff>
           <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -654,20 +660,26 @@
        <widget class="QToolButton" name="arteryVisibilityButton">
         <property name="minimumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="icon">
          <iconset>
           <normaloff>:/Icons/VisibleOff.png</normaloff>
           <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -731,20 +743,26 @@
        <widget class="QToolButton" name="veinVisibilityButton">
         <property name="minimumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="icon">
          <iconset>
           <normaloff>:/Icons/VisibleOff.png</normaloff>
           <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -816,20 +834,26 @@
          <widget class="QToolButton" name="lobeVisibilityButton">
           <property name="minimumSize">
            <size>
-            <width>21</width>
-            <height>21</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>21</width>
-            <height>21</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="icon">
            <iconset>
             <normaloff>:/Icons/VisibleOff.png</normaloff>
             <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -883,9 +907,83 @@
        </layout>
       </item>
       <item>
-       <layout class="QFormLayout" name="formLayoutLobe">
-        <item row="0" column="0">
-         <widget class="QLabel" name="labelLeftLung">
+       <layout class="QGridLayout" name="gridLayout"/>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayoutLobe">
+        <item row="3" column="0">
+         <widget class="QToolButton" name="rightMidLobeVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="labelLeftLowerLobe">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Left Lower Lobe</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightUpperLobe">
+          <property name="toolTip">
+           <string>Opacity of right upper lobe</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="labelLeftUpperLobe">
           <property name="minimumSize">
            <size>
             <width>124</width>
@@ -902,20 +1000,117 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>Left Lung</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <string>Left Upper Lobe</string>
           </property>
           <property name="margin">
            <number>0</number>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="ctkSliderWidget" name="sliderOpacityLeftLung">
+        <item row="1" column="0">
+         <widget class="QToolButton" name="leftLowerLobeVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="labelRightUpperLobe">
+          <property name="text">
+           <string>Right Upper Lobe</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QToolButton" name="leftUpperLobeVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QToolButton" name="rightUpperLobeVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityLeftUpperLobe">
           <property name="toolTip">
-           <string>Opacity of the left lung</string>
+           <string>Opacity of the left upper lobe</string>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
@@ -931,32 +1126,107 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="labelRightLung">
+        <item row="1" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityLeftLowerLobe">
+          <property name="toolTip">
+           <string>Opacity of the left lower lobe</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="labelRightMidLobe">
           <property name="minimumSize">
            <size>
             <width>124</width>
-            <height>24</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>124</width>
-            <height>24</height>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
-           <string>Right Lung</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <string>Right Middle Lobe</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="ctkSliderWidget" name="sliderOpacityRightLung">
+        <item row="4" column="0">
+         <widget class="QToolButton" name="rightLowerLobeVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="labelRightLowerLobe">
+          <property name="text">
+           <string>Right Lower Lobe</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightMiddleLobe">
           <property name="toolTip">
-           <string>Opacity of the right lung</string>
+           <string>Opacity of right middle lobe</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightLowerLobe">
+          <property name="toolTip">
+           <string>Opacity of right lower lobe</string>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
@@ -987,20 +1257,26 @@
        <widget class="QToolButton" name="ribsVisibilityButton">
         <property name="minimumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>21</width>
-          <height>21</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
         <property name="icon">
          <iconset>
           <normaloff>:/Icons/VisibleOff.png</normaloff>
           <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -1069,20 +1345,26 @@
          <widget class="QToolButton" name="noduleVisibilityButton">
           <property name="minimumSize">
            <size>
-            <width>21</width>
-            <height>21</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>21</width>
-            <height>21</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="icon">
            <iconset>
             <normaloff>:/Icons/VisibleOff.png</normaloff>
             <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
           </property>
           <property name="checkable">
            <bool>true</bool>
