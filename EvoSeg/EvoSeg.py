@@ -723,24 +723,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         for name in end_model_name_list:
 
             # 同时把按钮setenbled true
-            if name=="Airway_nnUnet":
-                self.ui.bt_seg_airway.setEnabled(True)
-                self.ui.radio_airway_tag.setChecked(True)
-            if name=="Artery_nnUnet":
-                self.ui.bt_seg_artery.setEnabled(True)
-                self.ui.radio_artery_tag.setChecked(True)
-            if name=="LungLobe_nnUnet":
-                self.ui.btn_seg_lobe.setEnabled(True)
-                self.ui.radio_lobe_tag.setChecked(True)
-            if name=="Rib_nnUnet":
-                self.ui.btn_seg_rib.setEnabled(True)
-                self.ui.radio_rib_tag.setChecked(True)
-            if name=="Vein_nnUnet":
-                self.ui.btn_seg_vein.setEnabled(True)
-                self.ui.radio_vein_tag.setChecked(True)
-            if name=="Nodule_nnUnet":
-                self.ui.btn_seg_nodule.setEnabled(True)
-                # self.ui.radio_vein_tag.setChecked(True)
+            for process in self._process.values():
+                if name == process.name:
+                    process.segmentationButton.setEnabled(True)
+                    if process.radioButton:
+                        process.radioButton.setChecked(True)
+                    break
 
             node = slicer.mrmlScene.GetFirstNodeByName(name+"_Output_Mask")
             node.CreateClosedSurfaceRepresentation()
@@ -820,11 +808,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 displayNode.SetVisibility3D(toggled)
                 displayNode.SetVisibility2DFill(toggled)
                 displayNode.SetVisibility2DOutline(toggled)
+                return
             else:
                 for segment in process.segments:
                     if segment.visibilityButton == visibilityButton:
                         displayNode.SetSegmentVisibility(segment.name, toggled)
                         displayNode.SetSegmentVisibility3D(segment.name, toggled)
+                        return
 
     def onSegmentationOpacityChanged(self, value, slider) -> None:
         process = EvoSegProcess.filterOne(self._process.values(), "opacitySlider", slider)
@@ -844,6 +834,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 if segment.opacitySlider == slider:
                     displayNode.SetSegmentOpacity3D(segment.name, value)
                     displayNode.SetSegmentOpacity2DFill(segment.name, value)
+                    return
 
 #
 # EvoSegLogic
