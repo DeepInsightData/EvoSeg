@@ -44,6 +44,31 @@ class EvoSeg(ScriptedLoadableModule):
 
     def EvoSegHello(self):
         pass
+
+class EvoSegProcess:
+    class Segment:
+        def __init__(self, name, visibilityButton, opacitySlider):
+            self.name=name
+            self.visibilityButton=visibilityButton
+            self.opacitySlider=opacitySlider
+
+    def __init__(self, name, segmentationButton, segmentationNode, radioButton, groupBox, visibilityButton, opacitySlider, segments=[]):
+        self.name = name
+        self.segmentationButton = segmentationButton
+        self.segmentationNode = segmentationNode
+        self.radioButton=radioButton
+        self.groupBox = groupBox
+        self.visibilityButton = visibilityButton
+        self.opacitySlider = opacitySlider
+        self.segments = segments
+
+    @staticmethod
+    def filterOne(processes, attr, value):
+        for process in processes:
+            if getattr(process, attr) == value:
+                return process
+        return None
+
 #
 # EvoSegWidget
 #
@@ -65,7 +90,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
         self._segmentationProcessInfoList = []
-
+    
         self.observations = None
         self.markup_node=None
         self.data_module=None
@@ -176,6 +201,75 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.sliderOpacityRibs.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityRibs))
         self.ui.sliderOpacityNodule.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityNodule))
         
+        self._process = {
+            "Airway_nnUnet" : EvoSegProcess(
+                name = "Airway_nnUnet", 
+                segmentationButton=self.ui.bt_seg_airway,
+                segmentationNode=None,
+                radioButton=self.ui.radio_airway_tag,
+                groupBox = self.ui.groupBoxAirway,
+                visibilityButton=self.ui.airwayVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityAirway,
+            ),
+            "Artery_nnUnet" : EvoSegProcess(
+                name = "Artery_nnUnet", 
+                segmentationButton=self.ui.bt_seg_artery,
+                segmentationNode=None,
+                radioButton=self.ui.radio_artery_tag,
+                groupBox=self.ui.groupBoxArtery,
+                visibilityButton=self.ui.arteryVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityArtery,
+            ),
+            "Vein_nnUnet": EvoSegProcess(
+                name = "Vein_nnUnet", 
+                segmentationButton=self.ui.btn_seg_vein,
+                segmentationNode=None,
+                radioButton=self.ui.radio_vein_tag,
+                groupBox=self.ui.groupBoxVein,
+                visibilityButton=self.ui.veinVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityVein,
+            ),
+            "LungLobe_nnUnet": EvoSegProcess(
+                name = "LungLobe_nnUnet",
+                segmentationButton=self.ui.btn_seg_lobe,
+                segmentationNode=None,
+                radioButton=self.ui.radio_lobe_tag,
+                groupBox=self.ui.groupBoxLobe,
+                visibilityButton=self.ui.lobeVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityLobe,
+                segments=[
+                    EvoSegProcess.Segment("left upper lobe", self.ui.leftUpperLobeVisibilityButton, self.ui.sliderOpacityLeftUpperLobe),
+                    EvoSegProcess.Segment("left lower lobe", self.ui.leftLowerLobeVisibilityButton, self.ui.sliderOpacityLeftLowerLobe),
+                    EvoSegProcess.Segment("right upper lobe", self.ui.rightUpperLobeVisibilityButton, self.ui.sliderOpacityRightUpperLobe),
+                    EvoSegProcess.Segment("right middle lobe", self.ui.rightMidLobeVisibilityButton, self.ui.sliderOpacityRightMiddleLobe),
+                    EvoSegProcess.Segment("right lower lobe", self.ui.rightLowerLobeVisibilityButton, self.ui.sliderOpacityRightLowerLobe),
+                ]
+            ),
+            "Rib_nnUnet": EvoSegProcess(
+                name = "Rib_nnUnet", 
+                segmentationButton=self.ui.btn_seg_rib,
+                segmentationNode=None,
+                radioButton=self.ui.radio_rib_tag,
+                groupBox=self.ui.groupBoxRibs,
+                visibilityButton=self.ui.ribsVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityRibs,
+            ),
+            "Nodule_nnUnet": EvoSegProcess(
+                name = "Nodule_nnUnet", 
+                segmentationButton=self.ui.btn_seg_nodule,
+                segmentationNode=None,
+                radioButton=None,
+                groupBox=self.ui.groupBoxNodule,
+                visibilityButton=self.ui.noduleVisibilityButton,
+                opacitySlider=self.ui.sliderOpacityNodule,
+            )
+        }
+
+        for process in self._process.values():
+            process.groupBox.setVisible(False)
+
+        self.sceneEndCloseObserverTag = self.addObserver(slicer.mrmlScene, slicer.mrmlScene.EndCloseEvent, self.onSceneEndClose)
+        self.sceneEndImportObserverTag = self.addObserver(slicer.mrmlScene, slicer.mrmlScene.EndImportEvent, self.onSceneEndImport)
 
     def enter(self):
         pass
@@ -184,6 +278,17 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # 切出模块时，及时关掉修改
         if self.bt_place_down:
             self.ui.bt_place.click()
+        if self.sceneEndCloseObserverTag:
+            self.removeObserver(self.sceneEndCloseObserverTag)
+        if self.sceneEndImportObserverTag:
+            self.removeObserver(self.sceneEndImportObserverTag)
+
+    def onSceneEndClose(self, caller, event):
+        for process in self._process.values():
+            process.segmentationNode=None
+            process.groupBox.setVisible(False)
+
+    def onSceneEndImport(self, caller, event):
         pass
 
     def onButtonGroupClick(self,value_for_group):
@@ -573,19 +678,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             for i in self._segmentationProcessInfoList:
                 self.logic.cancelProcessing(i["process"])
                 self._segmentationProcessInfoList.remove(i)
-                if i["name"]=="Airway_nnUnet":
-                    self.ui.bt_seg_airway.setEnabled(True)
-                if i["name"]=="Artery_nnUnet":
-                    self.ui.bt_seg_artery.setEnabled(True)
-                if i["name"]=="LungLobe_nnUnet":
-                    self.ui.btn_seg_lobe.setEnabled(True)
-                if i["name"]=="Rib_nnUnet":
-                    self.ui.btn_seg_rib.setEnabled(True)
-                if i["name"]=="Vein_nnUnet":
-                    self.ui.btn_seg_vein.setEnabled(True)
-                if i["name"]=="Nodule_nnUnet":
-                    self.ui.btn_seg_nodule.setEnabled(True)
-           
+                for process in self._process.values():
+                    if i["name"] == process.name:
+                        process.segmentationButton.setEnabled(True)
+                        break
             print(EvoSegWidget.PROCESSING_CANCEL_REQUESTED,"PROCESSING_CANCEL_REQUESTED")
 
     def onProcessImportStarted(self):
@@ -716,90 +812,39 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.radius_slider.setValue(minPrecision*5) # 默认为5倍最大间距 
 
     def onVisibilityButtonToggled(self, toggled : bool, visibilityButton : qt.QPushButton):
-        if visibilityButton == self.ui.airwayVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.arteryVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.veinVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("Vein_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.lobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.ribsVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("Rib_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.noduleVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("Nodule_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.leftUpperLobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.leftLowerLobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.rightUpperLobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.rightMidLobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif visibilityButton == self.ui.rightLowerLobeVisibilityButton:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-
-        if node:
-            displayNode = node.GetDisplayNode()
-            if visibilityButton == self.ui.leftUpperLobeVisibilityButton:
-              displayNode.SetSegmentVisibility("left upper lobe", toggled)
-              displayNode.SetSegmentVisibility3D("left upper lobe", toggled)
-            elif visibilityButton == self.ui.leftLowerLobeVisibilityButton:
-              displayNode.SetSegmentVisibility("left lower lobe", toggled)
-              displayNode.SetSegmentVisibility3D("left lower lobe", toggled)
-            elif visibilityButton == self.ui.rightUpperLobeVisibilityButton:
-              displayNode.SetSegmentVisibility("right upper lobe", toggled)
-              displayNode.SetSegmentVisibility3D("right upper lobe", toggled)
-            elif visibilityButton == self.ui.rightMidLobeVisibilityButton:
-              displayNode.SetSegmentVisibility("right middle lobe", toggled)
-              displayNode.SetSegmentVisibility3D("right middle lobe", toggled)
-            elif visibilityButton == self.ui.rightLowerLobeVisibilityButton:
-              displayNode.SetSegmentVisibility("right lower lobe", toggled)
-              displayNode.SetSegmentVisibility3D("right lower lobe", toggled)
+        for process in self._process.values():
+            if not process.segmentationNode:
+                continue
+            displayNode = process.segmentationNode.GetDisplayNode()
+            if visibilityButton == process.visibilityButton:
+                displayNode.SetVisibility3D(toggled)
+                displayNode.SetVisibility2DFill(toggled)
+                displayNode.SetVisibility2DOutline(toggled)
             else:
-              displayNode.SetVisibility3D(toggled)
-              displayNode.SetVisibility2DFill(toggled)
-              displayNode.SetVisibility2DOutline(toggled)
+                for segment in process.segments:
+                    if segment.visibilityButton == visibilityButton:
+                        displayNode.SetSegmentVisibility(segment.name, toggled)
+                        displayNode.SetSegmentVisibility3D(segment.name, toggled)
 
     def onSegmentationOpacityChanged(self, value, slider) -> None:
-        if slider == self.ui.sliderOpacityAirway:
-            node = slicer.mrmlScene.GetFirstNodeByName("Airway_nnUnet_Output_Mask")
-        elif slider == self.ui.sliderOpacityArtery:
-            node = slicer.mrmlScene.GetFirstNodeByName("Artery_nnUnet_Output_Mask")
-        elif slider == self.ui.sliderOpacityVein:
-            node = slicer.mrmlScene.GetFirstNodeByName("Vein_nnUnet_Output_Mask")
-        elif slider == self.ui.sliderOpacityLobe:
-            node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        elif slider == self.ui.sliderOpacityRibs:
-            node = slicer.mrmlScene.GetFirstNodeByName("Rib_nnUnet_Output_Mask")
-        elif slider == self.ui.sliderOpacityNodule:
-            node = slicer.mrmlScene.GetFirstNodeByName("Nodule_nnUnet_Output_Mask")
-
-        if node:
-            displayNode = node.GetDisplayNode()
-            displayNode.SetOpacity3D(value)
-            displayNode.SetOpacity2DFill(value)
+        process = EvoSegProcess.filterOne(self._process.values(), "opacitySlider", slider)
+        if process:
+            node = process.segmentationNode
+            if node:
+                displayNode = node.GetDisplayNode()
+                displayNode.SetOpacity3D(value)
+                displayNode.SetOpacity2DFill(value)
                 
     def onSegmentOpacityChanged(self, value, slider) -> None:
-        node = slicer.mrmlScene.GetFirstNodeByName("LungLobe_nnUnet_Output_Mask")
-        if node:
-            displayNode = node.GetDisplayNode()
-            if slider == self.ui.sliderOpacityLeftUpperLobe:
-                displayNode.SetSegmentOpacity3D("left upper lobe", value)
-                displayNode.SetSegmentOpacity2DFill("left upper lobe", value)
-            elif slider == self.ui.sliderOpacityLeftLowerLobe:
-                displayNode.SetSegmentOpacity3D("left lower lobe", value)
-                displayNode.SetSegmentOpacity2DFill("left lower lobe", value)
-            elif slider == self.ui.sliderOpacityRightUpperLobe:
-                displayNode.SetSegmentOpacity3D("right upper lobe", value)
-                displayNode.SetSegmentOpacity2DFill("right upper lobe", value)
-            elif slider == self.ui.sliderOpacityRightMiddleLobe:
-                displayNode.SetSegmentOpacity3D("right middle lobe", value)
-                displayNode.SetSegmentOpacity2DFill("right middle lobe", value)
-            elif slider == self.ui.sliderOpacityRightLowerLobe:
-                displayNode.SetSegmentOpacity3D("right lower lobe", value)
-                displayNode.SetSegmentOpacity2DFill("right lower lobe", value)
-        
+        for process in self._process.values():
+            if not process.segmentationNode:
+                continue
+            displayNode = process.segmentationNode.GetDisplayNode()
+            for segment in process.segments:
+                if segment.opacitySlider == slider:
+                    displayNode.SetSegmentOpacity3D(segment.name, value)
+                    displayNode.SetSegmentOpacity2DFill(segment.name, value)
+
 #
 # EvoSegLogic
 #
@@ -1266,8 +1311,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                         print("Finished processing outputSegmentation.")
 
-                        
-                                
+                    widget = slicer.modules.evoseg.widgetRepresentation().self()
+                    process = EvoSegProcess.filterOne(widget._process.values(), 'name', model)
+                    if process:
+                        process.segmentationNode = outputSegmentation
+                        process.groupBox.setVisible(True)
+                        process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D())                             
                 finally:
 
                     if self.endResultImportCallback:
