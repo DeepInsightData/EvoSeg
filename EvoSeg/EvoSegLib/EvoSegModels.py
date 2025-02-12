@@ -38,7 +38,7 @@ class EvoSegModels:
         EvoSegModel("Vein", qt.QColor("#0097ce")),
         LungLobeModel("Lobe", qt.QColor("#fde89e")),
         EvoSegModel("Rib", qt.QColor("#fde89e")),
-        EvoSegModel("Nodule", qt.QColor("#808080")),
+        EvoSegModel("Nodule", qt.QColor("#804f00")),
     ]
 
     _model_dict = {model.name: model for model in MODELS}
