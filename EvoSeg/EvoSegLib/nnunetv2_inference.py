@@ -43,6 +43,9 @@ def main(model_folder,
 
     if simulated_data:
         print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
+        output_dir = os.path.dirname(result_file)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         with open(model_folder+"/output-segmentation.nii.gz", 'rb') as f_src:  # 以二进制模式打开源文件
             with open(result_file, 'wb') as f_dest:  # 以二进制模式写入目标文件
                 while True:
