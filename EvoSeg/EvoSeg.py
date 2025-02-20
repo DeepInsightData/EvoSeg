@@ -19,6 +19,7 @@ import subprocess
 import SegmentStatistics
 import numpy as np
 from EvoSegLib import *
+from EvoSegLib.utils import splitSegment
 #
 # EvoSeg
 #
@@ -52,7 +53,7 @@ class EvoSegProcess:
             self.visibilityButton=visibilityButton
             self.opacitySlider=opacitySlider
 
-    def __init__(self, name, segmentationButton, segmentationNode, radioButton, groupBox, visibilityButton, opacitySlider, segments=[]):
+    def __init__(self, name, segmentationButton, segmentationNode, radioButton, groupBox, visibilityButton, opacitySlider, segments=[], splitByMidPlane=False):
         self.name = name
         self.segmentationButton = segmentationButton
         self.segmentationNode = segmentationNode
@@ -61,6 +62,7 @@ class EvoSegProcess:
         self.visibilityButton = visibilityButton
         self.opacitySlider = opacitySlider
         self.segments = segments
+        self.splitByMidPlane = splitByMidPlane
 
     @staticmethod
     def filterOne(processes, attr, value):
@@ -210,6 +212,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox = self.ui.groupBoxAirway,
                 visibilityButton=self.ui.airwayVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityAirway,
+                splitByMidPlane=True
             ),
             "Artery_nnUnet" : EvoSegProcess(
                 name = "Artery_nnUnet", 
@@ -219,6 +222,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxArtery,
                 visibilityButton=self.ui.arteryVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityArtery,
+                splitByMidPlane=True
             ),
             "Vein_nnUnet": EvoSegProcess(
                 name = "Vein_nnUnet", 
@@ -228,6 +232,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxVein,
                 visibilityButton=self.ui.veinVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityVein,
+                splitByMidPlane=True
             ),
             "LungLobe_nnUnet": EvoSegProcess(
                 name = "LungLobe_nnUnet",
@@ -243,7 +248,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     EvoSegProcess.Segment("right upper lobe", self.ui.rightUpperLobeVisibilityButton, self.ui.sliderOpacityRightUpperLobe),
                     EvoSegProcess.Segment("right middle lobe", self.ui.rightMidLobeVisibilityButton, self.ui.sliderOpacityRightMiddleLobe),
                     EvoSegProcess.Segment("right lower lobe", self.ui.rightLowerLobeVisibilityButton, self.ui.sliderOpacityRightLowerLobe),
-                ]
+                ],
+                splitByMidPlane=False
             ),
             "Rib_nnUnet": EvoSegProcess(
                 name = "Rib_nnUnet", 
@@ -253,6 +259,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxRibs,
                 visibilityButton=self.ui.ribsVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityRibs,
+                splitByMidPlane=False
             ),
             "Nodule_nnUnet": EvoSegProcess(
                 name = "Nodule_nnUnet", 
@@ -262,6 +269,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxNodule,
                 visibilityButton=self.ui.noduleVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityNodule,
+                splitByMidPlane=False
             )
         }
 
@@ -1307,7 +1315,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     if process:
                         process.segmentationNode = outputSegmentation
                         process.groupBox.setVisible(True)
-                        process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D())                             
+                        process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D()) 
+                        if process.splitByMidPlane:
+                            segmentIDs = vtk.vtkStringArray()
+                            segmentation = outputSegmentation.GetSegmentation()
+                            segmentation.GetSegmentIDs(segmentIDs)
+                            for i in range(segmentIDs.GetNumberOfValues()):
+                                segmentID = segmentIDs.GetValue(i)
+                                splitSegment(outputSegmentation, segmentID)
+
                 finally:
 
                     if self.endResultImportCallback:
@@ -1341,7 +1357,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             self.processingCompletedCallback(procReturnCode)
 
     def readSegmentation(self, outputSegmentation, outputSegmentationFile, model):
-
         labelValueToDescription ={ 
             1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
             2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
