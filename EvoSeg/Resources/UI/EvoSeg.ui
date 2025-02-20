@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>986</height>
+    <height>1257</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,5,0,0,0,0,0,0,0,0,5">
@@ -569,77 +569,215 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QToolButton" name="airwayVisibilityButton">
-        <property name="minimumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/Icons/VisibleOff.png</normaloff>
-          <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayoutAirway">
+        <item>
+         <widget class="QToolButton" name="airwayVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAirway">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Airway</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ctkSliderWidget" name="sliderOpacityAirway">
+          <property name="toolTip">
+           <string>Opacity of the airway</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="labelAirway">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Airway</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="ctkSliderWidget" name="sliderOpacityAirway">
-        <property name="toolTip">
-         <string>Opacity of the airway</string>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="pageStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayoutAirway">
+        <item row="2" column="0">
+         <widget class="QToolButton" name="rightAirwayVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="labelRightAirway">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Right Airway</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QToolButton" name="leftAirwayVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="labelLeftAirway">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Left Airway</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityLeftAirway">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightAirway">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -655,77 +793,221 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <widget class="QToolButton" name="arteryVisibilityButton">
-        <property name="minimumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/Icons/VisibleOff.png</normaloff>
-          <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayoutArtery">
+        <item>
+         <widget class="QToolButton" name="arteryVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelArtery">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Artery</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ctkSliderWidget" name="sliderOpacityArtery">
+          <property name="toolTip">
+           <string>Opacity of the artery</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="labelArtery">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Artery</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="ctkSliderWidget" name="sliderOpacityArtery">
-        <property name="toolTip">
-         <string>Opacity of the artery</string>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="pageStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayoutArtery">
+        <item row="1" column="1">
+         <widget class="QLabel" name="labelRightArtery">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Right Artery</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QToolButton" name="rightArteryVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="labelLeftArtery">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Left Artery</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QToolButton" name="leftArteryVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityLeftArtery">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightArtery">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -738,83 +1020,227 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
-       <widget class="QToolButton" name="veinVisibilityButton">
-        <property name="minimumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/Icons/VisibleOff.png</normaloff>
-          <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayoutVein">
+        <item>
+         <widget class="QToolButton" name="veinVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelVein">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Vein</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ctkSliderWidget" name="sliderOpacityVein">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Opacity of the vein</string>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="labelVein">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Vein</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="ctkSliderWidget" name="sliderOpacityVein">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Opacity of the vein</string>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="pageStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayoutVein">
+        <item row="0" column="0">
+         <widget class="QToolButton" name="leftVeinVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QToolButton" name="rightVeinVisibilityButton">
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/VisibleOff.png</normaloff>
+            <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="labelRightVein">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Right Vein</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="labelLeftVein">
+          <property name="minimumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>124</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Left Vein</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityLeftVein">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="ctkSliderWidget" name="sliderOpacityRightVein">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="pageStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -867,14 +1293,14 @@
          <widget class="QLabel" name="labelLobe">
           <property name="minimumSize">
            <size>
-            <width>100</width>
-            <height>24</height>
+            <width>124</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
-            <height>24</height>
+            <width>124</width>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -1290,14 +1716,14 @@
        <widget class="QLabel" name="labelRibs">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>24</height>
+          <width>124</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>100</width>
-          <height>24</height>
+          <width>124</width>
+          <height>32</height>
          </size>
         </property>
         <property name="text">
@@ -1378,14 +1804,14 @@
          <widget class="QLabel" name="labelPulmonaryNodule">
           <property name="minimumSize">
            <size>
-            <width>100</width>
-            <height>24</height>
+            <width>124</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
-            <height>24</height>
+            <width>124</width>
+            <height>32</height>
            </size>
           </property>
           <property name="text">

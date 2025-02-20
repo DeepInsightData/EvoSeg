@@ -11,11 +11,13 @@ def splitSegment(segmentationNode : slicer.vtkMRMLSegmentationNode, segmentID : 
     segmentation = segmentationNode.GetSegmentation()
     segment = segmentation.GetSegment(segmentID)
     if not segment:
+        print('splitSegment no segment found')
         return
 
     segmentName=segment.GetName()
     polyData = segmentationNode.GetClosedSurfaceInternalRepresentation(segmentID)
     if not polyData:
+        print('splitSegment no polyData found')
         return
 
     displayNode=segmentationNode.GetDisplayNode()
@@ -33,7 +35,7 @@ def splitSegment(segmentationNode : slicer.vtkMRMLSegmentationNode, segmentID : 
     clipperLeft.GenerateOutlineOn()
     clipperLeft.GenerateFacesOn()
     clipperLeft.Update()
-    segmentationNode.AddSegmentFromClosedSurfaceRepresentation(clipperLeft.GetOutput(), f'{segmentName}_Left', segmentColor)
+    leftSegmentID=segmentationNode.AddSegmentFromClosedSurfaceRepresentation(clipperLeft.GetOutput(), f'{segmentName}_Left', segmentColor, f'{segmentName}_Left')
 
     plane = vtk.vtkPlane()
     plane.SetOrigin(centerX, 0, 0) 
@@ -46,6 +48,9 @@ def splitSegment(segmentationNode : slicer.vtkMRMLSegmentationNode, segmentID : 
     clipperRight.GenerateOutlineOn()
     clipperRight.GenerateFacesOn()
     clipperRight.Update()
-    segmentationNode.AddSegmentFromClosedSurfaceRepresentation(clipperRight.GetOutput(), f'{segmentName}_Right', segmentColor)
+    rightSegmentID=segmentationNode.AddSegmentFromClosedSurfaceRepresentation(clipperRight.GetOutput(), f'{segmentName}_Right', segmentColor, f'{segmentName}_Right')
+
+    displayNode.SetSegmentDisplayPropertiesToDefault(leftSegmentID)
+    displayNode.SetSegmentDisplayPropertiesToDefault(rightSegmentID)
 
     segmentation.RemoveSegment(segmentID)

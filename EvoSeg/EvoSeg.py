@@ -180,8 +180,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.interactionNodeObserver=None
 
         self.ui.airwayVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.airwayVisibilityButton))
+        self.ui.leftAirwayVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftAirwayVisibilityButton))
+        self.ui.rightAirwayVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightAirwayVisibilityButton))
         self.ui.arteryVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.arteryVisibilityButton))
+        self.ui.leftArteryVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftArteryVisibilityButton))
+        self.ui.rightArteryVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightArteryVisibilityButton))
         self.ui.veinVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.veinVisibilityButton))
+        self.ui.leftVeinVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftVeinVisibilityButton))
+        self.ui.rightVeinVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.rightVeinVisibilityButton))    
         self.ui.lobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lobeVisibilityButton))
         self.ui.leftUpperLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftUpperLobeVisibilityButton))
         self.ui.leftLowerLobeVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.leftLowerLobeVisibilityButton))
@@ -192,8 +198,17 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.noduleVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.noduleVisibilityButton))
 
         self.ui.sliderOpacityAirway.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityAirway))
+        self.ui.sliderOpacityLeftAirway.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftAirway))
+        self.ui.sliderOpacityRightAirway.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightAirway))
+        
         self.ui.sliderOpacityArtery.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityArtery))
+        self.ui.sliderOpacityLeftArtery.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftArtery))
+        self.ui.sliderOpacityRightArtery.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightArtery))
+
         self.ui.sliderOpacityVein.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityVein))
+        self.ui.sliderOpacityLeftVein.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftVein))
+        self.ui.sliderOpacityRightVein.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityRightVein))
+
         self.ui.sliderOpacityLobe.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityLobe))
         self.ui.sliderOpacityLeftUpperLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftUpperLobe))
         self.ui.sliderOpacityLeftLowerLobe.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftLowerLobe))
@@ -212,6 +227,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox = self.ui.groupBoxAirway,
                 visibilityButton=self.ui.airwayVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityAirway,
+                segments=[
+                    EvoSegProcess.Segment("Airway_Left", self.ui.leftAirwayVisibilityButton, self.ui.sliderOpacityLeftAirway),
+                    EvoSegProcess.Segment("Airway_Right", self.ui.rightAirwayVisibilityButton, self.ui.sliderOpacityRightAirway),
+                ],
                 splitByMidPlane=True
             ),
             "Artery_nnUnet" : EvoSegProcess(
@@ -222,6 +241,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxArtery,
                 visibilityButton=self.ui.arteryVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityArtery,
+                segments=[
+                    EvoSegProcess.Segment("Artery_Left", self.ui.leftArteryVisibilityButton, self.ui.sliderOpacityLeftArtery),
+                    EvoSegProcess.Segment("Artery_Right", self.ui.rightArteryVisibilityButton, self.ui.sliderOpacityRightArtery),
+                ],
                 splitByMidPlane=True
             ),
             "Vein_nnUnet": EvoSegProcess(
@@ -232,6 +255,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxVein,
                 visibilityButton=self.ui.veinVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityVein,
+                segments=[
+                    EvoSegProcess.Segment("Vein_Left", self.ui.leftVeinVisibilityButton, self.ui.sliderOpacityLeftVein),
+                    EvoSegProcess.Segment("Vein_Right", self.ui.rightVeinVisibilityButton, self.ui.sliderOpacityRightVein),
+                ],
                 splitByMidPlane=True
             ),
             "LungLobe_nnUnet": EvoSegProcess(
@@ -820,8 +847,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             else:
                 for segment in process.segments:
                     if segment.visibilityButton == visibilityButton:
-                        displayNode.SetSegmentVisibility(segment.name, toggled)
-                        displayNode.SetSegmentVisibility3D(segment.name, toggled)
+                        segmentID = process.segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment.name)
+                        if segmentID:
+                            displayNode.SetSegmentVisibility(segmentID, toggled)
+                            displayNode.SetSegmentVisibility3D(segmentID, toggled)
                         return
 
     def onSegmentationOpacityChanged(self, value, slider) -> None:
@@ -840,8 +869,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             displayNode = process.segmentationNode.GetDisplayNode()
             for segment in process.segments:
                 if segment.opacitySlider == slider:
-                    displayNode.SetSegmentOpacity3D(segment.name, value)
-                    displayNode.SetSegmentOpacity2DFill(segment.name, value)
+                    segmentID = process.segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment.name)
+                    if segmentID:
+                        displayNode.SetSegmentOpacity3D(segmentID, value)
+                        displayNode.SetSegmentOpacity2DFill(segmentID, value)
                     return
 
 #
