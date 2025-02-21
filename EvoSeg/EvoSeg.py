@@ -506,15 +506,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def FasterUpdateSegForonPress(self, segmentation_masks,select_radio_tag_text):
         import numpy as np
 
+        is_splited_segment=False # 临时
+
         if select_radio_tag_text=="airway":
             segment_name=["airway"]
             seg_number_for_this_node=1
+            is_splited_segment=True
         elif select_radio_tag_text=="artery":
             segment_name=["artery"]
             seg_number_for_this_node=2
+            is_splited_segment=True
         elif select_radio_tag_text=="vein":
             segment_name=["vein"]
             seg_number_for_this_node=3
+            is_splited_segment=True
         elif select_radio_tag_text=="rib":
             segment_name=["rib"]
             seg_number_for_this_node=20
@@ -538,11 +543,16 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         BackgroundVolumeID_Red = slicer.app.layoutManager().sliceWidget("Red").sliceLogic().GetSliceCompositeNode().GetBackgroundVolumeID()
         volumeNode = slicer.mrmlScene.GetNodeByID(BackgroundVolumeID_Red)
-
         
         combined_mask[segmentation_masks[segment_name[0]]] = seg_number_for_this_node
         
-
+        if is_splited_segment:
+            # print(segment_name[0],"<<< merge left&right")
+            mergeSegments(segmentationNode,
+            segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0]+"_left"),
+            segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0]+"_right")
+            )
+        
         if len(segment_name)==1:
             segmentId = segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0])
         # else:
@@ -554,6 +564,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         slicer.util.updateSegmentBinaryLabelmapFromArray(np.transpose(combined_mask, (2, 1, 0)), segmentationNode, segmentId, volumeNode)
 
         segmentationNode.CreateClosedSurfaceRepresentation()
+
+        if is_splited_segment:
+            # print(segment_name[0],"<<< split again")
+            splitSegment(segmentationNode,
+            segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0])
+            )
 
 
     def someCustomAction(self, caller, eventId):

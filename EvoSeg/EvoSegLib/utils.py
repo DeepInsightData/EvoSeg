@@ -54,3 +54,32 @@ def splitSegment(segmentationNode : slicer.vtkMRMLSegmentationNode, segmentID : 
     displayNode.SetSegmentDisplayPropertiesToDefault(rightSegmentID)
 
     segmentation.RemoveSegment(segmentID)
+
+
+def mergeSegments(segmentationNode: slicer.vtkMRMLSegmentationNode, segmentID1: str, segmentID2: str):
+    segmentation = segmentationNode.GetSegmentation()
+    segment1 = segmentation.GetSegment(segmentID1)
+    segment2 = segmentation.GetSegment(segmentID2)
+
+    polyData1 = segmentationNode.GetClosedSurfaceInternalRepresentation(segmentID1)
+    polyData2 = segmentationNode.GetClosedSurfaceInternalRepresentation(segmentID2)
+
+    appendFilter = vtk.vtkAppendPolyData()
+    appendFilter.AddInputData(polyData1)
+    appendFilter.AddInputData(polyData2)
+    appendFilter.Update()
+    displayNode = segmentationNode.GetDisplayNode()
+    segmentColor = [0, 0, 0]
+    displayNode.GetSegmentColor(segmentID1, segmentColor)
+
+    segmentNameParts = segmentID1.split('_')
+    newSegmentID = f"{segmentNameParts[0]}"
+
+    mergedPolyData = appendFilter.GetOutput()
+    newSegmentID = segmentationNode.AddSegmentFromClosedSurfaceRepresentation(
+        mergedPolyData, newSegmentID, segmentColor, newSegmentID)
+
+    displayNode.SetSegmentDisplayPropertiesToDefault(newSegmentID)
+
+    segmentation.RemoveSegment(segmentID1)
+    segmentation.RemoveSegment(segmentID2)
