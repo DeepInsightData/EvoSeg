@@ -16,6 +16,8 @@ import nrrd
 import nibabel as nib
 from resampling import change_spacing
 
+from post_process import *
+
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
     output_dimension = len(properties['sitk_stuff']['spacing'])
@@ -162,6 +164,8 @@ def main(model_folder,
         # 带prob的输出是一个()需要拆开再合起来, 其中val相当于不带prob输出的seg_results纯numpy
         val, val_prob = seg_results
         val = val.transpose(2, 1, 0)
+        if os.path.basename(model_folder)=="Airway_nnUnet":
+            val = process_mask_3d(val, 1, 2)
         if os.path.basename(model_folder)=="Artery_nnUnet":
             # 特殊处理1, Artery_nnUnet执行结果*2
             val=val*2
@@ -173,6 +177,8 @@ def main(model_folder,
 
     else:
         seg_results = seg_results.transpose(2, 1, 0)
+        if os.path.basename(model_folder)=="Airway_nnUnet":
+            seg_results = process_mask_3d(seg_results, 1, 2)
         if os.path.basename(model_folder)=="Artery_nnUnet":
             # 特殊处理1, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
