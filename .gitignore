@@ -162,5 +162,7 @@ cython_debug/
 /Data
 /EvoSeg/Scripts/Airway_nnUnet
 /EvoSeg/Scripts/Artery_nnUnet
+/CompressedData
+/prob_data
 EvoSeg/__pycache__/
 EvoSeg/__pycache__/EvoSeg.cpython-39.pyc
