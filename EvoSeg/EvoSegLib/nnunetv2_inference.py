@@ -30,7 +30,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
-simulated_data=True
+simulated_data=False
 
 @torch.no_grad()
 def main(model_folder,
@@ -112,7 +112,7 @@ def main(model_folder,
     predictor = nnUNetPredictor(
         tile_step_size=step_size,
         use_gaussian=True,
-        use_mirroring=True,
+        use_mirroring=False,
         perform_everything_on_device=True,
         device=device,
         verbose=False,
