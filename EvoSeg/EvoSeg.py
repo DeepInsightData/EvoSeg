@@ -97,7 +97,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.observations = None
         self.markup_node=None
         self.data_module=None
-        self.data_module_name=None
+        self.data_module_name=''
         self.data_module_list=[]
         self.logic = EvoSegLogic()
 
@@ -170,12 +170,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         ))
         self.ui.bt_export.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Export.png")))
         self.ui.browseToModelsFolderButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Model.png")))
-        self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick('airway'))
-        self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick('artery'))
-        self.ui.btn_seg_lobe.clicked.connect(lambda: self.onSegButtonClick('lobe'))
-        self.ui.btn_seg_rib.clicked.connect(lambda: self.onSegButtonClick('rib'))
-        self.ui.btn_seg_vein.clicked.connect(lambda: self.onSegButtonClick('vein'))
-        self.ui.btn_seg_nodule.clicked.connect(lambda: self.onSegButtonClick('nodule'))
+        self.ui.bt_seg_airway.clicked.connect(lambda: self.onSegButtonClick(self.ui.bt_seg_airway))
+        self.ui.bt_seg_artery.clicked.connect(lambda: self.onSegButtonClick(self.ui.bt_seg_artery))
+        self.ui.btn_seg_vein.clicked.connect(lambda: self.onSegButtonClick(self.ui.btn_seg_vein))
+        self.ui.btn_seg_lobe.clicked.connect(lambda: self.onSegButtonClick(self.ui.btn_seg_lobe))
+        self.ui.btn_seg_rib.clicked.connect(lambda: self.onSegButtonClick(self.ui.btn_seg_rib))
+        self.ui.btn_seg_nodule.clicked.connect(lambda: self.onSegButtonClick(self.ui.btn_seg_nodule))
         
         self.ui.groupBox_Modify.hide()
         self.interactionNodeObserver=None
@@ -323,32 +323,18 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def onSceneEndImport(self, caller, event):
         pass
 
-    def onButtonGroupClick(self,value_for_group):
-        model_name_must_is=""
-        if value_for_group.text=="airway":
-            model_name_must_is = "Airway_nnUnet"
-        elif value_for_group.text=="artery":
-            model_name_must_is = "Artery_nnUnet"
-        elif value_for_group.text=="rib":
-            model_name_must_is = "Rib_nnUnet"
-        elif value_for_group.text=="lobe":
-            model_name_must_is = "LungLobe_nnUnet"
-        elif value_for_group.text=="vein":
-            model_name_must_is = "Vein_nnUnet"
-        elif value_for_group.text=="nodule":
-            model_name_must_is = "Nodule_nnUnet"
-        
-        if model_name_must_is=="":
+    def onButtonGroupClick(self, button, checked):
+        process = EvoSegProcess.filterOne(self._process.values(), "radioButton", button)
+        if not process:
+            print(f"No process found for button {button}")
             return
-        else:
-            output_segmentation_node=slicer.mrmlScene.GetFirstNodeByName(model_name_must_is+"_Output_Mask")
-            for i in self.data_module_list:
-                if i["model_name"]==model_name_must_is:
-                    self.data_module=i["seg_data"]
-                    self.data_module_name=model_name_must_is
-                    #print("set DataModule for:"+model_name_must_is)
-                    return
-        
+        self.data_module=None
+        self.data_module_name=''
+        for i in self.data_module_list:
+            if i["model_name"]==process.name:
+                self.data_module=i["seg_data"]
+                self.data_module_name=process.name
+                break
 
     def onExportClick(self):
         dataModuleWidget = slicer.modules.data.widgetRepresentation()
@@ -377,39 +363,17 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 openExportDICOMDialogAction.trigger()
                 slicer.mrmlScene.RemoveNode(export_node)
 
-    def onSegButtonClick(self,button_name):
-        
-        run_model_name=""
-        if "airway"==button_name:
-            run_model_name="Airway_nnUnet"
-            self.ui.bt_seg_airway.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        elif "artery"==button_name:
-            run_model_name="Artery_nnUnet"
-            self.ui.bt_seg_artery.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        elif "lobe"==button_name:
-            run_model_name="LungLobe_nnUnet"
-            self.ui.btn_seg_lobe.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        elif "rib"==button_name:
-            run_model_name="Rib_nnUnet"
-            self.ui.btn_seg_rib.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        elif "vein"==button_name:
-            run_model_name="Vein_nnUnet"
-            self.ui.btn_seg_vein.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        elif "nodule"==button_name:
-            run_model_name="Nodule_nnUnet"
-            self.ui.btn_seg_nodule.setEnabled(False)
-            self.ui.bt_cancel_run.setEnabled(True)
-        else:
-            slicer.util.messageBox("the model name '"+button_name+"' is Not Update!")
+    def onSegButtonClick(self, button):
+        process = EvoSegProcess.filterOne(self._process.values(), "segmentationButton", button)
+        if not process:
+            print(f"No process found for segmentationButton {button}")
             return
         
+        process.segmentationButton.setEnabled(False)
+        self.ui.bt_cancel_run.setEnabled(True)
+        
         if self._processingState == EvoSegWidget.PROCESSING_IDLE:
-            self.onApply(run_model_name)
+            self.onApply(process.name)
         else:
             self.onCancel()
 
@@ -571,7 +535,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def someCustomAction(self, caller, eventId):
         import numpy as np
-        markupsDisplayNode = caller
+        #markupsDisplayNode = caller
         #print(type(markupsDisplayNode))
         #print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
         
@@ -664,10 +628,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.removeObservers()
 
     def removeObservers(self):
-        #print("rm obse..")
         try:
             for observedNode, observation in self.observations:
                 observedNode.RemoveObserver(observation)
+            
             if self.sceneEndCloseObserverTag:
                 self.removeObserver(self.sceneEndCloseObserverTag)
             if self.sceneEndImportObserverTag:
@@ -838,13 +802,19 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onResultSeg(self,myDataModule, model_name, minPrecision):
         # 刷新DataModule 回调
-        self.data_module=myDataModule
+        append = True
         for i in self.data_module_list:
             if i["model_name"]==model_name:
-                i["seg_data"]=self.data_module
-                return
-        self.data_module_list.append({"model_name":model_name,"seg_data":self.data_module})
-
+                i["seg_data"]=myDataModule
+                append = False
+                break
+        if append:
+            self.data_module_list.append({"model_name":model_name,"seg_data":myDataModule})
+            process = EvoSegProcess.filterOne(self._process.values(), "name", model_name)
+            if process and process.radioButton == self.button_group.checkedButton():
+                self.data_module = myDataModule
+                self.data_module_name = model_name
+                
         # print(dir(self.ui.radius_slider))
         # self.ui.radius_slider.singleStep= minPrecision #
         self.ui.radius_slider.minimum = minPrecision*2 # 最大为2倍最大间距
