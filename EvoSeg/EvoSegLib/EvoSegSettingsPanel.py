@@ -17,10 +17,16 @@ class _ui_EvoSegSettingsPanel:
         self.airwayColorPickerButton.setMinimumSize(0, 0)
         self.airwayColorPickerButton.setMaximumSize(16777215, 16777215)
         airwayColorGroupBoxFormLayout.addRow(_("Color"),self.airwayColorPickerButton)
+        self.airwaySplitByMidPlaneCheckBox = qt.QCheckBox()
+        self.airwaySplitByMidPlaneCheckBox.setChecked(EvoSegModels.get('Airway').isSplitByMidPlane())
+        airwayColorGroupBoxFormLayout.addRow(_("Split By Middle Plane"), self.airwaySplitByMidPlaneCheckBox)
         vBoxLayout.addWidget(airwayColorGroupBox)
         parent.registerProperty('EvoSeg/AirwayColor', self.airwayColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Airway Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
+        parent.registerProperty('EvoSeg/AirwaySplitByMidPlane', self.airwaySplitByMidPlaneCheckBox,
+            "checked", str(qt.SIGNAL("toggled(bool)")),
+            _("Split By Middle Plane"), ctk.ctkSettingsPanel.OptionRequireRestart)
         
         ateryColorGroupBox = qt.QGroupBox(_('Artery'))
         arteryColorGroupBoxFormLayout = qt.QFormLayout(ateryColorGroupBox)
@@ -31,10 +37,16 @@ class _ui_EvoSegSettingsPanel:
         self.arteryColorPickerButton.setMinimumSize(0, 0)
         self.arteryColorPickerButton.setMaximumSize(16777215, 16777215)
         arteryColorGroupBoxFormLayout.addRow(_("Color"), self.arteryColorPickerButton)
+        self.arterySplitByMidPlaneCheckBox = qt.QCheckBox()
+        self.arterySplitByMidPlaneCheckBox.setChecked(EvoSegModels.get('Artery').isSplitByMidPlane())
+        arteryColorGroupBoxFormLayout.addRow(_("Split By Middle Plane"), self.arterySplitByMidPlaneCheckBox)
         vBoxLayout.addWidget(ateryColorGroupBox)
         parent.registerProperty('EvoSeg/ArteryColor', self.arteryColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Artery Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
+        parent.registerProperty('EvoSeg/ArterySplitByMidPlane', self.arterySplitByMidPlaneCheckBox,
+            "checked", str(qt.SIGNAL("toggled(bool)")),
+            _("Split By Middle Plane"), ctk.ctkSettingsPanel.OptionRequireRestart)
         
         veinColorGroupBox = qt.QGroupBox(_('Vein'))
         veinColorGroupBoxFormLayout = qt.QFormLayout(veinColorGroupBox)
@@ -45,10 +57,16 @@ class _ui_EvoSegSettingsPanel:
         self.veinColorPickerButton.setMinimumSize(0, 0)
         self.veinColorPickerButton.setMaximumSize(16777215, 16777215)
         veinColorGroupBoxFormLayout.addRow(_("Color"), self.veinColorPickerButton)
+        self.veinSplitByMidPlaneCheckBox = qt.QCheckBox()
+        self.veinSplitByMidPlaneCheckBox.setChecked(EvoSegModels.get('Vein').isSplitByMidPlane())
+        veinColorGroupBoxFormLayout.addRow(_("Split By Middle Plane"), self.veinSplitByMidPlaneCheckBox)
         vBoxLayout.addWidget(veinColorGroupBox)
         parent.registerProperty('EvoSeg/VeinColor', self.veinColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Vein Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
+        parent.registerProperty('EvoSeg/VeinSplitByMidPlane', self.veinSplitByMidPlaneCheckBox,
+            "checked", str(qt.SIGNAL("toggled(bool)")),
+            _("Split By Middle Plane"), ctk.ctkSettingsPanel.OptionRequireRestart)
         
         lobeColorGroupBox = qt.QGroupBox(_('Lobe'))
         lobeColorGroupBoxFormLayout = qt.QFormLayout(lobeColorGroupBox)

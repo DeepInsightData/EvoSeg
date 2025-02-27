@@ -53,7 +53,7 @@ class EvoSegProcess:
             self.visibilityButton=visibilityButton
             self.opacitySlider=opacitySlider
 
-    def __init__(self, name, segmentationButton, segmentationNode, radioButton, groupBox, visibilityButton, opacitySlider, segments=[], splitByMidPlane=False):
+    def __init__(self, name, segmentationButton, segmentationNode, radioButton, groupBox, visibilityButton, opacitySlider, model, segments=[]):
         self.name = name
         self.segmentationButton = segmentationButton
         self.segmentationNode = segmentationNode
@@ -61,8 +61,9 @@ class EvoSegProcess:
         self.groupBox = groupBox
         self.visibilityButton = visibilityButton
         self.opacitySlider = opacitySlider
+        self.model = model
         self.segments = segments
-        self.splitByMidPlane = splitByMidPlane
+
 
     @staticmethod
     def filterOne(processes, attr, value):
@@ -227,11 +228,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox = self.ui.groupBoxAirway,
                 visibilityButton=self.ui.airwayVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityAirway,
+                model = lambda: EvoSegModels.get('Airway'),
                 segments=[
                     EvoSegProcess.Segment("Airway_Left", self.ui.leftAirwayVisibilityButton, self.ui.sliderOpacityLeftAirway),
                     EvoSegProcess.Segment("Airway_Right", self.ui.rightAirwayVisibilityButton, self.ui.sliderOpacityRightAirway),
-                ],
-                splitByMidPlane=True
+                ]
             ),
             "Artery_nnUnet" : EvoSegProcess(
                 name = "Artery_nnUnet", 
@@ -241,11 +242,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxArtery,
                 visibilityButton=self.ui.arteryVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityArtery,
+                model = lambda: EvoSegModels.get('Artery'),
                 segments=[
                     EvoSegProcess.Segment("Artery_Left", self.ui.leftArteryVisibilityButton, self.ui.sliderOpacityLeftArtery),
                     EvoSegProcess.Segment("Artery_Right", self.ui.rightArteryVisibilityButton, self.ui.sliderOpacityRightArtery),
-                ],
-                splitByMidPlane=True
+                ]
             ),
             "Vein_nnUnet": EvoSegProcess(
                 name = "Vein_nnUnet", 
@@ -255,11 +256,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxVein,
                 visibilityButton=self.ui.veinVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityVein,
+                model = lambda: EvoSegModels.get('Vein'),
                 segments=[
                     EvoSegProcess.Segment("Vein_Left", self.ui.leftVeinVisibilityButton, self.ui.sliderOpacityLeftVein),
                     EvoSegProcess.Segment("Vein_Right", self.ui.rightVeinVisibilityButton, self.ui.sliderOpacityRightVein),
-                ],
-                splitByMidPlane=True
+                ]
             ),
             "LungLobe_nnUnet": EvoSegProcess(
                 name = "LungLobe_nnUnet",
@@ -269,14 +270,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxLobe,
                 visibilityButton=self.ui.lobeVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityLobe,
+                model = lambda: EvoSegModels.get('Lobe'),
                 segments=[
                     EvoSegProcess.Segment("left upper lobe", self.ui.leftUpperLobeVisibilityButton, self.ui.sliderOpacityLeftUpperLobe),
                     EvoSegProcess.Segment("left lower lobe", self.ui.leftLowerLobeVisibilityButton, self.ui.sliderOpacityLeftLowerLobe),
                     EvoSegProcess.Segment("right upper lobe", self.ui.rightUpperLobeVisibilityButton, self.ui.sliderOpacityRightUpperLobe),
                     EvoSegProcess.Segment("right middle lobe", self.ui.rightMidLobeVisibilityButton, self.ui.sliderOpacityRightMiddleLobe),
                     EvoSegProcess.Segment("right lower lobe", self.ui.rightLowerLobeVisibilityButton, self.ui.sliderOpacityRightLowerLobe),
-                ],
-                splitByMidPlane=False
+                ]
             ),
             "Rib_nnUnet": EvoSegProcess(
                 name = "Rib_nnUnet", 
@@ -286,7 +287,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxRibs,
                 visibilityButton=self.ui.ribsVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityRibs,
-                splitByMidPlane=False
+                model = lambda: EvoSegModels.get('Rib')
             ),
             "Nodule_nnUnet": EvoSegProcess(
                 name = "Nodule_nnUnet", 
@@ -296,7 +297,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxNodule,
                 visibilityButton=self.ui.noduleVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityNodule,
-                splitByMidPlane=False
+                model = lambda: EvoSegModels.get('Nodule')
             )
         }
 
@@ -313,10 +314,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # 切出模块时，及时关掉修改
         if self.bt_place_down:
             self.ui.bt_place.click()
-        if self.sceneEndCloseObserverTag:
-            self.removeObserver(self.sceneEndCloseObserverTag)
-        if self.sceneEndImportObserverTag:
-            self.removeObserver(self.sceneEndImportObserverTag)
 
     def onSceneEndClose(self, caller, event):
         for process in self._process.values():
@@ -671,6 +668,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         try:
             for observedNode, observation in self.observations:
                 observedNode.RemoveObserver(observation)
+            if self.sceneEndCloseObserverTag:
+                self.removeObserver(self.sceneEndCloseObserverTag)
+            if self.sceneEndImportObserverTag:
+                self.removeObserver(self.sceneEndImportObserverTag)
         except:
             print("No have observation")
 
@@ -1363,7 +1364,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         process.segmentationNode = outputSegmentation
                         process.groupBox.setVisible(True)
                         process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D()) 
-                        if process.splitByMidPlane:
+                        if process.model().isSplitByMidPlane():
                             segmentIDs = vtk.vtkStringArray()
                             segmentation = outputSegmentation.GetSegmentation()
                             segmentation.GetSegmentIDs(segmentIDs)

@@ -2,9 +2,13 @@ import qt
 import slicer
 
 class EvoSegModel:
-    def __init__(self, modelName: str, color: qt.QColor):
+    def __init__(self, modelName: str, color: qt.QColor, splitByMidPlane : bool = False):
         self.name = modelName
         self.defaultColor = color
+        self.splitByMidPlane = splitByMidPlane
+
+    def isSplitByMidPlane(self):
+        return slicer.util.settingsValue(f'EvoSeg/{self.name}SplitByMidPlane', self.splitByMidPlane)
 
     def color(self):
         return slicer.util.settingsValue(f'EvoSeg/{self.name}Color', self.defaultColor)
@@ -13,8 +17,8 @@ class EvoSegModel:
         return slicer.util.settingsValue(f'EvoSeg/{self.name}OutputVolumeNodeName', f'{self.name}_Output_Mask')
     
 class LungLobeModel(EvoSegModel):
-    def __init__(self, modelName: str, color: qt.QColor):
-        super().__init__(modelName, color)
+    def __init__(self, modelName: str, color: qt.QColor, splitByMidPlane : bool):
+        super().__init__(modelName, color, splitByMidPlane)
     
     def leftUpperLobeColor(self):
         return slicer.util.settingsValue(f'EvoSeg/LeftUpperLobeColor', qt.QColor("#80ae80"))
@@ -33,12 +37,12 @@ class LungLobeModel(EvoSegModel):
 
 class EvoSegModels:
     MODELS = [
-        EvoSegModel("Airway", qt.QColor("#c8c8eb")),
-        EvoSegModel("Artery", qt.QColor("#d8654f")),
-        EvoSegModel("Vein", qt.QColor("#0097ce")),
-        LungLobeModel("Lobe", qt.QColor("#fde89e")),
-        EvoSegModel("Rib", qt.QColor("#fde89e")),
-        EvoSegModel("Nodule", qt.QColor("#804f00")),
+        EvoSegModel("Airway", qt.QColor("#c8c8eb"), True),
+        EvoSegModel("Artery", qt.QColor("#d8654f"), True),
+        EvoSegModel("Vein", qt.QColor("#0097ce"), True),
+        LungLobeModel("Lobe", qt.QColor("#fde89e"), False),
+        EvoSegModel("Rib", qt.QColor("#fde89e"), False),
+        EvoSegModel("Nodule", qt.QColor("#804f00"), False),
     ]
 
     _model_dict = {model.name: model for model in MODELS}
