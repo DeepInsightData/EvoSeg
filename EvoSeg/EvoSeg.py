@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 from typing import Annotated, Optional
 
@@ -16,12 +17,14 @@ from slicer.parameterNodeWrapper import (
 
 from slicer import vtkMRMLScalarVolumeNode
 
-from qt import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget
-        
+from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
+
+import subprocess
+
+from OtherCode.data import DataModule
 #
 # EvoSeg
 #
-
 
 class EvoSeg(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
@@ -32,7 +35,7 @@ class EvoSeg(ScriptedLoadableModule):
         ScriptedLoadableModule.__init__(self, parent)
         self.parent.title = _("EvoSeg")  # TODO: make this more human readable by adding spaces
         # TODO: set categories (folders where the module shows up in the module selector)
-        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Examples")]
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Segmentation")]
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
         self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
         # TODO: update with short description of the module and a link to online module documentation
@@ -47,174 +50,25 @@ This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc
 and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
 """)
         self.terminologyName = None
-        self.anatomicContextName = None
 
         slicer.app.connect("startupCompleted()", self.configureDefaultTerminology)
         # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", registerSampleData)
+        slicer.app.connect("startupCompleted()", self.registerSampleData)
 
     def configureDefaultTerminology(self):
         moduleDir = os.path.dirname(self.parent.path)
-        terminologyFilePath = os.path.join(moduleDir, "Resources", "SegmentationCategoryTypeModifier-EvoSeg.term.json")
-        anatomicContextFilePath = os.path.join(moduleDir, "Resources", "AnatomicRegionAndModifier-EvoSeg.term.json")
+        #terminologyFilePath = os.path.join(moduleDir, "Resources", "SegmentationCategoryTypeModifier-EvoSeg.term.json")
+        #anatomicContextFilePath = os.path.join(moduleDir, "Resources", "AnatomicRegionAndModifier-EvoSeg.term.json")
         tlogic = slicer.modules.terminologies.logic()
-        self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
-        self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
+        #self.terminologyName = tlogic.LoadTerminologyFromFile(terminologyFilePath)
+        #self.anatomicContextName = tlogic.LoadAnatomicContextFromFile(anatomicContextFilePath)
+
 
     def registerSampleData(self):
         """
         Add data sets to Sample Data module.
         """
-
-        # For each sample data set: specify data set name and sha256 file content
-        sampleDataSets = [
-            [
-                "ProstateX-0000", """
-                3940564b147b7bcda52b6b305be3d39f7c9fb901b81caa9863c72ef6ff113dfb *ProstateX-0000-t2-tse-tra.nrrd
-                774a3891a506f534b5d60ab9831587803e18da0f2daa343997d09221942bf329 *ProstateX-0000-t2-tse-sag.nrrd
-                628b928f818350acdb95952daa107d089a6c9101cf74d51fb129ab9b5d490e59 *ProstateX-0000-t2-tse-cor.nrrd
-                62a00ffa4fab7a3d53e8cc17409cb0a6c7e6ebdaea694ecab78c7d8c55b6d4d3 *ProstateX-0000-adc.nrrd
-                """
-            ],
-            [
-                "msd-prostate-01", """
-                3745533b4bddd6f713d651ae54085fc91f00baab0860f279c8de1960b364ab88 *msd-prostate-01-adc.nrrd
-                b85b2e145168ea5d4265b3a9f17ec1fbe6de81b23bf833181021fcdbf6816723 *msd-prostate-01-t2.nrrd
-                """
-            ],
-            [
-                "ProstateX-0000", """
-                3940564b147b7bcda52b6b305be3d39f7c9fb901b81caa9863c72ef6ff113dfb *ProstateX-0000-t2-tse-tra.nrrd
-                774a3891a506f534b5d60ab9831587803e18da0f2daa343997d09221942bf329 *ProstateX-0000-t2-tse-sag.nrrd
-                628b928f818350acdb95952daa107d089a6c9101cf74d51fb129ab9b5d490e59 *ProstateX-0000-t2-tse-cor.nrrd
-                62a00ffa4fab7a3d53e8cc17409cb0a6c7e6ebdaea694ecab78c7d8c55b6d4d3 *ProstateX-0000-adc.nrrd
-                """
-            ],
-            [
-                "ICH-ADAPT2", """
-                40e9f1cb82dd68e8bd19dccf0ad116c8cb2eb67a8cfadf3ad9155642e4851d89 *ICH-ADAPT2.nii.gz
-                """
-            ],
-            [
-                "BraTS-GLI-00001-000", """
-                4399faadcc45c8a4541313cdf88aced7d835ed59ac3078d950e0eac293d603f5 *BraTS-GLI-00001-000-t1c.nii.gz
-                e860924b936e301ddeba20409fbb59dde322475cb49328f1b46a9235c792e73e *BraTS-GLI-00001-000-t1n.nii.gz
-                82aed8546af5e6d8d94fd91c56227abdcf6120130390d1556c4342a208980604 *BraTS-GLI-00001-000-t2f.nii.gz
-                4cd389cc57d12134a30a898c66532228126b9a7d0600ee578e82a32144528b51 *BraTS-GLI-00001-000-t2w.nii.gz
-                """
-            ],
-            [
-                "BraTS-MEN-00000-000", """
-                4cb970e92edcec52c5c4d72568a17c41006a663391ab76cb871a5054f76c4e37 *BraTS-MEN-00000-000-t1c.nii.gz
-                794d184402972c78a8a4be2b889f3683c80878f748912704fd23edc3ce6fa9dd *BraTS-MEN-00000-000-t1n.nii.gz
-                e82bf0f3e1870e61500de40d834d92da64021c634e146d225597c2ff3a682cbd *BraTS-MEN-00000-000-t2f.nii.gz
-                4d6d7aa361be09cb2b8d2e411fa26499301b5edf454acae1cd442f5c53904f75 *BraTS-MEN-00000-000-t2w.nii.gz
-                """
-            ],
-            [
-                "BraTS-MET-00002-000", """
-                360b294b428d335c90f340ca727d8fbce4a7ae3aaac9fc61929f4cd71a0aa90b *BraTS-MET-00002-000-t1c.nii.gz
-                bc8dcc7e2ae37b1ef6a231c1ee9e1fc355a21322f95572a78b59773c18459654 *BraTS-MET-00002-000-t1n.nii.gz
-                863838bfc13259ee9de1cf31e9cb6db1a3a6489863bbe7efd1238f630dce08bf *BraTS-MET-00002-000-t2f.nii.gz
-                3076031451a334c29242cbab9b65017c6acd89d5dda9a7566bb79d2325c51df9 *BraTS-MET-00002-000-t2w.nii.gz
-                """
-            ],
-            [
-                "BraTS-PED-00030-000", """
-                9fd304f9a7c691266b22efeb2610b879c454e0e31df758c32ec039ad2c1acde7 *BraTS-PED-00030-000-t1c.nii.gz
-                8c801c464b548b9acd49244db3e31895945c7a26abc1c7bbb34aac72706b7b9d *BraTS-PED-00030-000-t1n.nii.gz
-                7c69f8a39b722f3bdd8ed943f5c6aa2aa20aec011727bc237d074aef01c774ff *BraTS-PED-00030-000-t2f.nii.gz
-                88914c9e4aafacb21c642132a46c7f12096af958d8b915a80e023d5924fff8d8 *BraTS-PED-00030-000-t2w.nii.gz
-                """
-            ],
-            [
-                "BraTS-SSA-00002-000", """
-                b980aab6d6fb2e95f01e6f6c964d94a89ef32e717448e1b1c101e163219042b1 *BraTS-SSA-00002-000-t1c.nii.gz
-                cd78460e4225a1f145756c7fcda12a517ab3d13f62c52d8b287d78310e520cf7 *BraTS-SSA-00002-000-t1n.nii.gz
-                b7067abe232daafbf5c46c9707462edc961cdb30cb5eb445e5d4407e0da70c08 *BraTS-SSA-00002-000-t2f.nii.gz
-                4d9810cd217a9504f8aa4313a0edec4a091ecb145bad09dab5b7955688639420 *BraTS-SSA-00002-000-t2w.nii.gz
-                """
-            ]
-        ]
-
-        import SampleData
-        iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-        for sampleDataSet in sampleDataSets:
-            sampleName = sampleDataSet[0]
-            filenamesWithChecksums = sampleDataSet[1].split("\n")
-            uris = []
-            filenames = []
-            nodeNames = []
-            checksums = []
-            for filenamesWithChecksum in filenamesWithChecksums:
-                # filenamesWithChecksum = '                b980aab6d6fb2e95f01e6f6c964d94a89ef32e717448e1b1c101e163219042b1 *BraTS-SSA-00002-000-t1c.nii.gz'
-                filenamesWithChecksum = filenamesWithChecksum.strip()
-                if not filenamesWithChecksum:
-                    continue
-                checksum, filename = filenamesWithChecksum.split(" *")
-                uris.append(f"https://github.com/lassoan/SlicerMONAIAuto3DSeg/releases/download/TestingData/{filename}")
-                filenames.append(filename)
-                nodeNames.append(filename.split(".")[0])
-                checksums.append(f"SHA256:{checksum}")
-
-            SampleData.SampleDataLogic.registerCustomSampleDataSource(
-                category="MONAIAuto3DSeg",
-                sampleName=sampleName,
-                uris=uris,
-                fileNames=filenames,
-                nodeNames=nodeNames,
-                thumbnailFileName=os.path.join(iconsPath, f"{sampleName}.jpg"),
-                checksums=checksums
-            )
-
-#
-# Register sample data sets in Sample Data module
-#
-
-
-def registerSampleData():
-    """Add data sets to Sample Data module."""
-    # It is always recommended to provide sample data for users to make it easy to try the module,
-    # but if no sample data is available then this method (and associated startupCompeted signal connection) can be removed.
-
-    import SampleData
-
-    iconsPath = os.path.join(os.path.dirname(__file__), "Resources/Icons")
-
-    # To ensure that the source code repository remains small (can be downloaded and installed quickly)
-    # it is recommended to store data sets that are larger than a few MB in a Github release.
-
-    # EvoSeg1
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category="EvoSeg",
-        sampleName="EvoSeg1",
-        # Thumbnail should have size of approximately 260x280 pixels and stored in Resources/Icons folder.
-        # It can be created by Screen Capture module, "Capture all views" option enabled, "Number of images" set to "Single".
-        thumbnailFileName=os.path.join(iconsPath, "EvoSeg1.png"),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95",
-        fileNames="EvoSeg1.nrrd",
-        # Checksum to ensure file integrity. Can be computed by this command:
-        #  import hashlib; print(hashlib.sha256(open(filename, "rb").read()).hexdigest())
-        checksums="SHA256:998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95",
-        # This node name will be used when the data set is loaded
-        nodeNames="EvoSeg1",
-    )
-
-    # EvoSeg2
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category="EvoSeg",
-        sampleName="EvoSeg2",
-        thumbnailFileName=os.path.join(iconsPath, "EvoSeg2.png"),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97",
-        fileNames="EvoSeg2.nrrd",
-        checksums="SHA256:1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97",
-        # This node name will be used when the data set is loaded
-        nodeNames="EvoSeg2",
-    )
+        print("~")
 
 
 #
@@ -245,7 +99,6 @@ class EvoSegParameterNode:
 # EvoSegWidget
 #
 
-
 class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
@@ -268,13 +121,26 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._processingState = EvoSegWidget.PROCESSING_IDLE
         self._segmentationProcessInfo = None
 
+        self.label_np=None
+
+        self.markupsNode=None
+
+        self.data_module=None
+
+        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'r') as file:
+            app_config = json.load(file)
+        self.ui_language = app_config["language"]
+        
+        self.logic = EvoSegLogic(self.ui_language)
+
+        super().setup()
+        
+
     ##
     # 该临时翻译，仅限于对该插件ui文件中可以搜到字符串的控件进行翻译
     # 
     def translate(self, language="en-US"):
-        # 目前仅限于翻译中文
-        if language != "zh-CN":
-            return
+        # 翻译
         en_zh={
             "Advanced": "设置",
             "Apply": "应用",
@@ -286,21 +152,26 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Clear cache": "清除缓存",
             "<p>Delete all downloaded files for all models. The files will be automatically downloaded again as needed.</p>": "删除所有模型的所有下载文件。文件会根据需要自动重新下载。",
             "Download": "下载",
-            "<p>Download sample data set for the current segmentation model</p>": "下载当前分割模型的示例数据集",
+            "<p>Download sample data and model set for the current segmentation model</p>": "<p>下载当前分割模型和示例数据集</p>",
             "Full text": "全文",
             "<p>Search in full text of the segmentation model description. Uncheck to search only in the model names.</p>": "在分割模型描述的全文中搜索。取消勾选以仅在模型名称中搜索。",
+            "Search...": "搜索...",
+            "Input volume:": "输入体积:",
             "Input volume 1:": "输入体积 1：",
             "Input volume 2:": "输入体积 2：",
             "Input volume 3:": "输入体积 3：",
             "Input volume 4:": "输入体积 4：",
             "Inputs": "输入",
-            "Force to use CPU:": "强制使用 CPU：",
+            "Modify Result:": "修改结果:",
+            "<p>Translate to chinese</p>": "<p>切换成英文</p>",
+            "Force to use CPU: ": "强制使用 CPU：",
             "Segmentation model:": "分割模型：",
-            "Show all models:": "显示所有模型：",
-            "Segmentation:": "分割：",
+            "Show all models:": "显示模型全称：",
+            "Segmentation:": "分割选项:",
             "Manage models:": "管理模型：",
+            "Copy to folder":"导入模型",
             "Use standard segment names:": "使用标准分割名称：",
-            "EVO Python package:": "EVO Python 包：",
+            "Python package:": "Python 包：",
             "<p>List models that contain all the specified words</p>": "列出包含所有指定词的模型",
             "Download model if not saved": "如果未保存则下载模型",
             "<p>Copy it yourself.</p>": "请自行复制。",
@@ -308,26 +179,55 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             "Outputs": "输出",
             "Get Python package information": "获取 Python 包信息",
             "<p>Get information on the installed EVO Python package</p>": "获取已安装的 EVO Python 包的信息",
-            "Force reinstall": "强制重新安装",
+            "Reinstall": "重新安装",
             "<p>Force upgrade of EVO Python package to the version required by this module.</p>": "强制将 EVO Python 包升级到本模块所需的版本。",
             "0.50": "0.50",
             "Show 3D": "显示 3D",
             '<p>Show all models in "Segmentation model" list, including old versions.</p>': "显示“分割模型”列表中的所有模型，包括旧版本。",
-            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。"
+            "<p>If enabled (default) then segment names are obtained from Slicer standard terminology files. If disabled then internal identifiers are used as segment names.</p>": "如果启用（默认），则分段名称将从 Slicer 标准术语文件中获取。如果禁用，则使用内部标识符作为分段名称。",
+            "<p>Create new segmentation on Apply</p>":"<p>创建新分割</p>",
         }
 
-        for name in dir(self.ui):
-            widget = getattr(self.ui, name)
-            try:
-                #print(widget.text)
-                widget.setText(en_zh[widget.text])
-            except:
-                pass
-            try:
-                #print(widget.toolTip)
-                widget.setToolTip(en_zh[widget.toolTip])
-            except:
-                pass
+        if language == "zh-CN":
+            for name in dir(self.ui):
+                widget = getattr(self.ui, name)
+                try:
+                    #print(widget.text)
+                    widget.setText(en_zh[widget.text])
+                except:
+                    pass
+                try:
+                    #print(widget.toolTip)
+                    widget.setToolTip(en_zh[widget.toolTip])
+                except:
+                    pass
+            self.ui_language="zh-CN"
+        else:
+            for name in dir(self.ui):
+                widget = getattr(self.ui, name)
+                try:
+                    #print(widget.text)
+                    widget.setText([k for k, v in en_zh.items() if v == widget.text][0])
+                except:
+                    pass
+                try:
+                    #print(widget.toolTip)
+                    widget.setToolTip([k for k, v in en_zh.items() if v ==widget.toolTip][0])
+                except:
+                    pass
+            self.ui_language="en-US"
+        
+        save_data={  
+            "Name": "EvoSeg",
+            "language": "zh-CN"
+            }
+        save_data["language"] = self.ui_language
+        self.logic.ui_language =self.ui_language
+
+        with open(os.path.join(os.path.dirname(slicer.util.getModule('EvoSeg').path), "Resources", "AppConfig.json"), 'w') as file:
+            json.dump(save_data, file, indent=4) 
+        #print
+        # 非官方翻译最后一个版本
 
     def setup(self) -> None:
         """Called when the user opens the module the first time and the widget is initialized."""
@@ -341,7 +241,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         import qt
         # 下载样本数据按钮设置icon
-        self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg.png")))
+        self.ui.downloadSampleDataToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/radiology.svg")))
+        self.ui.TranslateToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/translate.svg")))
+        self.ui.ImportModelToolButton.setIcon(qt.QIcon(self.resourcePath("Icons/import_model.svg")))
+        self.ui.ImportModelToolButton.hide() # 进一步明确模型描述信息后启用
 
         self.inputNodeSelectors = [self.ui.inputNodeSelector0, self.ui.inputNodeSelector1, self.ui.inputNodeSelector2, self.ui.inputNodeSelector3]
         self.inputNodeLabels = [self.ui.inputNodeLabel0, self.ui.inputNodeLabel1, self.ui.inputNodeLabel2, self.ui.inputNodeLabel3]
@@ -355,11 +258,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
         # EvoSegLogic()直接copy EvoSegLogic()
-        self.logic = EvoSegLogic()
         self.logic.logCallback = self.addLog
         self.logic.processingCompletedCallback = self.onProcessingCompleted
         self.logic.startResultImportCallback = self.onProcessImportStarted
         self.logic.endResultImportCallback = self.onProcessImportEnded
+        
+        self.logic.setResultToLabelCallback = self.onResultSeg
 
         # Connections
 
@@ -372,7 +276,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         for inputNodeSelector in self.inputNodeSelectors:
             inputNodeSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.fullTextSearchCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
-        self.ui.cpuCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
+        # NOTE:已隐藏暂时没有用的选项
+        # self.ui.cpuCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.showAllModelsCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
         self.ui.useStandardSegmentNamesCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 
@@ -380,14 +285,43 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.modelComboBox.currentTextChanged.connect(self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationShow3DButton.setSegmentationNode)
+        #self.ui.outputSegmentationSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.ui.segmentationEditor_.setSegmentationNode)
 
         # Buttons
         self.ui.downloadSampleDataToolButton.connect("clicked(bool)", self.onDownloadSampleData)
+        self.ui.TranslateToolButton.connect("clicked(bool)", self.tr_ui)
+        self.ui.ImportModelToolButton.connect("clicked(bool)", self.onInputLocalModel)
+        self.ui.copyModelsButton.connect("clicked(bool)", self.onCopyModel)
         self.ui.packageInfoUpdateButton.connect("clicked(bool)", self.onPackageInfoUpdate)
+        self.ui.packageInfoUpdateButton.hide()
         self.ui.packageUpgradeButton.connect("clicked(bool)", self.onPackageUpgrade)
         self.ui.applyButton.connect("clicked(bool)", self.onApplyButton)
         self.ui.browseToModelsFolderButton.connect("clicked(bool)", self.onBrowseModelsFolder)
         self.ui.deleteAllModelsButton.connect("clicked(bool)", self.onClearModelsFolder)
+
+        # check box
+        self.ui.radioButton1.setChecked(True)
+        self.ui.radioButton12.setChecked(True)
+
+        # Hide or delete will
+        self.ui.label_3.hide()
+        self.ui.modelSearchBox.hide()
+        self.ui.fullTextSearchCheckBox.hide()
+
+        # new button click
+        self.ui.lineEdit_radius.setText("{'radius':3,}")
+        self.ui.button_undo.connect("clicked(bool)", self.onButtonUndoClick)
+        self.ui.button_save.connect("clicked(bool)", self.onButtonSaveClick)
+
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.ui.radioButton1)
+        self.button_group.addButton(self.ui.radioButton2)
+        self.button_group.addButton(self.ui.radioButton3)
+        self.button_group2 = QButtonGroup()
+        self.button_group2.addButton(self.ui.radioButton12)
+        self.button_group2.addButton(self.ui.radioButton22)
+        self.button_group2.addButton(self.ui.radioButton32)
+        self.button_group2.addButton(self.ui.radioButton42)
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -397,17 +331,252 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Make the model search box in focus by default so users can just start typing to find the model they need
         qt.QTimer.singleShot(0, self.ui.modelSearchBox.setFocus)
 
-        self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
+        # NOTE: 弃用
+        # self.ui.translate_ui.connect("toggled(bool)", self.tr_ui)
+        self.CrosshairNode = slicer.mrmlScene.GetFirstNodeByClass('vtkMRMLCrosshairNode')
+        
+        if self.CrosshairNode:
+            self.CrosshairNodeObserverTag = self.CrosshairNode.AddObserver(slicer.vtkMRMLCrosshairNode.CursorPositionModifiedEvent, self.processEvent)
+
+
+        # self.sliceView = slicer.app.layoutManager().sliceWidget("Red").sliceView()
+        # print(type(self.sliceView),"========================")
+        # self.checkbox = QCheckBox("123")
+        # self.sliceView.layout().addWidget(self.checkbox)
+
+        self.layoutManager = slicer.app.layoutManager()
+        
+        self.redSliceView = self.layoutManager.sliceWidget("Red")
+
+        
+        views = [
+            # slicer.app.layoutManager().threeDWidget(0).threeDView(),
+            slicer.app.layoutManager().sliceWidget("Red").sliceView(),
+            slicer.app.layoutManager().sliceWidget("Yellow").sliceView(),
+            slicer.app.layoutManager().sliceWidget("Green").sliceView()
+        ]
+
+        self.observations = []
+        # markupsDisplayNodes = slicer.util.getNodesByClass("vtkMRMLMarkupsDisplayNode")
+
+        #for markupsDisplayNode in markupsDisplayNodes:
+            # observations.append([markupsDisplayNode, markupsDisplayNode.AddObserver(markupsDisplayNode.CustomActionEvent1, self.someCustomAction)])
+        for view in views:
+                # markupsDisplayableManager = view.displayableManagerByClassName('vtkMRMLMarkupsDisplayableManager')
+                # widget = markupsDisplayableManager.GetWidget(markupsDisplayNode)
+                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, vtk.vtkWidgetEvent.NoEvent)
+                # widget.SetEventTranslation(widget.WidgetStateOnWidget, slicer.vtkMRMLInteractionEventData.LeftButtonClickEvent, vtk.vtkEvent.NoModifier, widget.WidgetEventCustomAction1)
+            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonPressEvent, self.onPress, 10.0)])
+            self.observations.append([view.interactorStyle().GetInteractor(), view.interactorStyle().GetInteractor().AddObserver(vtk.vtkCommand.LeftButtonReleaseEvent, self.onRelease, 10.0)])
+        
+        extensionsPath = slicer.app.extensionsInstallPath
+        print("Extensions Install Path:", extensionsPath)
+        layoutManager = slicer.app.layoutManager()
+        fourByFourWidget = layoutManager.threeDWidget(0).threeDView()
+
+        # 显示小部件
+        fourByFourWidget.show()
+    
+        #self.tnode.AddObserver(slicer.vtkMRMLMarkupsNode.PointPositionDefinedEvent, self.AddNewMarkup)
+          # if cn , language set
+
+        if(self.ui_language=="zh-CN"):
+            self.translate("zh-CN")
+
+    def onButtonUndoClick(self):
+        self.data_module.undo()
+        self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+    def onButtonSaveClick(self):
+        #segmentation_nodes = slicer.util.getNodesByClass('vtkMRMLSegmentationNode')
+        self.logic.set_new_data_module(self.data_module);
+        print("Save click")
+
+    def check_py_pack(self):
+        try:
+            import fire
+        except ModuleNotFoundError:
+            slicer.util.pip_install("fire")
+
+    def onPress(self,arg1, arg2):
+        import ast
+        position_=self.ui.label_img.text.split("<b>")
+        x,y,z=ast.literal_eval(position_[0])
+        #print(x,y,z,position_[1].split("</b>")[0]=="Out of Frame")
+        #print("Press")
+        if self.data_module==None and position_[1].split("</b>")[0]=="Out of Frame":
+            self.ui.label_img.setText(self.ui.label_img.text+" Erro: data module no init!")
+        else:
+            #print(self.data_module.get_masks())
+            optin_select=self.button_group2.checkedButton().text
+            param = ast.literal_eval(self.ui.lineEdit_radius.text)
+            #self.ui.label_img.setText(self.ui.label_img.text+ self.button_group.checkedButton().text+" "+self.button_group2.checkedButton().text+" "+str(param['radius']))
+            if optin_select=="Sphere Addition":
+                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+            elif optin_select=="Sphere Erasure":
+                self.data_module.sphere_addition(x, y, z, self.button_group.checkedButton().text, **param)
+            else:
+                return
+            #print(self.button_group.checkedButton().text)
+            #self.data_module.
+            self.ui.label_6.setText("modifiy queue len:"+str(self.data_module.get_history_len()))
+            self.ui.label_img.setText(self.ui.label_img.text+" >> add")
+            
+    def onRelease(self,arg1, arg2):
+        #print("release")
+        #self.ui.label_img.setText(self.ui.label_img.text+" add done")
+        return
+    def someCustomAction(self,caller, eventId):
+        markupsDisplayNode = caller
+        print(type(markupsDisplayNode))
+        print(f"Custom action activated in {markupsDisplayNode.GetNodeTagName()}")
+        #slicer.mrmlScene.RemoveNode(markupsDisplayNode)
+
+    # def generateViewDescription(self, xyz, ras, sliceNode, sliceLogic):
+
+    #     spacing = "%.1f" % sliceLogic.GetLowestVolumeSliceSpacing()[2]
+    #     if sliceNode.GetSliceSpacingMode() == slicer.vtkMRMLSliceNode.PrescribedSliceSpacingMode:
+    #         spacing = "(%s)" % spacing
+    #     hasVolume = False
+    #     layerLogicCalls = (('L', sliceLogic.GetLabelLayer),
+    #                     ('F', sliceLogic.GetForegroundLayer),
+    #                     ('B', sliceLogic.GetBackgroundLayer))
+    #     for layer,logicCall in layerLogicCalls:
+    #         layerLogic = logicCall()
+    #         volumeNode = layerLogic.GetVolumeNode()
+    #         ijk = [0, 0, 0]
+    #         if volumeNode:
+    #             hasVolume = True
+    #             xyToIJK = layerLogic.GetXYToIJKTransform()
+    #             ijkFloat = xyToIJK.TransformDoublePoint(xyz)
+    #             ijk = [_roundInt(value) for value in ijkFloat]
+    #             print(ijk)
+    #             return \
+    #             "  {layoutName: <8s}  ({xyz_position})  {orient: >8s} Sp: {spacing:s}" \
+    #             .format(layoutName=sliceNode.GetLayoutName(),
+    #                     xyz_position=str(ijk),
+    #                     orient=sliceNode.GetOrientationString(),
+    #                     spacing=spacing
+    #                     )
+
+        # return \
+        # "  {layoutName: <8s}  ({rLabel} {ras_x:3.1f}, {aLabel} {ras_y:3.1f}, {sLabel} {ras_z:3.1f})  {orient: >8s} Sp: {spacing:s}" \
+        # .format(layoutName=sliceNode.GetLayoutName(),
+        #         rLabel=sliceNode.GetAxisLabel(1) if ras[0]>=0 else sliceNode.GetAxisLabel(0),
+        #         aLabel=sliceNode.GetAxisLabel(3) if ras[1]>=0 else sliceNode.GetAxisLabel(2),
+        #         sLabel=sliceNode.GetAxisLabel(5) if ras[2]>=0 else sliceNode.GetAxisLabel(4),
+        #         ras_x=abs(ras[0]),
+        #         ras_y=abs(ras[1]),
+        #         ras_z=abs(ras[2]),
+        #         orient=sliceNode.GetOrientationString(),
+        #         spacing=spacing
+        #         )
+
+    def processEvent(self,observee,event):
+
+        insideView = False
+        ras = [0.0,0.0,0.0]
+        xyz = [0.0,0.0,0.0]
+        sliceNode = None
+        if self.CrosshairNode:
+            insideView = self.CrosshairNode.GetCursorPositionRAS(ras)
+            sliceNode = self.CrosshairNode.GetCursorPositionXYZ(xyz)
+        sliceLogic = None
+        if sliceNode:
+            appLogic = slicer.app.applicationLogic()
+            if appLogic:
+                sliceLogic = appLogic.GetSliceLogic(sliceNode)
+
+        if not insideView or not sliceNode or not sliceLogic:
+            return
+        displayableManagerCollection = vtk.vtkCollection()
+        if sliceNode:
+            sliceWidget = slicer.app.layoutManager().sliceWidget(sliceNode.GetName())
+            if sliceWidget:
+                # sliceWidget is owned by the layout manager
+                sliceView = sliceWidget.sliceView()
+                sliceView.getDisplayableManagers(displayableManagerCollection)
+        aggregatedDisplayableManagerInfo = ''
+        myManagerInfo=""
+        for index in range(displayableManagerCollection.GetNumberOfItems()):
+            displayableManager = displayableManagerCollection.GetItemAsObject(index)
+            infoString = displayableManager.GetDataProbeInfoStringForPosition(xyz)
+            if infoString != "":
+                aggregatedDisplayableManagerInfo += infoString + "<br>"
+                myManagerInfo=infoString
+
+        try:
+            infoWidget = slicer.modules.DataProbeInstance.infoWidget
+            #for layer in ("B", "F", "L", "S"):
+                #print(infoWidget.layerNames[layer].text, infoWidget.layerIJKs[layer].text, infoWidget.layerValues[layer].text)
+            
+            self.ui.label_img.setText(infoWidget.layerIJKs["B"].text+" "+infoWidget.layerValues["B"].text)
+            if aggregatedDisplayableManagerInfo != '':
+                #print(myManagerInfo)
+                self.ui.label_img.setText(self.ui.label_img.text+"<br>"+myManagerInfo.split('</font>')[-1])
+            else:
+                self.ui.label_img.setText(self.ui.label_img.text+"<br> ")
+            
+            
+            
+
+            # self.ui.label_img.setText(self.generateViewDescription(xyz, ras, sliceNode, sliceLogic))
+        except:
+            pass
+        # collect information from displayable managers
+    
+
+        
+    def onCopyModel(self):
+        
+        from qt import QMessageBox 
+        if os.path.exists(os.path.join(self.logic.modelsPath(),"Airway_nnUnet(artery)")):
+            QMessageBox.warning(None, "不可导入", f"模型Airway nnUnet(artery)路径已存在!\n清除缓存再试")
+            return
+        import qt
+        copy2dir= os.path.join(self.logic.modelsPath())
+        print(self.logic.modelsPath())
+        if not os.path.exists(copy2dir):
+            os.makedirs(copy2dir)
+            
+        select_file = QFileDialog.getOpenFileNames(None, "选择文件", "", "File (*.7z)")
+        
+        
+
+        self.logic.extract_7z(select_file[0],copy2dir)
+        print("ok?")
+        
+
+    def onInputLocalModel(self):
+        print("input local model")
+        # file_name, _ = QFileDialog.getOpenFileName(None, "选择文件", "", "File (*.7z)")
+        # if file_name:
+            # text, ok = QInputDialog.getText(None, "输入对话框", "当前版本不允许自定义模型导入:",text="Airway nnUnet(artery)")
+            # if ok and text:
+            #     print(f"你输入了: {text}")
+            # else:
+            #     print("你取消了输入")
+        # else:
+        #     return
 
     def tr_ui(self):
-        if self.ui.translate_ui.checked:
+        #if self.ui.translate_ui.checked:
+        if self.ui_language=="en-US":
             self.translate("zh-CN")
-            self.ui.translate_ui.setEnabled(False)
+            #self.ui.translate_ui.setEnabled(False)
         else:
             self.translate()
+
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
+
+    def removeObservers(self):
+        print("rm observation..")
+        try:
+            for observedNode, observation in self.observations:
+                observedNode.RemoveObserver(observation)
+        except:
+            print("No have observation")
 
     def enter(self) -> None:
         """Called each time the user opens this module."""
@@ -543,14 +712,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.downloadSampleDataToolButton.visible = sampleDataAvailable
 
             self.ui.fullTextSearchCheckBox.checked = fullTextSearch
-            self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
+            #self.ui.cpuCheckBox.checked = self._parameterNode.GetParameter("CPU") == "true"
             self.ui.showAllModelsCheckBox.checked = showAllModels
             self.ui.useStandardSegmentNamesCheckBox.checked = self._parameterNode.GetParameter("UseStandardSegmentNames") == "true"
             self.ui.outputSegmentationSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputSegmentation"))
 
             state = self._processingState
             if state == EvoSegWidget.PROCESSING_IDLE:
-                self.ui.applyButton.text = "Apply"
+                self.ui.applyButton.text = "Apply" if self.ui_language=="en-US" else "应用"
                 inputErrorMessages = []  # it will contain text if the inputs are not valid
                 if modelId:
                     modelInputs = self.logic.model(modelId)["inputs"]
@@ -584,25 +753,26 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     self.ui.applyButton.toolTip = "\n".join(inputErrorMessages)
                     self.ui.applyButton.enabled = False
                 else:
-                    self.ui.applyButton.toolTip = "Start segmentation"
+                    self.ui.applyButton.toolTip = "Start segmentation" if self.ui_language=="en-US" else "开始分割"
                     self.ui.applyButton.enabled = True
 
             elif state == EvoSegWidget.PROCESSING_STARTING:
-                self.ui.applyButton.text = "Starting..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation is being initialized"
+                self.ui.applyButton.text = "Starting..." if self.ui_language=="en-US" else "启动中..."
+                self.ui.applyButton.toolTip = "Please wait while the segmentation is being initialized" if self.ui_language=="en-US" else "请稍等，分割正在初始化"
                 self.ui.applyButton.enabled = False
             elif state == EvoSegWidget.PROCESSING_IN_PROGRESS:
-                self.ui.applyButton.text = "Cancel"
-                self.ui.applyButton.toolTip = "Cancel in-progress segmentation"
+                self.ui.applyButton.text = "Cancel" if self.ui_language=="en-US" else "取消"
+                self.ui.applyButton.toolTip = "Cancel in-progress segmentation" if self.ui_language=="en-US" else "停止分割进程"
                 self.ui.applyButton.enabled = True
             elif state == EvoSegWidget.PROCESSING_IMPORT_RESULTS:
-                self.ui.applyButton.text = "Importing results..."
-                self.ui.applyButton.toolTip = "Please wait while the segmentation result is being imported"
+                self.ui.applyButton.text = "Importing results..." if self.ui_language=="en-US" else "载入结果..."
+                self.ui.applyButton.toolTip = "Please wait while the segmentation result is being imported" if self.ui_language=="en-US" else "请稍等，分割结果正在载入"
                 self.ui.applyButton.enabled = False
             elif state == EvoSegWidget.PROCESSING_CANCEL_REQUESTED:
-                self.ui.applyButton.text = "Cancelling..."
-                self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled"
+                self.ui.applyButton.text = "Cancelling..." if self.ui_language=="en-US" else "正在取消..."
+                self.ui.applyButton.toolTip = "Please wait for the segmentation to be cancelled" if self.ui_language=="en-US" else "请等待分割进程退出"
                 self.ui.applyButton.enabled = False
+            
 
         finally:
             # All the GUI updates are done
@@ -630,7 +800,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # Only save model ID if valid, otherwise it is temporarily filtered out in the selector
                 self._parameterNode.SetParameter("Model", modelId)
             self._parameterNode.SetParameter("FullTextSearch", "true" if self.ui.fullTextSearchCheckBox.checked else "false")
-            self._parameterNode.SetParameter("CPU", "true" if self.ui.cpuCheckBox.checked else "false")
+            #self._parameterNode.SetParameter("CPU", "true" if self.ui.cpuCheckBox.checked else "false")
             self._parameterNode.SetParameter("ShowAllModels", "true" if self.ui.showAllModelsCheckBox.checked else "false")
             self._parameterNode.SetParameter("UseStandardSegmentNames", "true" if self.ui.useStandardSegmentNamesCheckBox.checked else "false")
             self._parameterNode.SetNodeReferenceID("OutputSegmentation", self.ui.outputSegmentationSelector.currentNodeID)
@@ -680,6 +850,16 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.onApply()
         else:
             self.onCancel()
+        
+        # NOTE: 临时重置视图到中心
+        layoutManager = slicer.app.layoutManager()
+        threeDWidget = layoutManager.threeDWidget(0)
+        threeDView = threeDWidget.threeDView()
+        # 重置视图焦点到场景中心
+        threeDView.resetFocalPoint()
+        # 重新渲染
+        threeDView.forceRender()
+
 
     def onApply(self):
         self.ui.statusLabel.plainText = ""
@@ -694,9 +874,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             with slicer.util.tryWithErrorDisplay("Failed to start processing.", waitCursor=True):
 
                 # Create new segmentation node, if not selected yet
+                
                 if not self.ui.outputSegmentationSelector.currentNode():
                     self.ui.outputSegmentationSelector.addNode()
-
+                #print(self.ui.outputSegmentationSelector.currentNode(),"<<<<<")
                 self.logic.useStandardSegmentNames = self.ui.useStandardSegmentNamesCheckBox.checked
 
                 # Compute output
@@ -704,9 +885,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 for inputNodeSelector in self.inputNodeSelectors:
                     if inputNodeSelector.visible:
                         inputNodes.append(inputNodeSelector.currentNode())
+                # self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
+                #     self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
                 self._segmentationProcessInfo = self.logic.process(inputNodes, self.ui.outputSegmentationSelector.currentNode(),
-                    self._currentModelId(), self.ui.noDownloadSearchCheckBox.checked, self.ui.cpuCheckBox.checked, waitForCompletion=False)
-
+                    self._currentModelId(), False, False, waitForCompletion=False)
+                
                 self.setProcessingState(EvoSegWidget.PROCESSING_IN_PROGRESS)
 
         except Exception as e:
@@ -751,29 +934,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         return False
 
     def onDownloadSampleData(self):
-        model = self.logic.model(self._currentModelId())
-        sampleDataName = model.get("sampleData")
-        if not sampleDataName:
-            slicer.util.messageBox("No sample data is available for this model.")
-            return
+        
+        copy2dir= os.path.join(self.logic.modelsPath())
+        print(self.logic.modelsPath())
+        if not os.path.exists(copy2dir):
+            os.makedirs(copy2dir)
+            
+        select_file = QFileDialog.getOpenFileNames(None, "快速选择文件", "", "File (*.nii.gz)")
+        if len(select_file)>=1:
+            slicer.util.loadVolume(select_file[0])
 
-        if type(sampleDataName) == list:
-            # For now, always just use the first data set if multiple data sets are provided
-            sampleDataName = sampleDataName[0]
-
-        with slicer.util.tryWithErrorDisplay("Failed to download sample data", waitCursor=True):
-            import SampleData
-            loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
-            inputs = model.get("inputs")
-
-        if not loadedSampleNodes:
-            slicer.util.messageBox(f"Failed to load sample data set '{sampleDataName}'.")
-            return
-
-        inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
-        for inputIndex, inputNode in enumerate(inputNodes):
-            if inputNode:
-                self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
+        # for inputIndex, inputNode in enumerate(inputNodes):
+        #     #print(inputIndex, inputNode)
+        #     if inputNode:
+        #         self.inputNodeSelectors[inputIndex].setCurrentNode(inputNode)
 
     def onPackageInfoUpdate(self):
         self.ui.packageInfoTextBrowser.plainText = ""
@@ -803,6 +977,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.deleteAllModels()
         slicer.util.messageBox("Downloaded models are deleted.")
 
+
+        
+    def onResultSeg(self,myDataModule):
+        # 刷新DataModule 回调
+        self.data_module=myDataModule
+        print("init DataModule ok")
 #
 # EvoSegLogic
 #
@@ -821,7 +1001,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     EXIT_CODE_USER_CANCELLED = 1001
     EXIT_CODE_DID_NOT_RUN = 1002
     
-    def __init__(self) -> None:
+    def __init__(self,the_ui_language) -> None:
         """Called when the logic class is instantiated. Can be used for initializing member variables."""
         ScriptedLoadableModuleLogic.__init__(self)
         from collections import OrderedDict
@@ -837,6 +1017,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.startResultImportCallback = None
         self.endResultImportCallback = None
         self.useStandardSegmentNames = True
+        self.setResultToLabelCallback = None
+        self.ui_language = the_ui_language
+
+        self.mdf_outputSegmentation=None
+        self.mdf_outputSegmentationFile=None
+        self.mdf_model=None
 
         # List of property type codes that are specified by in the EvoSeg terminology.
         #
@@ -847,11 +1033,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # otherwise the DICOM terminology will be used. This is necessary because the DICOM terminology
         # does not contain all the necessary items and some items are incomplete (e.g., don't have color or 3D Slicer label).
         #
-        self.EvoSegTerminologyPropertyTypes = self._EvoSegTerminologyPropertyTypes()
+        
+        #self.EvoSegTerminologyPropertyTypes = self._EvoSegTerminologyPropertyTypes()
 
         # List of anatomic regions that are specified by EvoSeg.
-        self.EvoSegAnatomicRegions = self._EvoSegAnatomicRegions()
-
+        
         # Segmentation models specified by in models.json file
         self.models = self.loadModelsDescription()
         self.defaultModel = self.models[0]["id"]
@@ -861,12 +1047,14 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         # Disabling this flag preserves input and output data after execution is completed,
         # which can be useful for troubleshooting.
-        self.clearOutputFolder = True
+        self.clearOutputFolder = False #NOTE: 临时
 
         # For testing the logic without actually running inference, set self.debugSkipInferenceTempDir to the location
         # where inference result is stored and set self.debugSkipInference to True.
         self.debugSkipInference = False
         self.debugSkipInferenceTempDir = r"c:\Users\andra\AppData\Local\Temp\Slicer\__SlicerTemp__2024-01-16_15+26+25.624"
+
+        self.data_module = []
 
     def model(self, modelId):
         for model in self.models:
@@ -898,7 +1086,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         version = match.group("version")
                     else:
                         if model['license'] == "EvoSeg": # TODO: 上下文约束了url格式，这里临时修改，此外在models.json中暂时用license区分自己添加进去的模型
-                            filename = "EvoSeg"
+                            filename = model["title"]
                             version = "1"
                         else:
                             logging.error(f"Failed to extract model id and version from url: {url} ")
@@ -906,15 +1094,18 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         # Contains a list of dict. One dict for each input.
                         # Currently, only "title" (user-displayable name) and "namePattern" of the input are specified.
                         # In the future, inputs could have additional properties, such as name, type, optional, ...
+                        #print(self.ui_language,"<<<<<")
                         inputs = model["inputs"]
                     else:
                         # Inputs are not defined, use default (single input volume)
-                        inputs = [{"title": "Input volume"}]
+                        #print(self.ui_language,"<<<<<")
+                        # 暂不好翻译
+                        inputs = [{"title": "Input volume"}] if self.ui_language=="en-US" else [{"title": "输入体积"}]
                     segmentNames = model.get('segmentNames')
                     if not segmentNames:
                         segmentNames = "N/A"
                     models.append({
-                        "id": f"{filename}-v{version}",
+                        "id": f"{filename}",#-v{version}",
                         "title": model['title'],
                         "version": version,
                         "inputs": inputs,
@@ -925,8 +1116,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         "details":
                             f"<p><b>Model:</b> {model['title']} (v{version})"
                             f"<p><b>Description:</b> {model['description']}\n"
-                            f"<p><b>Computation time on GPU:</b> {EvoSegLogic.humanReadableTimeFromSec(model.get('segmentationTimeSecGPU'))}\n"
-                            f"<br><b>Computation time on CPU:</b> {EvoSegLogic.humanReadableTimeFromSec(model.get('segmentationTimeSecCPU'))}\n"
                             f"<p><b>Imaging modality:</b> {model['imagingModality']}\n"
                             f"<p><b>Subject:</b> {model['subject']}\n"
                             f"<p><b>Segments:</b> {', '.join(segmentNames)}",
@@ -973,12 +1162,20 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # modelRoot = self.modelsPath().joinpath(modelName)
         for path in pathlib.Path(modelRoot).rglob("dataset.json"):
             return path.parent
-        raise RuntimeError(f"Model {modelName} path not found, in EvoSeg project v1 you can:\n 1. click 'open model cache folder' button in Advanced\n 2. Create a folder named 'EvoSeg-v1' in this directory(If it exists, do not create it.)\n 3. Extract your model json and fold_x to this folder.")
+        raise RuntimeError(f"Model {modelName} path not found, You can try:\n 1. click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\n 2. click 'Copy to folder' button -> Select your model_name.7z")
+
 
     def deleteAllModels(self):
         if self.modelsPath().exists():
             import shutil
             shutil.rmtree(self.modelsPath())
+
+    def extract_7z(self, archive, destination):
+        try:
+            subprocess.run(['7z', 'x', archive, f'-o{destination}'], check=True)
+            print(f"Successfully extracted {archive} to {destination}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error during extraction: {e}")
 
     def downloadModel(self, modelName, withDownload):
 
@@ -1057,30 +1254,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         return terminologyPropertyTypes
 
-    def _EvoSegAnatomicRegions(self):
-        """Get anatomic regions defined in from EVO Auto3DSeg terminology.
-        Terminology entries are either in DICOM or EVO Auto3DSeg "Anatomic codes".
-        """
-        anatomicRegions = []
-
-        terminologiesLogic = slicer.util.getModuleLogic("Terminologies")
-        if not hasattr(terminologiesLogic, "GetNumberOfRegionsInAnatomicContext"):
-            # This Slicer version does not have GetNumberOfRegionsInAnatomicContext method,
-            # do not add the region modifier (the only impact is that the modifier will not be selectable
-            # when editing the terminology on the GUI)
-            return anatomicRegions
-
-        EvoSegAnatomicContextName = slicer.modules.EvoSegInstance.anatomicContextName
-
-        # Retrieve all anatomical region codes
-
-        regionObject = slicer.vtkSlicerTerminologyType()
-        numberOfRegions = terminologiesLogic.GetNumberOfRegionsInAnatomicContext(EvoSegAnatomicContextName)
-        for i in range(numberOfRegions):
-            if terminologiesLogic.GetNthRegionInAnatomicContext(EvoSegAnatomicContextName, i, regionObject):
-                anatomicRegions.append(regionObject.GetCodingSchemeDesignator() + "^" + regionObject.GetCodeValue())
-
-        return anatomicRegions
 
     def labelDescriptions(self, modelName):
         """Return mapping from label value to label description.
@@ -1102,64 +1275,14 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 columnValues.append(columnValue)
             return columnValues
 
-        labelDescriptions = {}
-        labelsFilePath = self.modelPath(modelName).joinpath("labels.csv")
-        print(">>>>No labels.csv>>>>>",labelsFilePath)
-        # import csv
-        # with open(labelsFilePath, "r") as f:
-        #     reader = csv.reader(f)
-        #     columnNames = next(reader)
-        #     data = {}
-        #     # Loop through the rows of the csv file
-        #     for row in reader:
-
-        #         # Determine segmentation category (DICOM or EvoSeg)
-        #         terminologyPropertyTypeStr = (  # Example: SCT^23451007
-        #             row[columnNames.index("SegmentedPropertyTypeCodeSequence.CodingSchemeDesignator")]
-        #             + "^" + row[columnNames.index("SegmentedPropertyTypeCodeSequence.CodeValue")])
-        #         if terminologyPropertyTypeStr in self.EvoSegTerminologyPropertyTypes:
-        #             terminologyName = slicer.modules.EvoSegInstance.terminologyName
-        #         else:
-        #             terminologyName = "Segmentation category and type - DICOM master list"
-
-        #         # Determine the anatomic context name (DICOM or EvoSeg)
-        #         anatomicRegionStr = (  # Example: SCT^279245009
-        #             row[columnNames.index("AnatomicRegionSequence.CodingSchemeDesignator")]
-        #             + "^" + row[columnNames.index("AnatomicRegionSequence.CodeValue")])
-        #         if anatomicRegionStr in self.EvoSegAnatomicRegions:
-        #             anatomicContextName = slicer.modules.EvoSegInstance.anatomicContextName
-        #         else:
-        #             anatomicContextName = "Anatomic codes - DICOM master list"
-
-        #         terminologyEntryStr = (
-        #             terminologyName
-        #             +"~"
-        #             # Property category: "SCT^123037004^Anatomical Structure" or "SCT^49755003^Morphologically Altered Structure"
-        #             + "^".join(getCodeString("SegmentedPropertyCategoryCodeSequence", columnNames, row))
-        #             + "~"
-        #             # Property type: "SCT^23451007^Adrenal gland", "SCT^367643001^Cyst", ...
-        #             + "^".join(getCodeString("SegmentedPropertyTypeCodeSequence", columnNames, row))
-        #             + "~"
-        #             # Property type modifier: "SCT^7771000^Left", ...
-        #             + "^".join(getCodeString("SegmentedPropertyTypeModifierCodeSequence", columnNames, row))
-        #             + "~"
-        #             + anatomicContextName
-        #             + "~"
-        #             # Anatomic region (set if category is not anatomical structure): "SCT^64033007^Kidney", ...
-        #             + "^".join(getCodeString("AnatomicRegionSequence", columnNames, row))
-        #             + "~"
-        #             # Anatomic region modifier: "SCT^7771000^Left", ...
-        #             + "^".join(getCodeString("AnatomicRegionModifierSequence", columnNames, row))
-        #             )
-
-        #         # Store the terminology string for this structure
-        #         labelValue = int(row[columnNames.index("LabelValue")])
-        #         name = row[columnNames.index("Name")]
-        #         labelDescriptions[labelValue] = { "name": name, "terminology": terminologyEntryStr }
-        labelDescriptions[0] = { "name": "none", "terminology": "terminologyEntryStr" }
-        labelDescriptions[1] = { "name": "none", "terminology": "terminologyEntryStr" }
-        labelDescriptions[2] = { "name": "none", "terminology": "terminologyEntryStr" }
-        print("labelDescriptions",labelDescriptions)
+        labelDescriptions = { 
+            1: {"name": "Airway", "terminology": 'Segmentation category and type - DICOM master list~SCT^123037004^Anatomical Structure~SCT^89187006^Airway structure~SCT^^~~^^~^^'},
+            2: {"name": "Artery", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^51114001^Artery~SCT^^~~^^~^^'},
+            3: {"name": "Vein", "terminology": 'Segmentation category and type - DICOM master list~SCT^85756007^Tissue~SCT^29092000^Vein~SCT^^~~^^~^^'}
+        }
+        # labelsFilePath = self.modelPath(modelName).joinpath("labels.csv")
+        # print("in this version No should labels.csv",labelsFilePath) # NOTE: label is should define in futrue??
+        
         return labelDescriptions
 
     def getSegmentLabelColor(self, terminologyEntryStr):
@@ -1230,7 +1353,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
     def installedEVOPythonPackageInfo(self):
         import shutil
         import subprocess
-        versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "EVO"]).decode()
+        versionInfo = subprocess.check_output([shutil.which("PythonSlicer"), "-m", "pip", "show", "nnunetv2"]).decode()
         return versionInfo
 
     def setupPythonRequirements(self, upgrade=False):
@@ -1265,9 +1388,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Specify minimum version 1.3, as this is a known working version (it is possible that an earlier version works, too).
         # Without this, for some users EVO-0.9.0 got installed, which failed with this error:
         # "ImportError: cannot import name ‘MetaKeys’ from 'EVO.utils'"
-        EVOInstallString = "EVO[fire,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm]>=1.3"
+        EVOInstallString = "nnunetv2[fire,flask,pyyaml,nibabel,pynrrd,psutil,tensorboard,skimage,itk,tqdm,batchgenerators]>=1.3"
         if upgrade:
             EVOInstallString += " --upgrade"
+        if self.ui_language=="zh-CN":
+            EVOInstallString += " -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+        
         slicer.util.pip_install(EVOInstallString)
 
         self.dependenciesInstalled = True
@@ -1496,9 +1622,114 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import qt
         qt.QTimer.singleShot(self.processOutputCheckTimerIntervalMsec, lambda segmentationProcessInfo=segmentationProcessInfo: self.checkSegmentationProcessOutput(segmentationProcessInfo))
 
+    def beforeReadResult(self, result_data,result_data_path):
+        # 刷新DataModule
+        from vtk.util import numpy_support
+        import nrrd
+        import numpy as np
+        image_data = result_data.GetImageData()
+        if image_data:
+            vtk_array = numpy_support.vtk_to_numpy(image_data.GetPointData().GetScalars())
+            dimensions = image_data.GetDimensions()
+            numpy_array = vtk_array.reshape( dimensions[0], dimensions[1],dimensions[2])  # (Z, Y, X)
+            print("NumPy shape:", numpy_array.shape, dimensions)
+            ct_data = numpy_array
+            ct_data = ct_data - ct_data.min() * 1.0
+            ct_data = ct_data / ct_data.max()
+
+            data, options = nrrd.read(result_data_path+"/output-segmentation.nrrd")
+            #print("------------------------->>>>",options,"<<<<<<<<<<<--------------------")
+            print("------------------>",ct_data.shape,data.shape)
+            print("------------------>",ct_data.shape,data.shape)
+            if data.ndim>3:
+                segmentation_masks = {
+                    "airway" : data[0, :, :, :] == 1, 
+                    "Artery": data[2, :, :, :] == 1, 
+                    "Vein": data[2, :, :, :] == 2
+                }
+            else:
+                segmentation_masks = {
+                    "airway" : data[:, :, :] == 1, 
+                    "Artery": data[:, :, :] == 2, 
+                    "Vein": data[:, :, :] == 3
+                }
+            probability_maps = {
+                "airway": segmentation_masks["airway"].astype(np.float32),
+                "artery": segmentation_masks["Artery"].astype(np.float32),
+                "vein": segmentation_masks["Vein"].astype(np.float32),
+            }
+            self.data_module = DataModule(ct_data, segmentation_masks, probability_maps)
+            
+            
+
+        else:
+            print("no image data!")
+
+        
+
+
+
+
+        self.setResultToLabelCallback(self.data_module)
+        # print(result_path+"/output-segmentation.nrrd")
+        # import numpy as np
+        # import nibabel as nib
+        # import nrrd
+        # from OtherCode.data import DataModule
+        # from OtherCode.display import DisplayModule
+        # import matplotlib.pyplot as plt
+        # from matplotlib.widgets import Slider, Button, RangeSlider, CheckButtons
+        # # Load the NIfTI image
+        # # nii_image = nib.load(result_path+"/input-segmentation.nrrd")  # Replace with your file path
+        # # ct_data = nii_image.get_fdata()
+        # ct_data, optionsx = nrrd.read(result_path+"/input-volume0.nrrd")
+        # ct_data = ct_data - ct_data.min() * 1.0
+        # ct_data = ct_data / ct_data.max()
+
+        # # Load the predicted probability and the segmentation mask
+        # data, options = nrrd.read(result_path+"/output-segmentation.nrrd")
+        # self.setResultToLabelCallback(result_path+"/output-segmentation.nrrd")
+        # segmentation_masks = {
+        #     "airway" : data[0, :, :, :] == 1, 
+        #     "artery": data[2, :, :, :] == 1, 
+        #     "vein": data[2, :, :, :] == 2
+        # }
+        # display_colors = {
+        #     "airway" : [0.854902, 0.0823529, 0.768627], 
+        #     "artery" : [0, 0.478431, 0.670588], 
+        #     "vein": [0.729412, 0.301961, 0.25098]
+        # }
+        # probability_maps = {
+        #     "airway": segmentation_masks["airway"].astype(np.float32),
+        #     "artery": segmentation_masks["artery"].astype(np.float32),
+        #     "vein": segmentation_masks["vein"].astype(np.float32),
+        # }
+
+        # data_module = DataModule(ct_data, segmentation_masks, probability_maps)
+        # display_module = DisplayModule(data_module, display_colors)
+        # display_module.show()
+
+    def set_new_data_module(self, new_data_module):
+        import nrrd
+        import numpy as np
+        self.data_module=new_data_module
+        data, options = nrrd.read(self.mdf_outputSegmentationFile)
+
+        combined_mask = np.zeros(data.shape, dtype=np.uint8)  # 创建一个空的掩码
+        
+        segmentation_masks=new_data_module.get_masks()
+        
+        combined_mask[segmentation_masks["airway"]] = 1  # 标记 airway
+        combined_mask[segmentation_masks["Artery"]] = 2   # 标记 artery
+        combined_mask[segmentation_masks["Vein"]] = 3     # 标记 vein
+
+        nrrd.write(self.mdf_outputSegmentationFile, combined_mask, options)
+
+        self.readSegmentation(self.mdf_outputSegmentation, self.mdf_outputSegmentationFile, self.mdf_model)
+        print("ok")
 
     def onSegmentationProcessCompleted(self, segmentationProcessInfo):
-
+        import nrrd
         startTime = segmentationProcessInfo["startTime"]
         tempDir = segmentationProcessInfo["tempDir"]
         inputNodes = segmentationProcessInfo["inputNodes"]
@@ -1520,17 +1751,28 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                 try:
 
+
+                    print("------------------->Befor read")
+                    self.beforeReadResult(inputNodes[0], tempDir) # NOTE:临时
                     # Load result
                     self.log("Importing segmentation results...")
+                    #print(outputSegmentation,outputSegmentationFile,model)
+                    
+                    self.mdf_outputSegmentation=outputSegmentation
+                    self.mdf_outputSegmentationFile=outputSegmentationFile
+                    self.mdf_model=model
+                    #print(type(outputSegmentation), outputSegmentationFile, type(model))
                     self.readSegmentation(outputSegmentation, outputSegmentationFile, model)
-
+                    
                     # Set source volume - required for DICOM Segmentation export
                     inputVolume = inputNodes[0]
                     if not inputVolume.IsA('vtkMRMLScalarVolumeNode'):
                         raise ValueError("First input node must be a scalar volume")
                     outputSegmentation.SetNodeReferenceID(outputSegmentation.GetReferenceImageGeometryReferenceRole(), inputVolume.GetID())
                     outputSegmentation.SetReferenceImageGeometryParameterFromVolumeNode(inputVolume)
-
+                    
+                    
+                    
                     # Place segmentation node in the same place as the input volume
                     shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
                     inputVolumeShItem = shNode.GetItemByDataNode(inputVolume)
@@ -1577,9 +1819,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         # Get label descriptions
         maxLabelValue = max(labelValueToDescription.keys())
-        if min(labelValueToDescription.keys()) < 0:
-            raise RuntimeError("Label values in class_map must be positive")
-
+        # if min(labelValueToDescription.keys()) < 0:
+        #     raise RuntimeError("Label values in class_map must be positive")
+        # maxLabelValue = 3 #
         # Get color node with random colors
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
         rgba = [0, 0, 0, 0]
@@ -1590,9 +1832,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         colorTableNode.SetNumberOfColors(maxLabelValue+1)
         colorTableNode.SetName(model)
         for labelValue in labelValueToDescription:
+            print(labelValue,labelValueToDescription[labelValue]["name"])
             randomColorsNode.GetColor(labelValue,rgba)
             colorTableNode.SetColor(labelValue, rgba[0], rgba[1], rgba[2], rgba[3])
             colorTableNode.SetColorName(labelValue, labelValueToDescription[labelValue]["name"])
+        #print(colorTableNode,"----<<")
         slicer.mrmlScene.AddNode(colorTableNode)
 
         # Load the segmentation
@@ -1613,7 +1857,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
     def setTerminology(self, segmentation, segmentName, segmentId, terminologyEntryStr):
         segment = segmentation.GetSegmentation().GetSegment(segmentId)
+        print("------->",segmentId)
         if not segment:
+            self.log(f"Segment with ID '{segmentId}' is not present in this segmentation.")
             # Segment is not present in this segmentation
             return
         if terminologyEntryStr:
@@ -1641,7 +1887,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             title = model["title"]
             for modelTestResult in modelsTestResults:
                 if modelTestResult["title"] == title:
-                    for fieldName in ["segmentationTimeSecGPU", "segmentationTimeSecCPU", "segmentNames"]:
+                    for fieldName in ["segmentNames"]:
                         fieldValue = modelTestResult.get(fieldName)
                         if fieldValue:
                             model[fieldName] = fieldValue
@@ -1670,9 +1916,9 @@ class EvoSegTest(ScriptedLoadableModuleTest):
     def runTest(self):
         """Run as few or as many tests as needed here."""
         self.setUp()
-        self.test_EvoSeg1()
+        self.test_EvoSeg()
 
-    def test_EvoSeg1(self):
+    def test_EvoSeg(self):
         """Ideally you should have several levels of tests.  At the lowest level
         tests should exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -1684,242 +1930,242 @@ class EvoSegTest(ScriptedLoadableModuleTest):
         your test should break so they know that the feature is needed.
         """
 
-        self.delayDisplay("Starting the test")
+        self.delayDisplay("Test is space and Done!")
 
-        # Logic testing is disabled by default to not overload automatic build machines (pytorch is a huge package and computation
-        # on CPU takes 5-10 minutes). Set testLogic to True to enable testing.
-        testLogic = True
+    #     # Logic testing is disabled by default to not overload automatic build machines (pytorch is a huge package and computation
+    #     # on CPU takes 5-10 minutes). Set testLogic to True to enable testing.
+    #     testLogic = True
 
-        if not testLogic:
-            self.delayDisplay("Logic testing is disabled. Set testLogic to True to enable it.")
-            return
+    #     if not testLogic:
+    #         self.delayDisplay("Logic testing is disabled. Set testLogic to True to enable it.")
+    #         return
 
-        logic = EvoSegLogic()
-        logic.logCallback = self._mylog
+    #     logic = EvoSegLogic()
+    #     logic.logCallback = self._mylog
 
-        self.delayDisplay("Set up required Python packages")
-        logic.setupPythonRequirements()
+    #     self.delayDisplay("Set up required Python packages")
+    #     logic.setupPythonRequirements()
 
-        testResultsPath = logic.fileCachePath.joinpath("ModelsTestResults")
-        if not os.path.exists(testResultsPath):
-            os.makedirs(testResultsPath)
+    #     testResultsPath = logic.fileCachePath.joinpath("ModelsTestResults")
+    #     if not os.path.exists(testResultsPath):
+    #         os.makedirs(testResultsPath)
 
-        import json
-        modelsTestResultsJsonFilePath = os.path.join(testResultsPath.joinpath("ModelsTestResults.json"))
-        if os.path.exists(modelsTestResultsJsonFilePath):
-            # resume testing
-            with open(modelsTestResultsJsonFilePath) as f:
-              models = json.load(f)
-        else:
-            # start testing from scratch
-            models = logic.models
+    #     import json
+    #     modelsTestResultsJsonFilePath = os.path.join(testResultsPath.joinpath("ModelsTestResults.json"))
+    #     if os.path.exists(modelsTestResultsJsonFilePath):
+    #         # resume testing
+    #         with open(modelsTestResultsJsonFilePath) as f:
+    #           models = json.load(f)
+    #     else:
+    #         # start testing from scratch
+    #         models = logic.models
 
-        import PyTorchUtils
-        pytorchLogic = PyTorchUtils.PyTorchUtilsLogic()
-        if pytorchLogic.cuda:
-            # CUDA is available, test on both CPU and GPU
-            configurations = [{"forceUseCPU": False}, {"forceUseCPU": True}]
-        else:
-            # CUDA is not available, only test on CPU
-            configurations = [{"forceUseCPU": True}]
+    #     import PyTorchUtils
+    #     pytorchLogic = PyTorchUtils.PyTorchUtilsLogic()
+    #     if pytorchLogic.cuda:
+    #         # CUDA is available, test on both CPU and GPU
+    #         configurations = [{"forceUseCPU": False}, {"forceUseCPU": True}]
+    #     else:
+    #         # CUDA is not available, only test on CPU
+    #         configurations = [{"forceUseCPU": True}]
 
-        for configurationIndex, configuration in enumerate(configurations):
-            forceUseCpu = configuration["forceUseCPU"]
-            configurationName = "CPU" if forceUseCpu else "GPU"
+    #     for configurationIndex, configuration in enumerate(configurations):
+    #         forceUseCpu = configuration["forceUseCPU"]
+    #         configurationName = "CPU" if forceUseCpu else "GPU"
 
-            for modelIndex, model in enumerate(models):
-                if model.get("deprecated"):
-                    # Do not teset deprecated models
-                    continue
+    #         for modelIndex, model in enumerate(models):
+    #             if model.get("deprecated"):
+    #                 # Do not teset deprecated models
+    #                 continue
 
-                segmentationTimePropertyName = "segmentationTimeSec"+configurationName
-                if segmentationTimePropertyName in models[modelIndex]:
-                    # Skip already tested models
-                    continue
+    #             segmentationTimePropertyName = "segmentationTimeSec"+configurationName
+    #             if segmentationTimePropertyName in models[modelIndex]:
+    #                 # Skip already tested models
+    #                 continue
 
-                self.delayDisplay(f"Testing {model['title']} (v{model['version']})")
-                slicer.mrmlScene.Clear()
+    #             self.delayDisplay(f"Testing {model['title']} (v{model['version']})")
+    #             slicer.mrmlScene.Clear()
 
-                # Download sample data for model input
+    #             # Download sample data for model input
 
-                sampleDataName = model.get("sampleData")
-                if not sampleDataName:
-                    self.delayDisplay(f"Sample data not available for {model['title']}")
-                    continue
+    #             sampleDataName = model.get("sampleData")
+    #             if not sampleDataName:
+    #                 self.delayDisplay(f"Sample data not available for {model['title']}")
+    #                 continue
 
-                if type(sampleDataName) == list:
-                    # For now, always just use the first data set if multiple data sets are provided
-                    sampleDataName = sampleDataName[0]
+    #             if type(sampleDataName) == list:
+    #                 # For now, always just use the first data set if multiple data sets are provided
+    #                 sampleDataName = sampleDataName[0]
 
-                import SampleData
-                loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
-                if not loadedSampleNodes:
-                    raise RuntimeError(f"Failed to load sample data set '{sampleDataName}'.")
+    #             import SampleData
+    #             loadedSampleNodes = SampleData.SampleDataLogic().downloadSamples(sampleDataName)
+    #             if not loadedSampleNodes:
+    #                 raise RuntimeError(f"Failed to load sample data set '{sampleDataName}'.")
 
-                # Set model inputs
+    #             # Set model inputs
 
-                inputNodes = []
-                inputs = model.get("inputs")
-                inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
+    #             inputNodes = []
+    #             inputs = model.get("inputs")
+    #             inputNodes = EvoSegLogic.assignInputNodesByName(inputs, loadedSampleNodes)
 
-                outputSegmentation = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentationNode")
+    #             outputSegmentation = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentationNode")
 
-                # Run the segmentation
+    #             # Run the segmentation
 
-                self.delayDisplay(f"Running segmentation for {model['title']}...")
-                import time
-                startTime = time.time()
-                logic.process(inputNodes, outputSegmentation, model["id"], forceUseCpu)
-                segmentationTimeSec = time.time() - startTime
+    #             self.delayDisplay(f"Running segmentation for {model['title']}...")
+    #             import time
+    #             startTime = time.time()
+    #             logic.process(inputNodes, outputSegmentation, model["id"], forceUseCpu)
+    #             segmentationTimeSec = time.time() - startTime
 
-                # Save segmentation time (rounded to 0.1 sec) into model description
-                models[modelIndex][segmentationTimePropertyName] = round(segmentationTimeSec * 10) / 10
+    #             # Save segmentation time (rounded to 0.1 sec) into model description
+    #             models[modelIndex][segmentationTimePropertyName] = round(segmentationTimeSec * 10) / 10
 
-                # Save all segment names into model description
-                labelDescriptions = logic.labelDescriptions(model["id"])
-                segmentNames = []
-                for terminology in labelDescriptions.values():
-                    contextName, category, typeStr, typeModifier, anatomicContext, region, regionModifier = terminology["terminology"].split("~")
-                    typeName = typeStr.split("^")[2]
-                    typeModifierName = typeModifier.split("^")[2]
-                    if typeModifierName:
-                        typeName = f"{typeModifierName} {typeName}"
-                    regionName = region.split("^")[2]
-                    regionModifierName = regionModifier.split("^")[2]
-                    if regionModifierName:
-                        regionName = f"{regionModifierName} {regionName}"
-                    name = f"{typeName} in {regionName}" if regionName else typeName
-                    segmentNames.append(name)
-                models[modelIndex]["segmentNames"] = segmentNames
+    #             # Save all segment names into model description
+    #             labelDescriptions = logic.labelDescriptions(model["id"])
+    #             segmentNames = []
+    #             for terminology in labelDescriptions.values():
+    #                 contextName, category, typeStr, typeModifier, anatomicContext, region, regionModifier = terminology["terminology"].split("~")
+    #                 typeName = typeStr.split("^")[2]
+    #                 typeModifierName = typeModifier.split("^")[2]
+    #                 if typeModifierName:
+    #                     typeName = f"{typeModifierName} {typeName}"
+    #                 regionName = region.split("^")[2]
+    #                 regionModifierName = regionModifier.split("^")[2]
+    #                 if regionModifierName:
+    #                     regionName = f"{regionModifierName} {regionName}"
+    #                 name = f"{typeName} in {regionName}" if regionName else typeName
+    #                 segmentNames.append(name)
+    #             models[modelIndex]["segmentNames"] = segmentNames
 
-                sliceScreenshotFilename, rotate3dScreenshotFilename = self._writeScreenshots(outputSegmentation, testResultsPath, model["id"]+"-"+configurationName)
-                if configurationIndex == 0:
-                    # Use screenshot computed during the first configuration
-                    models[modelIndex]["segmentationResultsScreenshot2D"] = sliceScreenshotFilename.name
-                    models[modelIndex]["segmentationResultsScreenshot3D"] = rotate3dScreenshotFilename.name
+    #             sliceScreenshotFilename, rotate3dScreenshotFilename = self._writeScreenshots(outputSegmentation, testResultsPath, model["id"]+"-"+configurationName)
+    #             if configurationIndex == 0:
+    #                 # Use screenshot computed during the first configuration
+    #                 models[modelIndex]["segmentationResultsScreenshot2D"] = sliceScreenshotFilename.name
+    #                 models[modelIndex]["segmentationResultsScreenshot3D"] = rotate3dScreenshotFilename.name
 
-                # Write results to file (to allow accessing the results before all tests complete)
-                with open(modelsTestResultsJsonFilePath, 'w') as f:
-                    json.dump(models, f, indent=2)
+    #             # Write results to file (to allow accessing the results before all tests complete)
+    #             with open(modelsTestResultsJsonFilePath, 'w') as f:
+    #                 json.dump(models, f, indent=2)
 
-        logic.updateModelsDescriptionJsonFilePathFromTestResults(modelsTestResultsJsonFilePath)
-        self._writeTestResultsToMarkdown(modelsTestResultsJsonFilePath)
+    #     logic.updateModelsDescriptionJsonFilePathFromTestResults(modelsTestResultsJsonFilePath)
+    #     self._writeTestResultsToMarkdown(modelsTestResultsJsonFilePath)
 
-        self.delayDisplay("Test passed")
+    #     self.delayDisplay("Test passed")
 
-    def _mylog(self,text):
-        print(text)
+    # def _mylog(self,text):
+    #     print(text)
 
-    def _writeScreenshots(self, segmentationNode, outputPath, baseName, numberOfImages=25, lightboxColumns=5, numberOfVideoFrames=50):
-        import ScreenCapture
-        cap = ScreenCapture.ScreenCaptureLogic()
+    # def _writeScreenshots(self, segmentationNode, outputPath, baseName, numberOfImages=25, lightboxColumns=5, numberOfVideoFrames=50):
+    #     import ScreenCapture
+    #     cap = ScreenCapture.ScreenCaptureLogic()
 
-        sliceScreenshotFilename = outputPath.joinpath(f"{baseName}-slices.png")
-        rotate3dScreenshotFilename = outputPath.joinpath(f"{baseName}-rotate3d.gif")  # gif, mp4, png
-        videoLengthSec = 5
+    #     sliceScreenshotFilename = outputPath.joinpath(f"{baseName}-slices.png")
+    #     rotate3dScreenshotFilename = outputPath.joinpath(f"{baseName}-rotate3d.gif")  # gif, mp4, png
+    #     videoLengthSec = 5
 
-        # Capture slice sweep
-        sliceScreenshotsFilenamePattern = outputPath.joinpath("slices_%04d.png")
-        cap.showViewControllers(False)
-        slicer.app.layoutManager().resetSliceViews()
-        sliceNode = slicer.util.getNode("vtkMRMLSliceNodeRed")
-        sliceOffsetMin, sliceOffsetMax = cap.getSliceOffsetRange(sliceNode)
-        sliceOffsetStart = sliceOffsetMin + (sliceOffsetMax - sliceOffsetMin) * 0.05
-        sliceOffsetEnd = sliceOffsetMax - (sliceOffsetMax - sliceOffsetMin) * 0.05
-        cap.captureSliceSweep(
-            sliceNode, sliceOffsetStart, sliceOffsetEnd, numberOfImages,
-            sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name,
-            captureAllViews=None, transparentBackground=False)
-        cap.showViewControllers(True)
+    #     # Capture slice sweep
+    #     sliceScreenshotsFilenamePattern = outputPath.joinpath("slices_%04d.png")
+    #     cap.showViewControllers(False)
+    #     slicer.app.layoutManager().resetSliceViews()
+    #     sliceNode = slicer.util.getNode("vtkMRMLSliceNodeRed")
+    #     sliceOffsetMin, sliceOffsetMax = cap.getSliceOffsetRange(sliceNode)
+    #     sliceOffsetStart = sliceOffsetMin + (sliceOffsetMax - sliceOffsetMin) * 0.05
+    #     sliceOffsetEnd = sliceOffsetMax - (sliceOffsetMax - sliceOffsetMin) * 0.05
+    #     cap.captureSliceSweep(
+    #         sliceNode, sliceOffsetStart, sliceOffsetEnd, numberOfImages,
+    #         sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name,
+    #         captureAllViews=None, transparentBackground=False)
+    #     cap.showViewControllers(True)
 
-        # Create lightbox image
-        cap.createLightboxImage(lightboxColumns,
-            sliceScreenshotsFilenamePattern.parent,
-            sliceScreenshotsFilenamePattern.name,
-            numberOfImages,
-            sliceScreenshotFilename)
-        cap.deleteTemporaryFiles(sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name, numberOfImages)
+    #     # Create lightbox image
+    #     cap.createLightboxImage(lightboxColumns,
+    #         sliceScreenshotsFilenamePattern.parent,
+    #         sliceScreenshotsFilenamePattern.name,
+    #         numberOfImages,
+    #         sliceScreenshotFilename)
+    #     cap.deleteTemporaryFiles(sliceScreenshotsFilenamePattern.parent, sliceScreenshotsFilenamePattern.name, numberOfImages)
 
-        # Capture 3D rotation
-        rotate3dScreenshotsFilenamePattern = outputPath.joinpath("rotate3d_%04d.png")
-        segmentationNode.CreateClosedSurfaceRepresentation()
-        segmentationNode.GetDisplayNode().SetOpacity3D(0.6)
+    #     # Capture 3D rotation
+    #     rotate3dScreenshotsFilenamePattern = outputPath.joinpath("rotate3d_%04d.png")
+    #     segmentationNode.CreateClosedSurfaceRepresentation()
+    #     segmentationNode.GetDisplayNode().SetOpacity3D(0.6)
 
-        if rotate3dScreenshotFilename.suffix.lower() == ".png":
-            video = False
-            numberOfImages3d = numberOfImages
-        else:
-            video = True
-            numberOfImages3d = numberOfVideoFrames
-            if rotate3dScreenshotFilename.suffix.lower() == ".gif":
-                # animated GIF
-                extraOptions = "-filter_complex palettegen,[v]paletteuse"
-            elif rotate3dScreenshotFilename.suffix.lower() == ".mp4":
-                # H264 high-quality
-                extraOptions = "-codec libx264 -preset slower -crf 18 -pix_fmt yuv420p"
-            else:
-                raise ValueError(f"Unsupported format: {rotate3dScreenshotFilename.suffix}")
+    #     if rotate3dScreenshotFilename.suffix.lower() == ".png":
+    #         video = False
+    #         numberOfImages3d = numberOfImages
+    #     else:
+    #         video = True
+    #         numberOfImages3d = numberOfVideoFrames
+    #         if rotate3dScreenshotFilename.suffix.lower() == ".gif":
+    #             # animated GIF
+    #             extraOptions = "-filter_complex palettegen,[v]paletteuse"
+    #         elif rotate3dScreenshotFilename.suffix.lower() == ".mp4":
+    #             # H264 high-quality
+    #             extraOptions = "-codec libx264 -preset slower -crf 18 -pix_fmt yuv420p"
+    #         else:
+    #             raise ValueError(f"Unsupported format: {rotate3dScreenshotFilename.suffix}")
 
-        viewLabel = "1"
-        viewNode = slicer.vtkMRMLViewLogic().GetViewNode(slicer.mrmlScene, viewLabel)
-        viewNode.SetBackgroundColor(0,0,0)
-        viewNode.SetBackgroundColor2(0,0,0)
-        viewNode.SetAxisLabelsVisible(False)
-        viewNode.SetBoxVisible(False)
-        cap.showViewControllers(False)
-        slicer.app.layoutManager().resetThreeDViews()
-        cap.capture3dViewRotation(viewNode, -180, 180, numberOfImages3d, ScreenCapture.AXIS_YAW, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name)
-        cap.showViewControllers(True)
+    #     viewLabel = "1"
+    #     viewNode = slicer.vtkMRMLViewLogic().GetViewNode(slicer.mrmlScene, viewLabel)
+    #     viewNode.SetBackgroundColor(0,0,0)
+    #     viewNode.SetBackgroundColor2(0,0,0)
+    #     viewNode.SetAxisLabelsVisible(False)
+    #     viewNode.SetBoxVisible(False)
+    #     cap.showViewControllers(False)
+    #     slicer.app.layoutManager().resetThreeDViews()
+    #     cap.capture3dViewRotation(viewNode, -180, 180, numberOfImages3d, ScreenCapture.AXIS_YAW, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name)
+    #     cap.showViewControllers(True)
 
-        if video:
-            cap.createVideo(numberOfImages3d/videoLengthSec, extraOptions, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, rotate3dScreenshotFilename)
-        else:
-            cap.createLightboxImage(lightboxColumns,
-                rotate3dScreenshotsFilenamePattern.parent,
-                rotate3dScreenshotsFilenamePattern.name,
-                numberOfImages3d,
-                rotate3dScreenshotFilename)
+    #     if video:
+    #         cap.createVideo(numberOfImages3d/videoLengthSec, extraOptions, rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, rotate3dScreenshotFilename)
+    #     else:
+    #         cap.createLightboxImage(lightboxColumns,
+    #             rotate3dScreenshotsFilenamePattern.parent,
+    #             rotate3dScreenshotsFilenamePattern.name,
+    #             numberOfImages3d,
+    #             rotate3dScreenshotFilename)
 
-        cap.deleteTemporaryFiles(rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, numberOfImages3d)
+    #     cap.deleteTemporaryFiles(rotate3dScreenshotsFilenamePattern.parent, rotate3dScreenshotsFilenamePattern.name, numberOfImages3d)
 
-        return sliceScreenshotFilename, rotate3dScreenshotFilename
+    #     return sliceScreenshotFilename, rotate3dScreenshotFilename
 
-    def _writeTestResultsToMarkdown(self, modelsTestResultsJsonFilePath, modelsTestResultsMarkdownFilePath=None, screenshotUrlBase=None):
+    # def _writeTestResultsToMarkdown(self, modelsTestResultsJsonFilePath, modelsTestResultsMarkdownFilePath=None, screenshotUrlBase=None):
 
-        if modelsTestResultsMarkdownFilePath is None:
-            modelsTestResultsMarkdownFilePath = modelsTestResultsJsonFilePath.replace(".json", ".md")
-        if screenshotUrlBase is None:
-            screenshotUrlBase = "https://github.com/lassoan/SlicerEvoSeg/releases/download/ModelsTestResults/"
+    #     if modelsTestResultsMarkdownFilePath is None:
+    #         modelsTestResultsMarkdownFilePath = modelsTestResultsJsonFilePath.replace(".json", ".md")
+    #     if screenshotUrlBase is None:
+    #         screenshotUrlBase = "https://github.com/lassoan/SlicerEvoSeg/releases/download/ModelsTestResults/"
 
-        import json
-        from EvoSeg import EvoSegLogic
-        with open(modelsTestResultsJsonFilePath) as f:
-            modelsTestResults = json.load(f)
+    #     import json
+    #     from EvoSeg import EvoSegLogic
+    #     with open(modelsTestResultsJsonFilePath) as f:
+    #         modelsTestResults = json.load(f)
 
-        with open(modelsTestResultsMarkdownFilePath, 'w', newline="\n") as f:
-            f.write("# 3D Slicer EVO Auto3DSeg models\n\n")
-            # Write hardware information (only on Windows for now)
-            if os.name == "nt":
-                import subprocess
-                cpu = subprocess.check_output('wmic cpu get name', stderr=open(os.devnull, 'w')).decode('utf-8').partition('Name')[2].strip(' \r\n')
-                systemInfoStr = subprocess.check_output('systeminfo', stderr=open(os.devnull, 'w')).decode('utf-8')
-                # System information has a line like this: "Total Physical Memory:     32,590 MB"
-                import re
-                ram = re.search(r"Total Physical Memory:(.+)", systemInfoStr).group(1).strip()
-                f.write(f"Testing hardware: {cpu}, {ram}")
-                import torch
-                for i in range(torch.cuda.device_count()):
-                    gpuProperties = torch.cuda.get_device_properties(i)
-                    f.write(f", {gpuProperties.name} {round(torch.cuda.get_device_properties(0).total_memory/(2**30))}GB")
-                f.write("\n\n")
-            # Write test results
-            for model in modelsTestResults:
-                if model["deprecated"]:
-                    continue
-                title = f"{model['title']} (v{model['version']})"
-                f.write(f"## {title}\n")
-                f.write(f"{model['description']}\n\n")
-                f.write(f"Processing time: {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecGPU'])} on GPU, {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecCPU'])} on CPU\n\n")
-                f.write(f"Segment names: {', '.join(model['segmentNames'])}\n\n")
-                f.write(f"![2D view]({screenshotUrlBase}{model['segmentationResultsScreenshot2D']})\n")
-                f.write(f"![3D view]({screenshotUrlBase}{model['segmentationResultsScreenshot3D']})\n")
+    #     with open(modelsTestResultsMarkdownFilePath, 'w', newline="\n") as f:
+    #         f.write("# 3D Slicer EVO Auto3DSeg models\n\n")
+    #         # Write hardware information (only on Windows for now)
+    #         if os.name == "nt":
+    #             import subprocess
+    #             cpu = subprocess.check_output('wmic cpu get name', stderr=open(os.devnull, 'w')).decode('utf-8').partition('Name')[2].strip(' \r\n')
+    #             systemInfoStr = subprocess.check_output('systeminfo', stderr=open(os.devnull, 'w')).decode('utf-8')
+    #             # System information has a line like this: "Total Physical Memory:     32,590 MB"
+    #             import re
+    #             ram = re.search(r"Total Physical Memory:(.+)", systemInfoStr).group(1).strip()
+    #             f.write(f"Testing hardware: {cpu}, {ram}")
+    #             import torch
+    #             for i in range(torch.cuda.device_count()):
+    #                 gpuProperties = torch.cuda.get_device_properties(i)
+    #                 f.write(f", {gpuProperties.name} {round(torch.cuda.get_device_properties(0).total_memory/(2**30))}GB")
+    #             f.write("\n\n")
+    #         # Write test results
+    #         for model in modelsTestResults:
+    #             if model["deprecated"]:
+    #                 continue
+    #             title = f"{model['title']} (v{model['version']})"
+    #             f.write(f"## {title}\n")
+    #             f.write(f"{model['description']}\n\n")
+    #             f.write(f"Processing time: {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecGPU'])} on GPU, {EvoSegLogic.humanReadableTimeFromSec(model['segmentationTimeSecCPU'])} on CPU\n\n")
+    #             f.write(f"Segment names: {', '.join(model['segmentNames'])}\n\n")
+    #             f.write(f"![2D view]({screenshotUrlBase}{model['segmentationResultsScreenshot2D']})\n")
+    #             f.write(f"![3D view]({screenshotUrlBase}{model['segmentationResultsScreenshot3D']})\n")

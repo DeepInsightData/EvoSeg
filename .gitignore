@@ -164,3 +164,4 @@ cython_debug/
 /EvoSeg/Scripts/Artery_nnUnet
 /CompressedData
 /prob_data
+/EvoSeg/Scripts/nnunetv2_inference.py
