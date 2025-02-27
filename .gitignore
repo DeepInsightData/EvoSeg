@@ -162,3 +162,5 @@ cython_debug/
 /Data
 /EvoSeg/Scripts/Airway_nnUnet
 /EvoSeg/Scripts/Artery_nnUnet
+/CompressedData
+/prob_data

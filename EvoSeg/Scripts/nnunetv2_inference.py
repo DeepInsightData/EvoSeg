@@ -51,7 +51,7 @@ def main(model_folder,
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
         use_gaussian=True,
-        use_mirroring=True,
+        use_mirroring=False,
         perform_everything_on_device=True,
         device=device,
         verbose=False,
