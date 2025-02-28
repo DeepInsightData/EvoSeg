@@ -32,7 +32,7 @@ def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> Non
 
     sitk.WriteImage(itk_image, output_fname, True)
 
-simulated_data=False
+simulated_data=True
 
 @torch.no_grad()
 def main(model_folder,

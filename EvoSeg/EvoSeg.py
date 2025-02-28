@@ -507,7 +507,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         combined_mask[segmentation_masks[segment_name[0]]] = seg_number_for_this_node
         
-        if is_splited_segment:
+
+        is_splited_segment_and_check_splited = EvoSegModels.get(segment_name[0].split('_')[0].capitalize()).isSplitByMidPlane()
+
+        if is_splited_segment and is_splited_segment_and_check_splited:
             # print(segment_name[0],"<<< merge left&right")
             mergeSegments(segmentationNode,
             segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0]+"_left"),
@@ -526,7 +529,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         segmentationNode.CreateClosedSurfaceRepresentation()
 
-        if is_splited_segment:
+        if is_splited_segment and is_splited_segment_and_check_splited:
             # print(segment_name[0],"<<< split again")
             splitSegment(segmentationNode,
             segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment_name[0])
@@ -761,6 +764,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # segment.SetColor(random.random(), random.random(), random.random())
                 try:
                     color = EvoSegModels.get(name.split('_')[0]).color()
+                    print(name.split('_')[0],"<<<<<<<<<<<,")
                     segment.SetColor(color.redF(), color.greenF(), color.blueF())
                 except:
                     seg_name=segment.GetName()
