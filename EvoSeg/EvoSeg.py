@@ -967,61 +967,19 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # 写入缓存目录
         # Write input volume to file
         inputFiles = []
-        if model.split("_")[0]=="Nodule": # Nodule的时候Volume要保存成多个dicom文件
-            for inputIndex, inputNode in enumerate(inputNodes):
-                if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                    inputImageFile = tempDir + f"/input/"
-                    os.makedirs(inputImageFile, exist_ok=True)
-                    self.log(model+f": Writing input file to {inputImageFile}")
-
-                    shNode = slicer.vtkMRMLSubjectHierarchyNode.GetSubjectHierarchyNode(slicer.mrmlScene)
-
-                    volumeShItemID = shNode.GetItemByDataNode(inputNode)
-                    patientItemID = shNode.GetItemParent(volumeShItemID)
-
-                    if patientItemID != shNode.GetSceneItemID():
-                        parentName = shNode.GetItemName(patientItemID)
-                        self.log(f"{inputNode.GetName()} is already under subject hierarchy: {parentName}")
-                    else:
-                        patientItemID = shNode.CreateSubjectItem(shNode.GetSceneItemID(), "Nodule patient")
-                        parentName = "Nodule patient"
-                        studyItemID = shNode.CreateStudyItem(patientItemID, "Nodule study")
-                        shNode.SetItemParent(volumeShItemID, studyItemID)
-                        self.log(f"Added {inputNode.GetName()} to new hierarchy under 'Nodule patient' and 'Nodule study'")
-                    
-                    
-
-                    import DICOMScalarVolumePlugin
-                    exporter = DICOMScalarVolumePlugin.DICOMScalarVolumePluginClass()
-                    exportables = exporter.examineForExport(volumeShItemID)
-                    for exp in exportables:
-                        exp.directory = inputImageFile
-                        exp.setTag(patientItemID, parentName)
-                        exp.setTag('StudyID', "Nodule study")
-
-                    exporter.export(exportables)
-
-                    # slicer.mrmlScene.RemoveNode(shNode)
-                    # shNode.RemoveItem(patientItemID)
-                    # slicer.mrmlScene.AddNode(copyVolumeNode)
-
-                    inputFiles.append(inputImageFile)
-                else:
-                    raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")    
-
-        else: # 其它情况的保存
-            for inputIndex, inputNode in enumerate(inputNodes):
-                if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                    inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
-                    self.log(model+f": Writing input file to {inputImageFile}")
-                    volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
-                    volumeStorageNode.SetFileName(inputImageFile)
-                    volumeStorageNode.UseCompressionOff()
-                    volumeStorageNode.WriteData(inputNode)
-                    slicer.mrmlScene.RemoveNode(volumeStorageNode)
-                    inputFiles.append(inputImageFile)
-                else:
-                    raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
+        
+        for inputIndex, inputNode in enumerate(inputNodes):
+            if inputNode.IsA('vtkMRMLScalarVolumeNode'):
+                inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
+                self.log(model+f": Writing input file to {inputImageFile}")
+                volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
+                volumeStorageNode.SetFileName(inputImageFile)
+                volumeStorageNode.UseCompressionOff()
+                volumeStorageNode.WriteData(inputNode)
+                slicer.mrmlScene.RemoveNode(volumeStorageNode)
+                inputFiles.append(inputImageFile)
+            else:
+                raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
 
         # make Command
         if not is_self_deploy_model:
