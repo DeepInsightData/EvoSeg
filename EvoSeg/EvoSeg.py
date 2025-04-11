@@ -928,7 +928,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if not outputSegmentation:
             raise ValueError("Output segmentation is invalid")
 
-        # TODO: 下载Vein_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有total模型和调整好的新模型
+        # TODO: 下载Vein_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\"
         # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Vein_EvoSeg.zip
         is_self_deploy_model=False
         # NOTE: 更新后Vein同Airway那些模型
