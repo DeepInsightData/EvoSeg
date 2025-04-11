@@ -931,8 +931,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # TODO: 下载Vein_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有total模型和调整好的新模型
         # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Vein_EvoSeg.zip
         is_self_deploy_model=False
-        if model.split("_")[0]=="Vein": # 改用total 293模型 注释掉该if
-            is_self_deploy_model=True
+        # NOTE: 更新后Vein同Airway那些模型
+        # if model.split("_")[0]=="Vein": # 改用total 293模型 注释掉该if
+        #    is_self_deploy_model=True
 
         # TODO: 下载Nodule_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有Nodule模型运行文件
         # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Nodule_EvoSeg.zip
@@ -988,7 +989,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             modelPtFile = modelPath
             inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
             is_total_model=False
-            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" or model.split("_")[0]=="Vein":
+            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" :#NOTE: Vein不再是total-model or model.split("_")[0]=="Vein":
                 is_total_model=True
 
             auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
@@ -1019,7 +1020,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 self.log(model+": Creating segmentations with New EvoSeg AI...")
                 self.log(model+f": command: {auto3DSegCommand}")
             else:
-                # 这里执行自建模型Vein，当前版本仅取它对Vein的分割结果
+                # 这里执行自建模型Vein，当前版本仅取它对Vein的分割结果 TODO: 这个else将无效，未来删除
                 outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
                 inferenceScriptPyFile = os.path.join(modelPath, "artery_vein_code" , "run.py")
                 auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
