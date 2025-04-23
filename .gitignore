@@ -162,6 +162,7 @@ cython_debug/
 /Data
 /EvoSeg/Scripts/Airway_nnUnet
 /EvoSeg/Scripts/Artery_nnUnet
+/EvoSeg/Scripts/Vein_nnUnet
 /CompressedData
 /prob_data
 /EvoSeg/Scripts/nnunetv2_inference.py
