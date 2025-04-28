@@ -184,7 +184,7 @@ def main(model_folder,
             seg_results = process_mask_3d(seg_results, 1, 2)
         if os.path.basename(model_folder)=="Artery_nnUnet":
             # 进行腐蚀操作
-            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+            val = binary_erosion(seg_results, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理1, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
         #else: 其它
