@@ -17,6 +17,7 @@ import nibabel as nib
 from resampling import change_spacing
 
 from post_process import *
+from post_process_shrink import *
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
@@ -167,6 +168,8 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Airway_nnUnet":
             val = process_mask_3d(val, 1, 2)
         if os.path.basename(model_folder)=="Artery_nnUnet":
+            # 进行腐蚀操作
+            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理1, Artery_nnUnet执行结果*2
             val=val*2
         #else: 
@@ -180,6 +183,8 @@ def main(model_folder,
         if os.path.basename(model_folder)=="Airway_nnUnet":
             seg_results = process_mask_3d(seg_results, 1, 2)
         if os.path.basename(model_folder)=="Artery_nnUnet":
+            # 进行腐蚀操作
+            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理1, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
         #else: 其它
