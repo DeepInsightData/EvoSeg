@@ -755,11 +755,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 continue
             display_node.SetOpacity3D(0.8)
 
-            for i in range(segmentation.GetNumberOfSegments()):
-                segment = segmentation.GetNthSegment(i)
-                
-                # import random
-                # segment.SetColor(random.random(), random.random(), random.random())
+            segments = slicer.util.getSegments(node)
+            for _, segment in segments.items():
+                # 处理每个分割段
                 try:
                     color = EvoSegModels.get(name.split('_')[0]).color()
                     segment.SetColor(color.redF(), color.greenF(), color.blueF())
@@ -1237,13 +1235,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                         # 使用 outputSegmentation 作为分割节点
                         segmentEditorWidget.setSegmentationNode(outputSegmentation)
-
-                        # 遍历 outputSegmentation 的所有段
-                        segmentIDs = vtk.vtkStringArray()
-                        segmentation = outputSegmentation.GetSegmentation()
-                        segmentation.GetSegmentIDs(segmentIDs)
-                        for i in range(segmentIDs.GetNumberOfValues()):
-                            segmentID = segmentIDs.GetValue(i)
+                        segments = slicer.util.getSegments(outputSegmentation)
+                        
+                        for segmentID, segment in segments.items():
                             print(f"Processing segment: {segmentID}")
 
                             # 设置当前段为选中状态
@@ -1266,18 +1260,17 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                             else:
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
                         
+                        # 统计直径信息
                         segStatLogic = SegmentStatistics.SegmentStatisticsLogic()
                         segStatLogic.getParameterNode().SetParameter("Segmentation", outputSegmentation.GetID())
                         segStatLogic.getParameterNode().SetParameter("LabelmapSegmentStatisticsPlugin.obb_diameter_mm.enabled",str(True))
                         segStatLogic.computeStatistics()
                         stats = segStatLogic.getStatistics()
                         
-                        segmentIDs = vtk.vtkStringArray()
-                        segmentation.GetSegmentIDs(segmentIDs)
-                        for i in range(segmentIDs.GetNumberOfValues()):
-                            segmentID = segmentIDs.GetValue(i)
+                        # 由于Islands操作可能会创建新分段，需要重新获取所有段
+                        segments = slicer.util.getSegments(outputSegmentation)
+                        for segmentID, segment in segments.items():
                             diameterMm = np.max(np.array(stats[segmentID,"LabelmapSegmentStatisticsPlugin.obb_diameter_mm"]))
-                            segment = segmentation.GetSegment(segmentID)
                             segmentName = segment.GetName()
                             segment.SetName(f"{segmentName}_d{diameterMm:.2f}mm")
 
@@ -1295,11 +1288,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         process.groupBox.setVisible(True)
                         process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D()) 
                         if process.model().isSplitByMidPlane():
-                            segmentIDs = vtk.vtkStringArray()
-                            segmentation = outputSegmentation.GetSegmentation()
-                            segmentation.GetSegmentIDs(segmentIDs)
-                            for i in range(segmentIDs.GetNumberOfValues()):
-                                segmentID = segmentIDs.GetValue(i)
+                            segments = slicer.util.getSegments(outputSegmentation)
+                            for segmentID in segments.keys():
                                 splitSegment(outputSegmentation, segmentID)
 
                 finally:
