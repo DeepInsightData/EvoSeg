@@ -911,7 +911,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         modelRoot = self.fileCachePath.joinpath("models").joinpath(modelName)
         for path in pathlib.Path(modelRoot).rglob("dataset.json"):
             return path.parent
-        raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  |-...\n  ...\n")
+        raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  ...\n")
 
     def log(self, text):
         logging.info(text)
@@ -971,11 +971,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
                 inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
                 self.log(model+f": Writing input file to {inputImageFile}")
-                volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
-                volumeStorageNode.SetFileName(inputImageFile)
-                volumeStorageNode.UseCompressionOff()
-                volumeStorageNode.WriteData(inputNode)
-                slicer.mrmlScene.RemoveNode(volumeStorageNode)
+                slicer.util.saveNode(inputNode, inputImageFile, {"useCompression": False})
                 inputFiles.append(inputImageFile)
             else:
                 raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
@@ -1261,11 +1257,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
                         
                         # 统计直径信息
-                        segStatLogic = SegmentStatistics.SegmentStatisticsLogic()
-                        segStatLogic.getParameterNode().SetParameter("Segmentation", outputSegmentation.GetID())
-                        segStatLogic.getParameterNode().SetParameter("LabelmapSegmentStatisticsPlugin.obb_diameter_mm.enabled",str(True))
-                        segStatLogic.computeStatistics()
-                        stats = segStatLogic.getStatistics()
+                        stats = slicer.util.getSegmentStatistics(outputSegmentation, ["obb_diameter_mm"])
                         
                         # 由于Islands操作可能会创建新分段，需要重新获取所有段
                         segments = slicer.util.getSegments(outputSegmentation)
