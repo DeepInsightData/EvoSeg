@@ -16,7 +16,6 @@ from slicer.parameterNodeWrapper import (
 from slicer import vtkMRMLScalarVolumeNode
 from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
 import subprocess
-import SegmentStatistics
 import numpy as np
 from EvoSegLib import *
 from EvoSegLib.utils import splitSegment
@@ -40,12 +39,6 @@ class EvoSeg(ScriptedLoadableModule):
         self.settingsPanel = EvoSegSettingsPanel()
         slicer.app.settingsDialog().addPanel("EvoSeg", self.settingsPanel)
 
-        # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", self.EvoSegHello)
-
-    def EvoSegHello(self):
-        pass
-
 class EvoSegProcess:
     class Segment:
         def __init__(self, name, visibilityButton, opacitySlider):
@@ -64,6 +57,20 @@ class EvoSegProcess:
         self.model = model
         self.segments = segments
 
+    def init_segmentation_node(self):
+        self.segmentationNode = slicer.mrmlScene.GetFirstNodeByName(f'{self.name}_Output_Mask')
+        self.groupBox.setVisible(self.segmentationNode is not None)
+        if self.segmentationNode:
+            displayNode = self.segmentationNode.GetDisplayNode()
+            self.opacitySlider.setValue(displayNode.GetOpacity3D())
+            self.visibilityButton.setChecked(displayNode.GetVisibility())
+            
+            # 初始化所有segment的slider值
+            for segment in self.segments:
+                segmentID = self.segmentationNode.GetSegmentation().GetSegmentIdBySegmentName(segment.name)
+                if segmentID:
+                    segment.opacitySlider.setValue(displayNode.GetSegmentOpacity3D(segmentID))
+                    segment.visibilityButton.setChecked(displayNode.GetSegmentVisibility(segmentID))
 
     @staticmethod
     def filterOne(processes, attr, value):
@@ -308,7 +315,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.sceneEndImportObserverTag = self.addObserver(slicer.mrmlScene, slicer.mrmlScene.EndImportEvent, self.onSceneEndImport)
 
     def enter(self):
-        pass
+        """Called when the user enters the module."""
+        for process in self._process.values():
+            process.init_segmentation_node()
         
     def exit(self):
         # 切出模块时，及时关掉修改
@@ -321,7 +330,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             process.groupBox.setVisible(False)
 
     def onSceneEndImport(self, caller, event):
-        pass
+        """Called when a scene is imported."""
+        for process in self._process.values():
+            process.init_segmentation_node()
 
     def onButtonGroupClick(self, button, checked):
         process = EvoSegProcess.filterOne(self._process.values(), "radioButton", button)
