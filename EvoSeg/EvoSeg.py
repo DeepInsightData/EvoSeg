@@ -16,6 +16,7 @@ from slicer.parameterNodeWrapper import (
 from slicer import vtkMRMLScalarVolumeNode
 from qt import QEvent, QObject, QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog, QImage, QPixmap, QCheckBox, QButtonGroup
 import subprocess
+import SegmentStatistics
 import numpy as np
 from EvoSegLib import *
 from EvoSegLib.utils import splitSegment
@@ -766,9 +767,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 continue
             display_node.SetOpacity3D(0.8)
 
-            segments = slicer.util.getSegments(node)
-            for _, segment in segments.items():
-                # 处理每个分割段
+            for i in range(segmentation.GetNumberOfSegments()):
+                segment = segmentation.GetNthSegment(i)
+                
+                # import random
+                # segment.SetColor(random.random(), random.random(), random.random())
                 try:
                     color = EvoSegModels.get(name.split('_')[0]).color()
                     segment.SetColor(color.redF(), color.greenF(), color.blueF())
@@ -922,7 +925,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         modelRoot = self.fileCachePath.joinpath("models").joinpath(modelName)
         for path in pathlib.Path(modelRoot).rglob("dataset.json"):
             return path.parent
-        raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  ...\n")
+        raise RuntimeError(f"Model {modelName} path not found, You can try:\n click 'open model cache folder' button -> Create a folder name of model name -> Extract your model json and fold_x to this folder.\nYour model folder should be:\n{modelName} \n  |-fold_1\n  |-dataset.json\n  |-...\n  ...\n")
 
     def log(self, text):
         logging.info(text)
@@ -982,7 +985,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
                 inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
                 self.log(model+f": Writing input file to {inputImageFile}")
-                slicer.util.saveNode(inputNode, inputImageFile, {"useCompression": False})
+                volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
+                volumeStorageNode.SetFileName(inputImageFile)
+                volumeStorageNode.UseCompressionOff()
+                volumeStorageNode.WriteData(inputNode)
+                slicer.mrmlScene.RemoveNode(volumeStorageNode)
                 inputFiles.append(inputImageFile)
             else:
                 raise ValueError(f"Input node type {inputNode.GetClassName()} is not supported")
@@ -1242,9 +1249,13 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                         # 使用 outputSegmentation 作为分割节点
                         segmentEditorWidget.setSegmentationNode(outputSegmentation)
-                        segments = slicer.util.getSegments(outputSegmentation)
-                        
-                        for segmentID, segment in segments.items():
+
+                        # 遍历 outputSegmentation 的所有段
+                        segmentIDs = vtk.vtkStringArray()
+                        segmentation = outputSegmentation.GetSegmentation()
+                        segmentation.GetSegmentIDs(segmentIDs)
+                        for i in range(segmentIDs.GetNumberOfValues()):
+                            segmentID = segmentIDs.GetValue(i)
                             print(f"Processing segment: {segmentID}")
 
                             # 设置当前段为选中状态
@@ -1267,13 +1278,18 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                             else:
                                 print(f"  Failed to activate Islands effect for segment: {segmentID}")
                         
-                        # 统计直径信息
-                        stats = slicer.util.getSegmentStatistics(outputSegmentation, ["obb_diameter_mm"])
+                        segStatLogic = SegmentStatistics.SegmentStatisticsLogic()
+                        segStatLogic.getParameterNode().SetParameter("Segmentation", outputSegmentation.GetID())
+                        segStatLogic.getParameterNode().SetParameter("LabelmapSegmentStatisticsPlugin.obb_diameter_mm.enabled",str(True))
+                        segStatLogic.computeStatistics()
+                        stats = segStatLogic.getStatistics()
                         
-                        # 由于Islands操作可能会创建新分段，需要重新获取所有段
-                        segments = slicer.util.getSegments(outputSegmentation)
-                        for segmentID, segment in segments.items():
+                        segmentIDs = vtk.vtkStringArray()
+                        segmentation.GetSegmentIDs(segmentIDs)
+                        for i in range(segmentIDs.GetNumberOfValues()):
+                            segmentID = segmentIDs.GetValue(i)
                             diameterMm = np.max(np.array(stats[segmentID,"LabelmapSegmentStatisticsPlugin.obb_diameter_mm"]))
+                            segment = segmentation.GetSegment(segmentID)
                             segmentName = segment.GetName()
                             segment.SetName(f"{segmentName}_d{diameterMm:.2f}mm")
 
@@ -1291,8 +1307,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                         process.groupBox.setVisible(True)
                         process.opacitySlider.setValue(outputSegmentation.GetDisplayNode().GetOpacity3D()) 
                         if process.model().isSplitByMidPlane():
-                            segments = slicer.util.getSegments(outputSegmentation)
-                            for segmentID in segments.keys():
+                            segmentIDs = vtk.vtkStringArray()
+                            segmentation = outputSegmentation.GetSegmentation()
+                            segmentation.GetSegmentIDs(segmentIDs)
+                            for i in range(segmentIDs.GetNumberOfValues()):
+                                segmentID = segmentIDs.GetValue(i)
                                 splitSegment(outputSegmentation, segmentID)
 
                 finally:
