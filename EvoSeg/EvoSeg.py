@@ -141,7 +141,9 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.bt_export.connect("clicked(bool)", self.onExportClick)
 
+        self.ui.bt_batch.connect("clicked(bool)", self.onBatchSegmentation)
         self.ui.bt_cancel_run.connect("clicked(bool)", self.onCancel)
+        
 
         # check box
         self.ui.radio_airway_tag.setChecked(True)
@@ -171,6 +173,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.btn_seg_rib.setIcon(qt.QIcon(self.resourcePath("Icons/rib_segmentation.png")))
         self.ui.btn_seg_vein.setIcon(qt.QIcon(self.resourcePath("Icons/vein_segmentation.png")))
         self.ui.btn_seg_nodule.setIcon(qt.QIcon(self.resourcePath("Icons/nodule_segmentation.png")))
+        self.ui.bt_batch.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Batch.png")))
         self.ui.bt_cancel_run.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Cancel.png")))
         self.ui.bt_place.setIcon(qt.QIcon(self.resourcePath("Icons/EvoSeg_Place.png")))
         self.ui.bt_place.toggled.connect(lambda checked: self.ui.bt_place.setIcon(
@@ -697,6 +700,11 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.bt_seg_airway.setEnabled(True)
             self.ui.bt_seg_artery.setEnabled(True)
             self.ui.bt_cancel_run.setEnabled(False)
+            self.ui.bt_batch.setEnabled(True)
+
+    def onBatchSegmentation(self):
+        with slicer.util.tryWithErrorDisplay("Batch processing failed.", waitCursor=True):
+            print("Batch segmentation")
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):

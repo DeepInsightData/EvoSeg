@@ -19,6 +19,7 @@ set(MODULE_PYTHON_SCRIPTS
 
 set(MODULE_PYTHON_RESOURCES
   Resources/Icons/${MODULE_NAME}.png
+  Resources/Icons/EvoSeg_Batch.png
   Resources/Icons/EvoSeg_Cancel.png
   Resources/Icons/EvoSeg_Export.png
   Resources/Icons/EvoSeg_Model.png
