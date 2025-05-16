@@ -1012,7 +1012,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" :#NOTE: Vein不再是total-model or model.split("_")[0]=="Vein":
                 is_total_model=True
 
-            auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+            command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
                 "--model_folder", str(modelPtFile),
                 "--image_file", inputFiles[0],
                 "--result_file", str(outputSegmentationFile),
@@ -1020,17 +1020,17 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 ]
 
             for inputIndex in range(1, len(inputFiles)):
-                auto3DSegCommand.append(f"--image-file-{inputIndex+1}")
-                auto3DSegCommand.append(inputFiles[inputIndex])
+                command.append(f"--image-file-{inputIndex+1}")
+                command.append(inputFiles[inputIndex])
 
             self.log(model+": Creating segmentations with EvoSeg AI...")
-            self.log(model+f": command: {auto3DSegCommand}")
+            self.log(model+f": command: {command}")
         else:
             if model.split("_")[0]=="Nodule":
                 # 这里执行自建模型Nodule
                 outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
                 inferenceScriptPyFile = os.path.join(modelPath, "lung_nodule_ct_detection/scripts" , "generate_mask.py")
-                auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+                command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
                     "--i", tempDir+"/input",
                     "--o", tempDir+"/output",
                     "--t", str(0.86),
@@ -1038,21 +1038,21 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     ]
 
                 self.log(model+": Creating segmentations with New EvoSeg AI...")
-                self.log(model+f": command: {auto3DSegCommand}")
+                self.log(model+f": command: {command}")
             else:
                 # 这里执行自建模型Vein，当前版本仅取它对Vein的分割结果 TODO: 这个else将无效，未来删除
                 outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
                 inferenceScriptPyFile = os.path.join(modelPath, "artery_vein_code" , "run.py")
-                auto3DSegCommand = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
+                command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
                     "--input", tempDir+"/input",
                     "--output", tempDir+"/output",
                     "--slicer_python_path", pythonSlicerExecutablePath
                     ]
 
                 self.log(model+": Creating segmentations with New EvoSeg AI...")
-                self.log(model+f": command: {auto3DSegCommand}")
+                self.log(model+f": command: {command}")
 
-        proc = slicer.util.launchConsoleProcess(auto3DSegCommand, updateEnvironment=None)
+        proc = slicer.util.launchConsoleProcess(command, updateEnvironment=None)
 
         segmentationProcessInfo["proc"] = proc
         segmentationProcessInfo["procReturnCode"] = EvoSegLogic.EXIT_CODE_DID_NOT_RUN
