@@ -168,7 +168,7 @@ def modifiy_totalsegmentator(model_folder_set,input: Union[str, Path, Nifti1Imag
         statistics = False
     else:
         statistics_fast = False
-    print("---->",task_id)
+    # print("---->",task_id)
     # if type(task_id) is list:
     #     for tid in task_id:
     #         download_pretrained_weights(tid)

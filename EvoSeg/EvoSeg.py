@@ -704,10 +704,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     def onBatchSegmentation(self):
         with slicer.util.tryWithErrorDisplay("Batch processing failed.", waitCursor=True):
-            print("Batch segmentation")
+            self.ui.bt_batch.setEnabled(False)
+            self.logic.batchMode = True
+            self.onSegButtonClick(self._process["LungLobe_nnUnet"].segmentationButton)
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
+            self.logic.batchMode = False
+            self.ui.bt_batch.setEnabled(True)
             if len(self._segmentationProcessInfoList)==0:
                 slicer.util.messageBox("No Process Run")
                 return
@@ -816,6 +820,20 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
+        if self.logic.batchMode:
+            if "LungLobe_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Airway_nnUnet"].segmentationButton)
+            elif "Airway_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Artery_nnUnet"].segmentationButton)
+            elif "Artery_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Vein_nnUnet"].segmentationButton)
+            elif "Vein_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Rib_nnUnet"].segmentationButton)
+            elif "Rib_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Nodule_nnUnet"].segmentationButton)
+            else:
+                self.logic.batchMode = False
+                self.ui.bt_batch.setEnabled(True)
         
     def onBrowseModelsFolder(self):
         self.logic.createModelsDir()
@@ -922,6 +940,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.clearOutputFolder = False #NOTE: 清除缓存目录
 
         self.data_module = []
+        self.batchMode = False
 
     def createModelsDir(self):
         modelsDir = self.fileCachePath.joinpath("models")
@@ -1071,6 +1090,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         else:
             # Debugging
             self.onSegmentationProcessCompleted(segmentationProcessInfo)
+
         return segmentationProcessInfo
 
     def cancelProcessing(self, segmentationProcessInfo):
