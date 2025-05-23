@@ -14,9 +14,11 @@ set(requirements_file ${CMAKE_BINARY_DIR}/${proj}-requirements.txt)
 file(WRITE ${requirements_file} [===[
 # [torch]
 torch==2.4.0 --hash=sha256:0da13570771e09f6d754196aa865a690222d683df07b62f20922a3f27546faf5  \
-             --hash=sha256:e0a73c7384d3e0a09fea5c2a10afc95bac9386e7360fe0bddd167b09697f59a8 
+  --hash=sha256:e0a73c7384d3e0a09fea5c2a10afc95bac9386e7360fe0bddd167b09697f59a8  \
+	--hash=sha256:a2feb98ac470109472fb10dfef38622a7ee08482a16c357863ebc7bc7db7c8f7
 torchvision==0.19.0  --hash=sha256:03fc97a9058bb489aee898d2b7cef7e2e7636ecda1d9afbadf03e5b7268ae07a \
-        --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7
+  --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7 \
+	--hash=sha256:b5f70f5a8bd9c8b00a076bf466b39b5cd679ef62587c47cc048adb04d9c5f155
 # [/torch]
 # [fire]
 fire==0.6.0 --hash=sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66
@@ -102,14 +104,14 @@ fft_conv_pytorch==1.2.0 --hash=sha256:17b9bd616df86da25e4820473698eb4831c2f2f6e7
 argparse==1.4.0 --hash=sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314
 traceback2==1.4.0 --hash=sha256:8253cebec4b19094d67cc5ed5af99bf1dba1285292226e98a31929f87a5d6b23
 linecache2==1.0.0 --hash=sha256:e78be9c0a0dfcbac712fe04fbf92b96cddae80b1b842f24248214c8496f006ef
-requests==2.32.3 --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
+requests==2.27.1 --hash=sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d
 pydicom==2.4.4 --hash=sha256:f9f8e19b78525be57aa6384484298833e4d06ac1d6226c79459131ddb0bd7c42
 pyparsing==3.1.2 --hash=sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742
 idna==3.7 --hash=sha256:82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0
-urllib3==2.3.0 --hash=sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df
+urllib3==1.26.20 --hash=sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e
 chardet==5.2.0 --hash=sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970
 certifi==2024.2.2 --hash=sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1
-charset_normalizer==3.3.2 --hash=sha256:b01b88d45a6fcb69667cd6d2f7a9aeb4bf53760d7fc536bf679ec94fe9f3ff3d
+charset_normalizer==2.0.12 --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
 # [/nnunetv2]
 
 # [pynrrd]
@@ -122,7 +124,7 @@ psutil==6.1.0 --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32f
 # [/psutil]
 
 #[TotalSegmentator]
-TotalSegmentator==2.4.0 --hash=sha256:41974e5d61958a679aead73890c72e0ec79f504e7cca0965d609f1ff11678fdc
+TotalSegmentator==2.8.0 --hash=sha256:88e12f3cfc45687f45aca32720f86353fcf4b0863d7ee6beb503012c825a643d
 p_tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529
 xvfbwrapper==0.2.9 --hash=sha256:bcf4ae571941b40254faf7a73432dfc119ad21ce688f1fdec533067037ecfc24
 pyarrow==18.1.0 --hash=sha256:a1880dd6772b685e803011a6b43a230c23b566859a6e0c9a276c1e0faf4f4052
