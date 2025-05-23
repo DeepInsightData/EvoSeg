@@ -982,9 +982,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         #if not is_self_deploy_model: 
         try:
             modelPath = self.modelPath(model)
-        except:
-            # TODO: 需要重构
-            return
+        except RuntimeError as e:
+            self.log(f"Model {model} not found: {e}")
+            return None
         
         segmentationProcessInfo = {}
 
@@ -1216,7 +1216,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "right middle lobe": segmentation_masks["right middle lobe"].astype(np.float32),
                 "right lower lobe": segmentation_masks["right lower lobe"].astype(np.float32),
                 "rib": segmentation_masks["rib"].astype(np.float32),
-                "nodule": segmentation_masks["rib"].astype(np.float32),
+                "nodule": segmentation_masks["nodule"].astype(np.float32),
             }
 
             self.data_module = DataModule(ct_data, segmentation_masks, probability_maps, result_data.GetSpacing())
@@ -1398,24 +1398,29 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         randomColorsNode = slicer.mrmlScene.GetNodeByID("vtkMRMLColorTableNodeRandom")
         rgba = [0, 0, 0, 0]
 
-        # Create color table for this segmentation model
-        colorTableNode = slicer.vtkMRMLColorTableNode()
-        colorTableNode.SetTypeToUser()
-        colorTableNode.SetNumberOfColors(maxLabelValue+1)
-        colorTableNode.SetName(model)
-        for labelValue in labelValueToDescription:
-            #print(labelValue,labelValueToDescription[labelValue]["name"])
-            randomColorsNode.GetColor(labelValue,rgba)
-            colorTableNode.SetColor(labelValue, rgba[0], rgba[1], rgba[2], rgba[3])
-            colorTableNode.SetColorName(labelValue, labelValueToDescription[labelValue]["name"])
-        #print(colorTableNode,"----<<")
-        slicer.mrmlScene.AddNode(colorTableNode)
+        colorTableNode = None
+        try:
+            # Create color table for this segmentation model
+            colorTableNode = slicer.vtkMRMLColorTableNode()
+            colorTableNode.SetTypeToUser()
+            colorTableNode.SetNumberOfColors(maxLabelValue+1)
+            colorTableNode.SetName(model)
+            for labelValue in labelValueToDescription:
+                #print(labelValue,labelValueToDescription[labelValue]["name"])
+                randomColorsNode.GetColor(labelValue,rgba)
+                colorTableNode.SetColor(labelValue, rgba[0], rgba[1], rgba[2], rgba[3])
+                colorTableNode.SetColorName(labelValue, labelValueToDescription[labelValue]["name"])
+            #print(colorTableNode,"----<<")
+            slicer.mrmlScene.AddNode(colorTableNode)
 
-        # Load the segmentation
-        outputSegmentation.SetLabelmapConversionColorTableNodeID(colorTableNode.GetID())
-        outputSegmentation.AddDefaultStorageNode()
-        storageNode = outputSegmentation.GetStorageNode()
-        storageNode.SetFileName(outputSegmentationFile)
-        storageNode.ReadData(outputSegmentation)
-
-        slicer.mrmlScene.RemoveNode(colorTableNode)
+            # Load the segmentation
+            outputSegmentation.SetLabelmapConversionColorTableNodeID(colorTableNode.GetID())
+            outputSegmentation.AddDefaultStorageNode()
+            storageNode = outputSegmentation.GetStorageNode()
+            storageNode.SetFileName(outputSegmentationFile)
+            storageNode.ReadData(outputSegmentation)
+            
+        finally:
+            # 确保清理资源
+            if colorTableNode:
+                slicer.mrmlScene.RemoveNode(colorTableNode)
