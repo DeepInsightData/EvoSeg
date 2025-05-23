@@ -754,7 +754,8 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # 并确定当前运行完的模型名字
         end_model_name_list=[]
         for i in self._segmentationProcessInfoList:
-            if i["process"]["proc"].returncode==0:
+            proc = i["process"]["proc"]
+            if proc.returncode==0:
                 end_model_name_list.append(i["name"])
                 self._segmentationProcessInfoList.remove(i)
                 continue
@@ -762,7 +763,6 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # 现在使用Slicer Setting所设置的颜色
         for name in end_model_name_list:
-
             # 同时把按钮setenbled true
             for process in self._process.values():
                 if name == process.name:
@@ -1100,11 +1100,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if proc:
             # Simple proc.kill() would not work, that would only stop the launcher
             import psutil
-            psProcess = psutil.Process(proc.pid)
-            for psChildProcess in psProcess.children(recursive=True):
-                psChildProcess.kill()
-            if psProcess.is_running():
-                psProcess.kill()
+            try:
+                psProcess = psutil.Process(proc.pid)
+                for psChildProcess in psProcess.children(recursive=True):
+                    if psChildProcess.is_running():
+                        psChildProcess.kill()
+                if psProcess.is_running():
+                    psProcess.kill()
+            except psutil.NoSuchProcess:
+                pass
         else:
             self.onSegmentationProcessCompleted(segmentationProcessInfo)
 
@@ -1343,12 +1347,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                                 splitSegment(outputSegmentation, segmentID)
 
                 finally:
-
                     if self.endResultImportCallback:
                         self.endResultImportCallback()
 
             else:
-                self.log(model+f": Processing failed with return code {procReturnCode}")
+                self.log(f"{model}: Processing failed with return code {procReturnCode}")
+                widget = slicer.modules.evoseg.widgetRepresentation().self()
+                process = EvoSegProcess.filterOne(widget._process.values(), 'name', model)
+                if process:
+                    process.segmentationButton.setEnabled(True)
 
         if self.clearOutputFolder:
             self.log(model+": Cleaning up temporary folder.")
@@ -1365,11 +1372,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         elapsedTime = stopTime - startTime
         if cancelRequested:
             self.log(model+f": Processing was cancelled after {elapsedTime:.2f} seconds.")
+        elif procReturnCode == 0:
+            self.log(f"{model}: Processing was completed in {elapsedTime:.2f} seconds.")
         else:
-            if procReturnCode == 0:
-                self.log(model+f": Processing was completed in {elapsedTime:.2f} seconds.")
-            else:
-                self.log(model+f": Processing failed after {elapsedTime:.2f} seconds.")
+            self.log(f"{model}: Processing failed after {elapsedTime:.2f} seconds.")
 
         if self.processingCompletedCallback:
             self.processingCompletedCallback(procReturnCode)
