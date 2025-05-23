@@ -13,11 +13,10 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 set(requirements_file ${CMAKE_BINARY_DIR}/${proj}-requirements.txt)
 file(WRITE ${requirements_file} [===[
 # [torch]
-torch==2.4.0 --hash=sha256:0da13570771e09f6d754196aa865a690222d683df07b62f20922a3f27546faf5  \
-             --hash=sha256:e0a73c7384d3e0a09fea5c2a10afc95bac9386e7360fe0bddd167b09697f59a8 
-torchvision==0.19.0  --hash=sha256:03fc97a9058bb489aee898d2b7cef7e2e7636ecda1d9afbadf03e5b7268ae07a \
-        --hash=sha256:1f595eae367fbe7a46ec85fe6c55fa4185ef8b31bde5ae9b018c6b615b09c7d7
+torch==2.7.0 --hash=sha256:0fc03ca7f2c3547082640e7a79d0b495f866cca67381b9fe3732ca35aa37a858
+torchvision==0.22.0 --hash=sha256:4621a76a5bf36da08448669a67f2ce50a3d2b6df4014ceb0c776155e2abc7b3e
 # [/torch]
+
 # [fire]
 fire==0.6.0 --hash=sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66
 termcolor==2.5.0 --hash=sha256:37b17b5fc1e604945c2642c872a3764b5d547a48009871aea3edd3afa180afb8
@@ -33,7 +32,7 @@ packaging==24.2 --hash=sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f69
 # [scikit-image]
 scikit-image==0.24.0 --hash=sha256:56dab751d20b25d5d3985e95c9b4e975f55573554bd76b0aedf5875217c93e69
 lazy_loader==0.4 --hash=sha256:342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc
-imageio==2.36.0 --hash=sha256:471f1eda55618ee44a3c9960911c35e647d9284c68f077e868df633398f137f0
+imageio==2.37.0 --hash=sha256:11efa15b87bc7871b61590326b2d635439acc321cf7f8ce996f812543ce10eed
 tifffile==2024.8.30 --hash=sha256:8bc59a8f02a2665cd50a910ec64961c5373bee0b8850ec89d3b7b485bf7be7ad
 scipy==1.13.1 --hash=sha256:392e4ec766654852c25ebad4f64e4e584cf19820b980bc04960bca0b0cd6eaa2
 # [/scikit-image]
@@ -64,17 +63,17 @@ fsspec==2024.10.0 --hash=sha256:03b9a6785766a4de40368b88906366755e2819e758b83705
 # [/fsspec]
 
 #[pillow]
-pillow==10.3.0 --hash=sha256:0ba26351b137ca4e0db0342d5d00d2e355eb29372c05afd544ebf47c0956ffeb
+pillow==11.2.1 --hash=sha256:6ebce70c3f486acf7591a3d73431fa504a4e18a9b97ff27f5f47b7368e4b9dd1
 #[/pillow]
 
 # [nnunetv2]
-nnunetv2==2.5.1 --hash=sha256:8dca9e6b49a443ad144774245340ada0c6fe84007930c3ba4c4467e12c510cdc
+nnunetv2==2.5.2 --hash=sha256:34d73a2101223b209fc032d7614e203d60b44099e69dfa268e62ee4aa6a72464
 acvl_utils==0.2 --hash=sha256:d58636b5049b0ba698b6cbac27cdff9350458c40329555051083758c35e7da36
 dynamic_network_architectures==0.3.1 --hash=sha256:e3702b451891c01ccdcbd468aea309ae7301ab706e27394a438f3edba3fd9acd
 tqdm==4.67.1 --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2
 dicom2nifti==2.5.0 --hash=sha256:9518dcc12a3d92c2415deca7dccf4606ec37b57dcecf716dbca53a7852efdaa5
 batchgenerators==0.25 --hash=sha256:38a67413e847ff367e64abac36331fcb065494202d526ae96f7644de3a0e5495
-scikit_learn==1.5.2 --hash=sha256:3bed4909ba187aca80580fe2ef370d9180dcf18e621a27c4cf2ef10d279a7efe
+scikit_learn==1.6.1 --hash=sha256:7a73d457070e3318e32bdb3aa79a8d990474f19035464dfd8bede2883ab5dc3b
 pandas==2.2.3 --hash=sha256:4850ba03528b6dd51d6c5d273c46f183f39a9baf3f0143e566b89450965b105e
 graphviz==0.20.3 --hash=sha256:81f848f2904515d8cd359cc611faba817598d2feaac4027b266aa3eda7b3dde5
 matplotlib==3.9.2 --hash=sha256:b2696efdc08648536efd4e1601b5fd491fd47f4db97a5fbfd175549a7365c1b2
@@ -122,7 +121,7 @@ psutil==6.1.0 --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32f
 # [/psutil]
 
 #[TotalSegmentator]
-TotalSegmentator==2.4.0 --hash=sha256:41974e5d61958a679aead73890c72e0ec79f504e7cca0965d609f1ff11678fdc
+TotalSegmentator==2.8.0 --hash=sha256:88e12f3cfc45687f45aca32720f86353fcf4b0863d7ee6beb503012c825a643d
 p_tqdm==1.4.2 --hash=sha256:0f860c5facd0b0059da39998e55cfc035563f92d85d2f4895ba88a675c3c7529
 xvfbwrapper==0.2.9 --hash=sha256:bcf4ae571941b40254faf7a73432dfc119ad21ce688f1fdec533067037ecfc24
 pyarrow==18.1.0 --hash=sha256:a1880dd6772b685e803011a6b43a230c23b566859a6e0c9a276c1e0faf4f4052
