@@ -167,11 +167,15 @@ def main(model_folder,
         val = val.transpose(2, 1, 0)
         if os.path.basename(model_folder)=="Airway_nnUnet":
             val = process_mask_3d(val, 1, 2)
-        if os.path.basename(model_folder)=="Artery_nnUnet":
+        elif os.path.basename(model_folder)=="Artery_nnUnet":
             # 进行腐蚀操作
             val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理1, Artery_nnUnet执行结果*2
             val=val*2
+        elif os.path.basename(model_folder)=="Vein_nnUnet":
+            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+            # 特殊处理, Vein_nnUnet执行结果*3
+            val=val*3
         #else: 
         seg_results=(val, val_prob)
 
@@ -182,11 +186,16 @@ def main(model_folder,
         seg_results = seg_results.transpose(2, 1, 0)
         if os.path.basename(model_folder)=="Airway_nnUnet":
             seg_results = process_mask_3d(seg_results, 1, 2)
-        if os.path.basename(model_folder)=="Artery_nnUnet":
+        elif os.path.basename(model_folder)=="Artery_nnUnet":
             # 进行腐蚀操作
             val = binary_erosion(seg_results, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
-            # 特殊处理1, Artery_nnUnet执行结果*2
+            # 特殊处理, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
+        elif os.path.basename(model_folder)=="Vein_nnUnet":
+            # 进行腐蚀操作
+            seg_results = binary_erosion(seg_results, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+            # 特殊处理, Vein_nnUnet执行结果*3
+            seg_results=seg_results*3
         #else: 其它
 
         # 转成nii
