@@ -18,6 +18,7 @@ from resampling import change_spacing
 
 from post_process import *
 from post_process_shrink import *
+from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binary_dilation
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
@@ -160,20 +161,31 @@ def main(model_folder,
     seg_results = predictor.predict_single_npy_array(img_in_rsp_data, prop,
                                              None, None,
                                              save_prob_maps)
+    base_dir = os.path.basename(model_folder)
     # 结果的特殊处理
     if save_prob_maps:
         # 带prob的输出是一个()需要拆开再合起来, 其中val相当于不带prob输出的seg_results纯numpy
         val, val_prob = seg_results
         val = val.transpose(2, 1, 0)
-        if os.path.basename(model_folder)=="Airway_nnUnet":
+        if base_dir=="Airway_nnUnet":
             val = process_mask_3d(val, 1, 2)
-        elif os.path.basename(model_folder)=="Artery_nnUnet":
-            # 进行腐蚀操作
-            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+        elif base_dir=="Artery_nnUnet":
+            # 先进行闭运算平滑，减少断裂风险
+            mask_closed = binary_closing(val, structure=np.ones((3, 3, 3)), iterations=1).astype(np.uint8)
+            mask_smoothed = gaussian_filter(mask_closed.astype(float), sigma=1)
+            mask_smoothed = (mask_smoothed > 0.5).astype(np.uint8)  # 重新二值化
+            # 再进行腐蚀操作
+            val = binary_erosion(mask_smoothed, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理1, Artery_nnUnet执行结果*2
             val=val*2
-        elif os.path.basename(model_folder)=="Vein_nnUnet":
-            val = binary_erosion(val, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+        elif base_dir=="Vein_nnUnet":
+            # 先进行闭运算平滑，减少断裂风险
+            mask_closed = binary_closing(val, structure=np.ones((3, 3, 3)), iterations=1).astype(np.uint8)
+             # 高斯滤波进一步平滑
+            mask_smoothed = gaussian_filter(mask_closed.astype(float), sigma=1)
+            mask_smoothed = (mask_smoothed > 0.5).astype(np.uint8)  # 重新二值化
+            # 再进行腐蚀操作
+            val = binary_erosion(mask_smoothed, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理, Vein_nnUnet执行结果*3
             val=val*3
         #else: 
@@ -184,16 +196,25 @@ def main(model_folder,
 
     else:
         seg_results = seg_results.transpose(2, 1, 0)
-        if os.path.basename(model_folder)=="Airway_nnUnet":
+        if base_dir=="Airway_nnUnet":
             seg_results = process_mask_3d(seg_results, 1, 2)
-        elif os.path.basename(model_folder)=="Artery_nnUnet":
-            # 进行腐蚀操作
-            val = binary_erosion(seg_results, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+        elif base_dir=="Artery_nnUnet":
+            # 先进行闭运算平滑，减少断裂风险
+            mask_closed = binary_closing(seg_results, structure=np.ones((3, 3, 3)), iterations=1).astype(np.uint8)
+            mask_smoothed = gaussian_filter(mask_closed.astype(float), sigma=1)
+            mask_smoothed = (mask_smoothed > 0.5).astype(np.uint8)  # 重新二值化
+            # 再进行腐蚀操作
+            seg_results = binary_erosion(mask_smoothed, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理, Artery_nnUnet执行结果*2
             seg_results=seg_results*2
-        elif os.path.basename(model_folder)=="Vein_nnUnet":
-            # 进行腐蚀操作
-            seg_results = binary_erosion(seg_results, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
+        elif base_dir=="Vein_nnUnet":
+            # 先进行闭运算平滑，减少断裂风险
+            mask_closed = binary_closing(seg_results, structure=np.ones((3, 3, 3)), iterations=1).astype(np.uint8)
+            # 高斯滤波进一步平滑
+            mask_smoothed = gaussian_filter(mask_closed.astype(float), sigma=1)
+            mask_smoothed = (mask_smoothed > 0.5).astype(np.uint8)  # 重新二值化
+            # 再进行腐蚀操作
+            seg_results = binary_erosion(mask_smoothed, structure=np.ones((2, 2, 2)), iterations=1).astype(np.uint8)
             # 特殊处理, Vein_nnUnet执行结果*3
             seg_results=seg_results*3
         #else: 其它
@@ -241,7 +262,6 @@ def main(model_folder,
     for timing_checkpoint in timing_checkpoints:
         print(f"  {timing_checkpoint[0]}: {timing_checkpoint[1] - previous_start_time:.2f} seconds")
         previous_start_time = timing_checkpoint[1]
-
     print(f'ALL DONE, result saved in {result_file}')
 
 if __name__ == '__main__':
