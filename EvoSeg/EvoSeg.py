@@ -937,7 +937,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # Timer for checking the output of the segmentation process that is running in the background
         self.processOutputCheckTimerIntervalMsec = 1000
 
-        self.clearOutputFolder = False #NOTE: 清除缓存目录
+        self.clearOutputFolder = True #NOTE: 清除缓存目录
 
         self.data_module = []
         self.batchMode = False
@@ -967,19 +967,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         if not outputSegmentation:
             raise ValueError("Output segmentation is invalid")
 
-        # TODO: 下载Vein_nnUnet.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\"
-        # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Vein_nnUnet.zip
         is_self_deploy_model=False
-        # NOTE: 更新后Vein同Airway那些模型
-        # if model.split("_")[0]=="Vein": # 改用total 293模型 注释掉该if
-        #    is_self_deploy_model=True
 
-        # TODO: 下载Nodule_EvoSeg.zip，并将压缩包中的目录解压到".....\.EvoSeg\models\", 含有Nodule模型运行文件
-        # https://github.com/DeepInsightData/EvoSeg/releases/download/v0.0.1/Nodule_EvoSeg.zip
-        if model.split("_")[0]=="Nodule": # 同Vein
+        if model.split("_")[0]=="Nodule":
             is_self_deploy_model=True
 
-        #if not is_self_deploy_model: 
         try:
             modelPath = self.modelPath(model)
         except RuntimeError as e:
@@ -1028,7 +1020,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             modelPtFile = modelPath
             inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
             is_total_model=False
-            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" :#NOTE: Vein不再是total-model or model.split("_")[0]=="Vein":
+            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" :
                 is_total_model=True
 
             command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
@@ -1054,18 +1046,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     "--o", tempDir+"/output",
                     "--t", str(0.86),
                     "--spp", pythonSlicerExecutablePath
-                    ]
-
-                self.log(model+": Creating segmentations with New EvoSeg AI...")
-                self.log(model+f": command: {command}")
-            else:
-                # 这里执行自建模型Vein，当前版本仅取它对Vein的分割结果 TODO: 这个else将无效，未来删除
-                outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
-                inferenceScriptPyFile = os.path.join(modelPath, "artery_vein_code" , "run.py")
-                command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
-                    "--input", tempDir+"/input",
-                    "--output", tempDir+"/output",
-                    "--slicer_python_path", pythonSlicerExecutablePath
                     ]
 
                 self.log(model+": Creating segmentations with New EvoSeg AI...")

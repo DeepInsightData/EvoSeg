@@ -73,8 +73,8 @@ def main(model_folder,
         elif os.path.basename(model_folder) == "Rib_nnUnet":
             val[(val < 1) | (val > 24)] = 0
             val[val != 0] = 20
-        elif os.path.basename(model_folder) == "Vein_nnUnet":
-            val[val != 3] = 0
+        # elif os.path.basename(model_folder) == "Vein_nnUnet": #Vein 已不在此处理
+        #     val[val != 3] = 0
 
         output_img = nib.Nifti1Image(val, output_img.affine)
 
