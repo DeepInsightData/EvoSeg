@@ -716,7 +716,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 slicer.util.messageBox("No Process Run")
                 return
             #print(len(self._segmentationProcessInfoList),"----<<")
-            for i in self._segmentationProcessInfoList:
+            for i in reversed(self._segmentationProcessInfoList):
                 self.logic.cancelProcessing(i["process"])
                 self._segmentationProcessInfoList.remove(i)
                 for process in self._process.values():
