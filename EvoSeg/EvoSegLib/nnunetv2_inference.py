@@ -20,6 +20,8 @@ from post_process import *
 from post_process_shrink import *
 from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binary_dilation
 
+from crop_with_totalsegmentator import *
+
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
     output_dimension = len(properties['sitk_stuff']['spacing'])
@@ -96,6 +98,9 @@ def main(model_folder,
     # check if model_folder exists
     if not os.path.isdir(model_folder):
         raise ValueError(f"model_folder {model_folder} does not exist")
+
+    # 新增预处理
+    process_files(image_file, image_file)
 
     # check if image_file exists
     if not os.path.isfile(image_file):
