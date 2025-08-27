@@ -340,7 +340,6 @@ def process_files(input_path, output_path, margin=(10, 10, 10), temp_dir=None):
         print(f"Error: {input_path} is neither a file nor a directory")
         return False
 
-
 def main():
     """
     主函数 - 命令行接口

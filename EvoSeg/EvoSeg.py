@@ -988,6 +988,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
         import pathlib
         tempDirPath = pathlib.Path(tempDir)
+        # tempDirPathParent = pathlib.Path(tempDir).parent
+
+        # print(tempDirPath)
+        # print(tempDirPathParent)
 
         # Get Python executable path
         import shutil
@@ -1020,14 +1024,19 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             modelPtFile = modelPath
             inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
             is_total_model=False
-            if model.split("_")[0]=="Rib" or model.split("_")[0]=="LungLobe" :
+            is_multi_input=False
+
+            if model.split("_")[0]=="Rib" :
                 is_total_model=True
+            if model.split("_")[0]=="LungLobe" :
+                is_multi_input=True
 
             command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
                 "--model_folder", str(modelPtFile),
                 "--image_file", inputFiles[0],
                 "--result_file", str(outputSegmentationFile),
-                "--use_total", str(is_total_model)
+                "--use_total", str(is_total_model),
+                "--use_multi_input", str(is_multi_input),
                 ]
 
             for inputIndex in range(1, len(inputFiles)):
@@ -1112,7 +1121,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         retcode = proc.returncode  # non-zero return code means error
         segmentationProcessInfo["procReturnCode"] = retcode
 
-
     def startSegmentationProcessMonitoring(self, segmentationProcessInfo):
         import queue
         import sys
@@ -1123,7 +1131,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         segmentationProcessInfo["procThread"].start()
 
         self.checkSegmentationProcessOutput(segmentationProcessInfo)
-
 
     def checkSegmentationProcessOutput(self, segmentationProcessInfo):
 

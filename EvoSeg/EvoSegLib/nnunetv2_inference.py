@@ -21,6 +21,7 @@ from post_process_shrink import *
 from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binary_dilation
 
 from crop_with_totalsegmentator import *
+from lung_inference0825 import *
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
@@ -45,6 +46,7 @@ def main(model_folder,
          save_prob_maps=False,
          resample=None,
          use_total=False,
+         use_multi_input=False,
          **kwargs):
 
     if simulated_data:
@@ -87,6 +89,14 @@ def main(model_folder,
 
         nib.save(output_img, result_file)
 
+        return
+
+    if use_multi_input:
+        
+        #image_file="C:/Users/P14s/AppData/Local/Temp/Slicer/__SlicerTemp__2025-08-26_09+04+49.843/input/input-volume0.nii.gz"
+        lung_inference0825_main(model_folder, image_file, result_file)
+        
+        print(f'ALL DONE, result saved in {result_file}')
         return
 
     if resample is not None: # 目前resample下对prob_maps该如何处理未知
