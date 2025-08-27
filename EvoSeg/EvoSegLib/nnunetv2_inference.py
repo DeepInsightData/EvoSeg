@@ -93,6 +93,7 @@ def main(model_folder,
 
     if use_multi_input:
         
+        process_files(image_file, image_file)
         #image_file="C:/Users/P14s/AppData/Local/Temp/Slicer/__SlicerTemp__2025-08-26_09+04+49.843/input/input-volume0.nii.gz"
         lung_inference0825_main(model_folder, image_file, result_file)
         
