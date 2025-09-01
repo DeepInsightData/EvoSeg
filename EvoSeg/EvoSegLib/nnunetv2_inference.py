@@ -20,7 +20,7 @@ from post_process import *
 from post_process_shrink import *
 from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binary_dilation
 
-from crop_with_totalsegmentator import *
+from crop_lung_roi import *
 from lung_inference0825 import *
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
@@ -47,6 +47,7 @@ def main(model_folder,
          resample=None,
          use_total=False,
          use_multi_input=False,
+         roi_file=None,
          **kwargs):
 
     if simulated_data:
@@ -65,6 +66,14 @@ def main(model_folder,
         print(f'ALL DONE, result saved in {result_file}')
         return
 
+    if roi_file:
+        if os.path.exists(roi_file):
+            image_file = roi_file
+        elif process_files(image_file, roi_file):
+            image_file = roi_file
+        else:
+            print(f"Failed to crop lung roi file of {image_file}")
+    
     if use_total:
         from modify_total_python_api import modifiy_totalsegmentator
 
@@ -92,8 +101,6 @@ def main(model_folder,
         return
 
     if use_multi_input:
-        
-        process_files(image_file, image_file)
         #image_file="C:/Users/P14s/AppData/Local/Temp/Slicer/__SlicerTemp__2025-08-26_09+04+49.843/input/input-volume0.nii.gz"
         lung_inference0825_main(model_folder, image_file, result_file)
         
@@ -109,9 +116,6 @@ def main(model_folder,
     # check if model_folder exists
     if not os.path.isdir(model_folder):
         raise ValueError(f"model_folder {model_folder} does not exist")
-
-    # 新增预处理
-    process_files(image_file, image_file)
 
     # check if image_file exists
     if not os.path.isfile(image_file):

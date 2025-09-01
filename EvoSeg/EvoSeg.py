@@ -1,3 +1,7 @@
+import pathlib
+import re
+import shutil
+import tempfile
 import qt
 import logging
 import json
@@ -131,6 +135,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.endResultImportCallback = self.onProcessImportEnded
         self.logic.setResultToLabelCallback = self.onResultSeg
 
+        self.ui.VolumeNodeComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onVolumeNodeSelected)
         self.ui.bt_place.connect("clicked(bool)", self.check_set_modifiy)
         self.bt_place_down = False
 
@@ -642,6 +647,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def cleanup(self) -> None:
         """Called when the application closes and the module widget is destroyed."""
         self.removeObservers()
+        self.logic.removeCaseDir()
 
     def removeObservers(self):
         try:
@@ -900,7 +906,13 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                         displayNode.SetSegmentOpacity3D(segmentID, value)
                         displayNode.SetSegmentOpacity2DFill(segmentID, value)
                     return
-
+                
+    def onVolumeNodeSelected(self, node):
+        self.logic.removeCaseDir()
+        if node:
+            nodeName = node.GetName()
+            prefix = 'case_' + re.sub(r'[^a-zA-Z0-9_-]', '_', nodeName)+'_'
+            self.logic.createCaseDir(prefix)
 #
 # EvoSegLogic
 #
@@ -927,7 +939,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.fileCachePath = pathlib.Path.home().joinpath(".EvoSeg")
 
         self.moduleDir = os.path.dirname(slicer.util.getModule('EvoSeg').path)
-
+        self.caseDir = None
         self.logCallback = None
         self.processingCompletedCallback = None
         self.startResultImportCallback = None
@@ -1037,6 +1049,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "--result_file", str(outputSegmentationFile),
                 "--use_total", str(is_total_model),
                 "--use_multi_input", str(is_multi_input),
+                "--roi_file", None
                 ]
 
             for inputIndex in range(1, len(inputFiles)):
@@ -1411,3 +1424,16 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             # 确保清理资源
             if colorTableNode:
                 slicer.mrmlScene.RemoveNode(colorTableNode)
+    
+    def removeCaseDir(self):
+        try:
+            if self.caseDir:
+                case_path = pathlib.Path(self.caseDir)
+                if case_path.exists():
+                    shutil.rmtree(case_path)
+        except Exception as e:
+            self.log(f"remove case directory error {e}")
+
+    def createCaseDir(self, prefix):
+        temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
+        self.caseDir = temp_dir.name
