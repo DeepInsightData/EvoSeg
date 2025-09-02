@@ -136,6 +136,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic.setResultToLabelCallback = self.onResultSeg
 
         self.ui.VolumeNodeComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onVolumeNodeSelected)
+        self.onVolumeNodeSelected(self.ui.VolumeNodeComboBox.currentNode())
         self.ui.bt_place.connect("clicked(bool)", self.check_set_modifiy)
         self.bt_place_down = False
 
@@ -1038,9 +1039,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             is_total_model=False
             is_multi_input=False
 
-            if model.split("_")[0]=="Rib" :
+            modelName = model.split("_")[0]
+            if modelName=="Rib" :
                 is_total_model=True
-            if model.split("_")[0]=="LungLobe" :
+            elif modelName=="LungLobe":
                 is_multi_input=True
 
             command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
@@ -1049,8 +1051,12 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "--result_file", str(outputSegmentationFile),
                 "--use_total", str(is_total_model),
                 "--use_multi_input", str(is_multi_input),
-                "--roi_file", None
                 ]
+            
+            if modelName in ["Airway", "Artery", "Vein"]:
+                roi_file = os.path.join(self.caseDir, os.path.basename(inputFiles[0]))
+                command.append(f"--roi_file")
+                command.append(roi_file)
 
             for inputIndex in range(1, len(inputFiles)):
                 command.append(f"--image-file-{inputIndex+1}")
@@ -1072,8 +1078,9 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
 
                 self.log(model+": Creating segmentations with New EvoSeg AI...")
                 self.log(model+f": command: {command}")
-
-        proc = slicer.util.launchConsoleProcess(command, updateEnvironment=None)
+        
+        os.makedirs(self.caseDir, exist_ok=True)
+        proc = slicer.util.launchConsoleProcess(command, updateEnvironment=None, cwd=self.caseDir)
 
         segmentationProcessInfo["proc"] = proc
         segmentationProcessInfo["procReturnCode"] = EvoSegLogic.EXIT_CODE_DID_NOT_RUN
