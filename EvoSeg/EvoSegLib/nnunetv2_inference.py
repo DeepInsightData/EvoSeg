@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import fire
 import time
@@ -71,7 +72,10 @@ def main(model_folder,
         
     predict_dir = os.path.join(case_dir, 'predict')
     os.makedirs(predict_dir, exist_ok=True)
-    predict_file = os.path.join(predict_dir, image_file_name)
+    model_foler_name = os.path.basename(model_folder)
+    model_name = re.search(r'[A-Za-z0-9]+', model_foler_name).group()
+    basename = image_file_name.replace('.nii.gz', '') if image_file_name.endswith('nii.gz') else Path(image_file).stem
+    predict_file = os.path.join(predict_dir, f'{basename}_{model_name}.nii.gz')
     
     output_dir = os.path.join(case_dir, 'output')
     os.makedirs(output_dir, exist_ok=True)
@@ -84,12 +88,12 @@ def main(model_folder,
 
         val = output_img.dataobj[:]
         # 特殊处理
-        if os.path.basename(model_folder) == "LungLobe_nnUnet":
+        if model_foler_name == "LungLobe_nnUnet":
             val[(val < 10) | (val > 14)] = 0 
-        elif os.path.basename(model_folder) == "Rib_nnUnet":
+        elif model_foler_name == "Rib_nnUnet":
             val[(val < 1) | (val > 24)] = 0
             val[val != 0] = 20
-        # elif os.path.basename(model_folder) == "Vein_nnUnet": #Vein 已不在此处理
+        # elif model_foler_name == "Vein_nnUnet": #Vein 已不在此处理
         #     val[val != 3] = 0
 
         output_img = nib.Nifti1Image(val, output_img.affine)
