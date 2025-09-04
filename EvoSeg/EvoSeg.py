@@ -909,11 +909,12 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     return
                 
     def onVolumeNodeSelected(self, node):
-        self.logic.removeCaseDir()
         if node:
             nodeName = node.GetName()
-            prefix = 'case_' + re.sub(r'[^a-zA-Z0-9_-]', '_', nodeName)+'_'
-            self.logic.createCaseDir(prefix)
+            case_dir = 'case_' + re.sub(r'[^a-zA-Z0-9_-]', '_', nodeName)
+            EvoSegmentator.get_instance().reset(case_dir)
+        else:
+            EvoSegmentator.get_instance().reset()
 #
 # EvoSegLogic
 #
@@ -940,7 +941,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         self.fileCachePath = pathlib.Path.home().joinpath(".EvoSeg")
 
         self.moduleDir = os.path.dirname(slicer.util.getModule('EvoSeg').path)
-        self.caseDir = None
         self.logCallback = None
         self.processingCompletedCallback = None
         self.startResultImportCallback = None
@@ -996,18 +996,10 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         import time
         startTime = time.time()
         self.log(model+": Processing started")
-
-        tempDir = slicer.util.tempDirectory()
-
-        import pathlib
-        tempDirPath = pathlib.Path(tempDir)
-        # tempDirPathParent = pathlib.Path(tempDir).parent
-
-        # print(tempDirPath)
-        # print(tempDirPathParent)
+        segmentator = EvoSegmentator.get_instance()
+        caseDir = segmentator.case_dir
 
         # Get Python executable path
-        import shutil
         pythonSlicerExecutablePath = shutil.which("PythonSlicer")
         #print(pythonSlicerExecutablePath)
         if not pythonSlicerExecutablePath:
@@ -1019,7 +1011,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         
         for inputIndex, inputNode in enumerate(inputNodes):
             if inputNode.IsA('vtkMRMLScalarVolumeNode'):
-                inputImageFile = tempDir + f"/input/input-volume{inputIndex}.nii.gz"
+                inputImageFile = os.path.join(segmentator.input_dir, f"input-volume{inputIndex}.nii.gz")
                 self.log(model+f": Writing input file to {inputImageFile}")
                 volumeStorageNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLVolumeArchetypeStorageNode")
                 volumeStorageNode.SetFileName(inputImageFile)
@@ -1033,7 +1025,7 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         # make Command
         if not is_self_deploy_model:
             # 执行nnunet
-            outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
+            outputSegmentationFile = os.path.join(segmentator.output_dir, "output-segmentation.nii.gz")
             modelPtFile = modelPath
             inferenceScriptPyFile = os.path.join(self.moduleDir, "EvoSegLib", "nnunetv2_inference.py")
             is_total_model=False
@@ -1051,12 +1043,8 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "--result_file", str(outputSegmentationFile),
                 "--use_total", str(is_total_model),
                 "--use_multi_input", str(is_multi_input),
+                "--case_dir", str(caseDir)
                 ]
-            
-            if modelName in ["Airway", "Artery", "Vein"]:
-                roi_file = os.path.join(self.caseDir, os.path.basename(inputFiles[0]))
-                command.append(f"--roi_file")
-                command.append(roi_file)
 
             for inputIndex in range(1, len(inputFiles)):
                 command.append(f"--image-file-{inputIndex+1}")
@@ -1067,11 +1055,11 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
         else:
             if model.split("_")[0]=="Nodule":
                 # 这里执行自建模型Nodule
-                outputSegmentationFile = tempDir + "/output/output-segmentation.nii.gz"
+                outputSegmentationFile = os.path.join(segmentator.output_dir, "output-segmentation.nii.gz")
                 inferenceScriptPyFile = os.path.join(modelPath, "lung_nodule_ct_detection/scripts" , "generate_mask.py")
                 command = [ pythonSlicerExecutablePath, str(inferenceScriptPyFile),
-                    "--i", tempDir+"/input",
-                    "--o", tempDir+"/output",
+                    "--i", segmentator.input_dir,
+                    "--o", segmentator.output_dir,
                     "--t", str(0.86),
                     "--spp", pythonSlicerExecutablePath
                     ]
@@ -1079,14 +1067,15 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 self.log(model+": Creating segmentations with New EvoSeg AI...")
                 self.log(model+f": command: {command}")
         
-        os.makedirs(self.caseDir, exist_ok=True)
-        proc = slicer.util.launchConsoleProcess(command, updateEnvironment=None, cwd=self.caseDir)
+        # Ensure case directory exists
+        os.makedirs(caseDir, exist_ok=True)
+        proc = slicer.util.launchConsoleProcess(command, updateEnvironment=None, cwd=caseDir)
 
         segmentationProcessInfo["proc"] = proc
         segmentationProcessInfo["procReturnCode"] = EvoSegLogic.EXIT_CODE_DID_NOT_RUN
         segmentationProcessInfo["cancelRequested"] = False
         segmentationProcessInfo["startTime"] = startTime
-        segmentationProcessInfo["tempDir"] = tempDir
+        segmentationProcessInfo["tempDir"] = caseDir
         segmentationProcessInfo["segmentationProcess"] = proc
         segmentationProcessInfo["inputNodes"] = inputNodes
         segmentationProcessInfo["outputSegmentation"] = outputSegmentation
@@ -1364,14 +1353,6 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 if process:
                     process.segmentationButton.setEnabled(True)
 
-        if self.clearOutputFolder:
-            self.log(model+": Cleaning up temporary folder.")
-            if os.path.isdir(tempDir):
-                import shutil
-                shutil.rmtree(tempDir)
-        else:
-            self.log(model+f": Not cleaning up temporary folder: {tempDir}")
-
         # Report total elapsed time
         import time
         stopTime = time.time()
@@ -1431,16 +1412,3 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             # 确保清理资源
             if colorTableNode:
                 slicer.mrmlScene.RemoveNode(colorTableNode)
-    
-    def removeCaseDir(self):
-        try:
-            if self.caseDir:
-                case_path = pathlib.Path(self.caseDir)
-                if case_path.exists():
-                    shutil.rmtree(case_path)
-        except Exception as e:
-            self.log(f"remove case directory error {e}")
-
-    def createCaseDir(self, prefix):
-        temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
-        self.caseDir = temp_dir.name

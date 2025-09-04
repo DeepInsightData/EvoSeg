@@ -41,15 +41,15 @@ simulated_data=False
 
 @torch.no_grad()
 def main(model_folder,
+         case_dir,
          image_file,
          result_file,
          save_prob_maps=False,
          resample=None,
          use_total=False,
          use_multi_input=False,
-         roi_file=None,
          **kwargs):
-
+    image_file_name = os.path.basename(image_file)
     if simulated_data:
         print("->copy:"+model_folder+"/output-segmentation.nii.gz to"+result_file)
         output_dir = os.path.dirname(result_file)
@@ -65,14 +65,16 @@ def main(model_folder,
                     f_dest.write(chunk)
         print(f'ALL DONE, result saved in {result_file}')
         return
-
-    if roi_file:
-        if os.path.exists(roi_file):
-            image_file = roi_file
-        elif process_files(image_file, roi_file):
-            image_file = roi_file
-        else:
-            print(f"Failed to crop lung roi file of {image_file}")
+    preprocess_dir = os.path.join(case_dir, 'preprocess')
+    os.makedirs(preprocess_dir, exist_ok=True)
+    preprocessed_file = os.path.join(preprocess_dir, image_file_name)
+        
+    predict_dir = os.path.join(case_dir, 'predict')
+    os.makedirs(predict_dir, exist_ok=True)
+    predict_file = os.path.join(predict_dir, image_file_name)
+    
+    output_dir = os.path.join(case_dir, 'output')
+    os.makedirs(output_dir, exist_ok=True)
     
     if use_total:
         from modify_total_python_api import modifiy_totalsegmentator
@@ -93,16 +95,15 @@ def main(model_folder,
         output_img = nib.Nifti1Image(val, output_img.affine)
 
         output_dir = os.path.dirname(result_file)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
+        os.makedirs(output_dir, exist_ok=True)
         nib.save(output_img, result_file)
-
         return
 
     if use_multi_input:
+        if not os.path.isfile(preprocessed_file):
+            process_files(image_file, preprocessed_file)
         #image_file="C:/Users/P14s/AppData/Local/Temp/Slicer/__SlicerTemp__2025-08-26_09+04+49.843/input/input-volume0.nii.gz"
-        lung_inference0825_main(model_folder, image_file, result_file)
+        lung_inference0825_main(model_folder, preprocessed_file, result_file)
         
         print(f'ALL DONE, result saved in {result_file}')
         return
@@ -121,6 +122,9 @@ def main(model_folder,
     if not os.path.isfile(image_file):
         raise ValueError(f"image_file {image_file} does not exist")
     
+    if not os.path.isfile(preprocessed_file):
+        process_files(image_file, preprocessed_file)
+
     use_folds = (1, )
     device = torch.device('cuda', 0)
 
@@ -154,8 +158,8 @@ def main(model_folder,
     timing_checkpoints.append(('model loading', time.time()))
     
     
-    print(f"Loading image from {image_file}")
-    input_image = nib.load(image_file)
+    print(f"Loading image from {preprocessed_file}")
+    input_image = nib.load(preprocessed_file)
     if type(resample) is float:
         resample = [resample, resample, resample]
     if resample is not None:
@@ -187,6 +191,7 @@ def main(model_folder,
         # 带prob的输出是一个()需要拆开再合起来, 其中val相当于不带prob输出的seg_results纯numpy
         val, val_prob = seg_results
         val = val.transpose(2, 1, 0)
+        nib.save(nib.Nifti1Image(val.astype(np.uint8), affine), Path(predict_file))
         if base_dir=="Airway_nnUnet":
             val = process_mask_3d(val, 1, 2)
         elif base_dir=="Artery_nnUnet":
@@ -216,6 +221,8 @@ def main(model_folder,
 
     else:
         seg_results = seg_results.transpose(2, 1, 0)
+        nib.save(nib.Nifti1Image(seg_results.astype(np.uint8), affine), Path(predict_file))
+        
         if base_dir=="Airway_nnUnet":
             seg_results = process_mask_3d(seg_results, 1, 2)
         elif base_dir=="Artery_nnUnet":
