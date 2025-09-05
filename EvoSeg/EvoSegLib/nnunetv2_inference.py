@@ -23,6 +23,7 @@ from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binar
 
 from crop_lung_roi import *
 from lung_inference0825 import *
+from evoseg_inference import LungSegmentPredictor
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
     assert seg.ndim == 3, 'segmentation must be 3d. If you are exporting a 2d segmentation, please provide it as shape 1,x,y'
@@ -104,12 +105,19 @@ def main(model_folder,
         return
 
     if use_multi_input:
-        if not os.path.isfile(preprocessed_file):
-            process_files(image_file, preprocessed_file)
-        #image_file="C:/Users/P14s/AppData/Local/Temp/Slicer/__SlicerTemp__2025-08-26_09+04+49.843/input/input-volume0.nii.gz"
-        lung_inference0825_main(model_folder, preprocessed_file, result_file)
-        
-        print(f'ALL DONE, result saved in {result_file}')
+        lung_segment_predicator = LungSegmentPredictor(model_folder=model_folder)
+        airway_pred = os.path.join(predict_dir, f'{basename}_Airway.nii.gz')
+        if not os.path.isfile(airway_pred):
+            raise ValueError(f"{basename}_Airway.nii.gz not found") 
+        artery_pred = os.path.join(predict_dir, f'{basename}_Artery.nii.gz')
+        if not os.path.isfile(artery_pred):
+            raise ValueError(f"{basename}_Artery.nii.gz not found") 
+        vein_pred = os.path.join(predict_dir, f'{basename}_Vein.nii.gz')
+        if not os.path.isfile(vein_pred):
+            raise ValueError(f"{basename}_Vein.nii.gz not found")
+        lung_segment_predicator.predict(preprocessed_file, airway_pred=airway_pred, 
+            artery_pred=artery_pred, vein_pred=vein_pred, output_dir=predict_file.replace('.nii.gz', ''))
+        lung_segment_predicator.postprocess(predict_file=predict_file, output_file=result_file)
         return
 
     if resample is not None: # 目前resample下对prob_maps该如何处理未知
@@ -130,7 +138,7 @@ def main(model_folder,
         process_files(image_file, preprocessed_file)
 
     use_folds = (1, )
-    device = torch.device('cuda', 0)
+    device = torch.device('cuda', 0) if torch.cuda.is_available() else torch.device('cpu')
 
     if resample is not None and resample < 3.0:
         # overall speedup for 15mm model roughly 11% (GPU) and 100% (CPU)
