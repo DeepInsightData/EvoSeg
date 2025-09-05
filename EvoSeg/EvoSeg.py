@@ -829,16 +829,14 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._segmentationProcessInfo = None
         if self.logic.batchMode:
             if "Airway_nnUnet" in end_model_name_list:
-                self.onSegButtonClick(self._process["Airway_nnUnet"].segmentationButton)
-            elif "Artery_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Artery_nnUnet"].segmentationButton)
-            elif "Vein_nnUnet" in end_model_name_list:
+            elif "Artery_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Vein_nnUnet"].segmentationButton)
-            elif "LungLobe_nnUnet" in end_model_name_list:
+            elif "Vein_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["LungLobe_nnUnet"].segmentationButton)
-            elif "Rib_nnUnet" in end_model_name_list:
+            elif "LungLobe_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Rib_nnUnet"].segmentationButton)
-            elif "Nodule_nnUnet" in end_model_name_list:
+            elif "Rib_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Nodule_nnUnet"].segmentationButton)
             else:
                 self.logic.batchMode = False
