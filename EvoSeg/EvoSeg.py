@@ -713,7 +713,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         with slicer.util.tryWithErrorDisplay("Batch processing failed.", waitCursor=True):
             self.ui.bt_batch.setEnabled(False)
             self.logic.batchMode = True
-            self.onSegButtonClick(self._process["LungLobe_nnUnet"].segmentationButton)
+            self.onSegButtonClick(self._process["Airway_nnUnet"].segmentationButton)
 
     def onCancel(self):
         with slicer.util.tryWithErrorDisplay("Failed to cancel processing.", waitCursor=True):
@@ -828,15 +828,17 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #----------------------------------------------------------------------
         self._segmentationProcessInfo = None
         if self.logic.batchMode:
-            if "LungLobe_nnUnet" in end_model_name_list:
+            if "Airway_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Airway_nnUnet"].segmentationButton)
-            elif "Airway_nnUnet" in end_model_name_list:
-                self.onSegButtonClick(self._process["Artery_nnUnet"].segmentationButton)
             elif "Artery_nnUnet" in end_model_name_list:
-                self.onSegButtonClick(self._process["Vein_nnUnet"].segmentationButton)
+                self.onSegButtonClick(self._process["Artery_nnUnet"].segmentationButton)
             elif "Vein_nnUnet" in end_model_name_list:
-                self.onSegButtonClick(self._process["Rib_nnUnet"].segmentationButton)
+                self.onSegButtonClick(self._process["Vein_nnUnet"].segmentationButton)
+            elif "LungLobe_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["LungLobe_nnUnet"].segmentationButton)
             elif "Rib_nnUnet" in end_model_name_list:
+                self.onSegButtonClick(self._process["Rib_nnUnet"].segmentationButton)
+            elif "Nodule_nnUnet" in end_model_name_list:
                 self.onSegButtonClick(self._process["Nodule_nnUnet"].segmentationButton)
             else:
                 self.logic.batchMode = False
@@ -909,6 +911,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     return
                 
     def onVolumeNodeSelected(self, node):
+        # Reset EvoSegmentator singleton when volume node changes
         if node:
             nodeName = node.GetName()
             case_dir = 'case_' + re.sub(r'[^a-zA-Z0-9_-]', '_', nodeName)
