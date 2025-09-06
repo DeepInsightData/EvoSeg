@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>2172</height>
+    <height>2367</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,5,0,0,0,0,0,0,0,0,5">
@@ -1326,7 +1326,7 @@
            </size>
           </property>
           <property name="text">
-           <string>All Segments</string>
+           <string>Lung Segments</string>
           </property>
          </widget>
         </item>
@@ -1360,7 +1360,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxLeftUpperLobe">
         <property name="title">
-         <string>Left Upper Lobe</string>
+         <string></string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -1402,9 +1402,21 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelOpacityLeftUpperLobe">
+            <widget class="QLabel" name="labelLeftUpperLobe">
+             <property name="minimumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Opacity:</string>
+              <string>Left Upper Lobe</string>
              </property>
             </widget>
            </item>
@@ -1430,220 +1442,232 @@
           </layout>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutLeftUpperLobe">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="apicoposteriorLB1_2VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="labelApicoposteriorLB1_2">
-             <property name="text">
-              <string>Apicoposterior S1+2</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityApicoposteriorLB1_2">
-             <property name="toolTip">
-              <string>Opacity of Apicoposterior S1+2</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QToolButton" name="anteriorLB3VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelAnteriorLB3">
-             <property name="text">
-              <string>Anterior S3 (Left)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorLB3">
-             <property name="toolTip">
-              <string>Opacity of Anterior S3 (Left)</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QToolButton" name="superiorLingularLB4VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelSuperiorLingularLB4">
-             <property name="text">
-              <string>Superior lingular S4</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLingularLB4">
-             <property name="toolTip">
-              <string>Opacity of Superior lingular S4</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QToolButton" name="inferiorLingularLB5VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="labelInferiorLingularLB5">
-             <property name="text">
-              <string>Inferior lingular S5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityInferiorLingularLB5">
-             <property name="toolTip">
-              <string>Opacity of Inferior lingular S5</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox">
+           <property name="title">
+            <string>segments</string>
+           </property>
+           <property name="collapsed">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <layout class="QGridLayout" name="gridLayoutLeftUpperLobe">
+              <item row="0" column="0">
+               <widget class="QToolButton" name="apicoposteriorLB1_2VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="labelApicoposteriorLB1_2">
+                <property name="text">
+                 <string>Apicoposterior LB1/2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityApicoposteriorLB1_2">
+                <property name="toolTip">
+                 <string>Opacity of Apicoposterior LB1/2</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QToolButton" name="anteriorLB3VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="labelAnteriorLB3">
+                <property name="text">
+                 <string>Anterior LB3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityAnteriorLB3">
+                <property name="toolTip">
+                 <string>Opacity of Anterior LB3</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QToolButton" name="superiorLingularLB4VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="labelSuperiorLingularLB4">
+                <property name="text">
+                 <string>Superior lingular LB4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLingularLB4">
+                <property name="toolTip">
+                 <string>Opacity of Superior lingular LB4</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QToolButton" name="inferiorLingularLB5VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="labelInferiorLingularLB5">
+                <property name="text">
+                 <string>Inferior lingular LB5</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityInferiorLingularLB5">
+                <property name="toolTip">
+                 <string>Opacity of Inferior lingular LB5</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -1651,7 +1675,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxLeftLowerLobe">
         <property name="title">
-         <string>Left Lower Lobe</string>
+         <string></string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -1693,9 +1717,21 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelOpacityLeftLowerLobe">
+            <widget class="QLabel" name="labelLeftLowerLobe">
+             <property name="minimumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Opacity:</string>
+              <string>Left Lower Lobe</string>
              </property>
             </widget>
            </item>
@@ -1721,220 +1757,232 @@
           </layout>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutLeftLowerLobe">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="superiorLB6VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="labelSuperiorLB6">
-             <property name="text">
-              <string>Superior S6 (Left)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLB6">
-             <property name="toolTip">
-              <string>Opacity of Superior S6 (Left)</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QToolButton" name="anteriorBasalLB8VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelAnteriorBasalLB8">
-             <property name="text">
-              <string>Anterior basal S8 (Left)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalLB8">
-             <property name="toolTip">
-              <string>Opacity of Anterior basal S8 (Left)</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QToolButton" name="lateralBasalLB9VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelLateralBasalLB9">
-             <property name="text">
-              <string>Lateral basal S9 (Left)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalLB9">
-             <property name="toolTip">
-              <string>Opacity of Lateral basal S9 (Left)</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QToolButton" name="posteriorBasalLB10VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="labelPosteriorBasalLB10">
-             <property name="text">
-              <string>Posterior basal S10 (Left)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalLB10">
-             <property name="toolTip">
-              <string>Opacity of Posterior basal S10 (Left)</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox_2">
+           <property name="title">
+            <string>segments</string>
+           </property>
+           <property name="collapsed">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <layout class="QGridLayout" name="gridLayoutLeftLowerLobe">
+              <item row="0" column="0">
+               <widget class="QToolButton" name="superiorLB6VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="labelSuperiorLB6">
+                <property name="text">
+                 <string>Superior LB6</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLB6">
+                <property name="toolTip">
+                 <string>Opacity of Superior LB6</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QToolButton" name="anteriorBasalLB8VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="labelAnteriorBasalLB8">
+                <property name="text">
+                 <string>Anterior basal LB8</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalLB8">
+                <property name="toolTip">
+                 <string>Opacity of Anterior basal LB8</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QToolButton" name="lateralBasalLB9VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="labelLateralBasalLB9">
+                <property name="text">
+                 <string>Lateral basal LB9</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalLB9">
+                <property name="toolTip">
+                 <string>Opacity of Lateral basal LB9</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QToolButton" name="posteriorBasalLB10VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="labelPosteriorBasalLB10">
+                <property name="text">
+                 <string>Posterior basal LB10</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalLB10">
+                <property name="toolTip">
+                 <string>Opacity of Posterior basal LB10</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -1942,7 +1990,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightUpperLobe">
         <property name="title">
-         <string>Right Upper Lobe</string>
+         <string></string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -1984,9 +2032,21 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelOpacityRightUpperLobe">
+            <widget class="QLabel" name="labelRightUpperLobe">
+             <property name="minimumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Opacity:</string>
+              <string>Right Upper Lobe</string>
              </property>
             </widget>
            </item>
@@ -2012,167 +2072,179 @@
           </layout>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutRightUpperLobe">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="apicalRB1VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="labelApicalRB1">
-             <property name="text">
-              <string>Apical S1</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityApicalRB1">
-             <property name="toolTip">
-              <string>Opacity of Apical S1</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QToolButton" name="posteriorRB2VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelPosteriorRB2">
-             <property name="text">
-              <string>Posterior S2</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorRB2">
-             <property name="toolTip">
-              <string>Opacity of Posterior S2</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QToolButton" name="anteriorRB3VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelAnteriorRB3">
-             <property name="text">
-              <string>Anterior S3</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorRB3">
-             <property name="toolTip">
-              <string>Opacity of Anterior S3</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox_3">
+           <property name="title">
+            <string>segments</string>
+           </property>
+           <property name="collapsed">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <layout class="QGridLayout" name="gridLayoutRightUpperLobe">
+              <item row="0" column="0">
+               <widget class="QToolButton" name="apicalRB1VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="labelPosteriorRB2">
+                <property name="text">
+                 <string>Posterior RB2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="labelAnteriorRB3">
+                <property name="text">
+                 <string>Anterior RB3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QToolButton" name="posteriorRB2VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QToolButton" name="anteriorRB3VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityAnteriorRB3">
+                <property name="toolTip">
+                 <string>Opacity of Anterior RB3</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="labelApicalRB1">
+                <property name="text">
+                 <string>Apical RB1</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityPosteriorRB2">
+                <property name="toolTip">
+                 <string>Opacity of Posterior RB2</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityApicalRB1">
+                <property name="toolTip">
+                 <string>Opacity of Apical RB1</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -2180,7 +2252,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightMiddleLobe">
         <property name="title">
-         <string>Right Middle Lobe</string>
+         <string></string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -2222,9 +2294,21 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelOpacityRightMiddleLobe">
+            <widget class="QLabel" name="labelRightMiddleLobe">
+             <property name="minimumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Opacity:</string>
+              <string>Right Middle Lobe</string>
              </property>
             </widget>
            </item>
@@ -2250,114 +2334,126 @@
           </layout>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutRightMiddleLobe">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="lateralRB4VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="labelLateralRB4">
-             <property name="text">
-              <string>Lateral S4</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralRB4">
-             <property name="toolTip">
-              <string>Opacity of Lateral S4</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QToolButton" name="medialRB5VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelMedialRB5">
-             <property name="text">
-              <string>Medial S5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityMedialRB5">
-             <property name="toolTip">
-              <string>Opacity of Medial S5</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox_4">
+           <property name="title">
+            <string>segments</string>
+           </property>
+           <property name="collapsed">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <item>
+             <layout class="QGridLayout" name="gridLayoutRightMiddleLobe">
+              <item row="0" column="0">
+               <widget class="QToolButton" name="lateralRB4VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="labelLateralRB4">
+                <property name="text">
+                 <string>Lateral RB4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityLateralRB4">
+                <property name="toolTip">
+                 <string>Opacity of Lateral RB4</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QToolButton" name="medialRB5VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="labelMedialRB5">
+                <property name="text">
+                 <string>Medial RB5</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityMedialRB5">
+                <property name="toolTip">
+                 <string>Opacity of Medial RB5</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -2365,7 +2461,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightLowerLobe">
         <property name="title">
-         <string>Right Lower Lobe</string>
+         <string></string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -2407,9 +2503,21 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelOpacityRightLowerLobe">
+            <widget class="QLabel" name="labelRightLowerLobe">
+             <property name="minimumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>124</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Opacity:</string>
+              <string>Right Lower Lobe</string>
              </property>
             </widget>
            </item>
@@ -2435,273 +2543,285 @@
           </layout>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutRightLowerLobe">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="superiorRB6VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="labelSuperiorRB6">
-             <property name="text">
-              <string>Superior S6</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorRB6">
-             <property name="toolTip">
-              <string>Opacity of Superior S6</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QToolButton" name="medialBasalRB7VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelMedialBasalRB7">
-             <property name="text">
-              <string>Medial basal S7</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityMedialBasalRB7">
-             <property name="toolTip">
-              <string>Opacity of Medial basal S7</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QToolButton" name="anteriorBasalRB8VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelAnteriorBasalRB8">
-             <property name="text">
-              <string>Anterior basal S8</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalRB8">
-             <property name="toolTip">
-              <string>Opacity of Anterior basal S8</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QToolButton" name="lateralBasalRB9VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="labelLateralBasalRB9">
-             <property name="text">
-              <string>Lateral basal S9</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalRB9">
-             <property name="toolTip">
-              <string>Opacity of Lateral basal S9</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QToolButton" name="posteriorBasalRB10VisibilityButton">
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>32</width>
-               <height>32</height>
-              </size>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/VisibleOff.png</normaloff>
-               <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="labelPosteriorBasalRB10">
-             <property name="text">
-              <string>Posterior basal S10</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalRB10">
-             <property name="toolTip">
-              <string>Opacity of Posterior basal S10</string>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="pageStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox_5">
+           <property name="title">
+            <string>segments</string>
+           </property>
+           <property name="collapsed">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <layout class="QGridLayout" name="gridLayoutRightLowerLobe">
+              <item row="0" column="0">
+               <widget class="QToolButton" name="superiorRB6VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="labelSuperiorRB6">
+                <property name="text">
+                 <string>Superior RB6</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacitySuperiorRB6">
+                <property name="toolTip">
+                 <string>Opacity of Superior RB6</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QToolButton" name="medialBasalRB7VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="labelMedialBasalRB7">
+                <property name="text">
+                 <string>Medial basal RB7</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityMedialBasalRB7">
+                <property name="toolTip">
+                 <string>Opacity of Medial basal RB7</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QToolButton" name="anteriorBasalRB8VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="labelAnteriorBasalRB8">
+                <property name="text">
+                 <string>Anterior basal RB8</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalRB8">
+                <property name="toolTip">
+                 <string>Opacity of Anterior basal RB8</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QToolButton" name="lateralBasalRB9VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="labelLateralBasalRB9">
+                <property name="text">
+                 <string>Lateral basal RB9</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalRB9">
+                <property name="toolTip">
+                 <string>Opacity of Lateral basal RB9</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QToolButton" name="posteriorBasalRB10VisibilityButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>:/Icons/VisibleOff.png</normaloff>
+                  <normalon>:/Icons/VisibleOn.png</normalon>:/Icons/VisibleOff.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLabel" name="labelPosteriorBasalRB10">
+                <property name="text">
+                 <string>Posterior basal RB10</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalRB10">
+                <property name="toolTip">
+                 <string>Opacity of Posterior basal RB10</string>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="pageStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -2910,6 +3030,12 @@
    <class>qMRMLWidget</class>
    <extends>QWidget</extends>
    <header>qMRMLWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>ctkCollapsibleGroupBox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
