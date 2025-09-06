@@ -387,31 +387,31 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                     EvoSegProcess.SegmentGroup(
                         "LeftUpperLobe", 
                         self.ui.leftUpperLobeVisibilityButton, 
-                        self.ui.sliderOpacityLeftUpperLobeGroup, 
+                        self.ui.sliderOpacityLeftUpperLobe, 
                         LungLobeModel.LeftUpperLobeSegments
                     ),
                     EvoSegProcess.SegmentGroup(
                         "LeftLowerLobe", 
                         self.ui.leftLowerLobeVisibilityButton, 
-                        self.ui.sliderOpacityLeftLowerLobeGroup, 
+                        self.ui.sliderOpacityLeftLowerLobe, 
                         LungLobeModel.LeftLowerLobeSegments
                     ),
                     EvoSegProcess.SegmentGroup(
                         "RightUpperLobe", 
                         self.ui.rightUpperLobeVisibilityButton, 
-                        self.ui.sliderOpacityRightUpperLobeGroup, 
+                        self.ui.sliderOpacityRightUpperLobe, 
                         LungLobeModel.RightUpperLobeSegments
                     ),
                     EvoSegProcess.SegmentGroup(
                         "RightMiddleLobe", 
                         self.ui.rightMiddleLobeVisibilityButton, 
-                        self.ui.sliderOpacityRightMiddleLobeGroup, 
+                        self.ui.sliderOpacityRightMiddleLobe, 
                         LungLobeModel.RightMiddleLobeSegments
                     ),
                     EvoSegProcess.SegmentGroup(
                         "RightLowerLobe", 
                         self.ui.rightLowerLobeVisibilityButton, 
-                        self.ui.sliderOpacityRightLowerLobeGroup, 
+                        self.ui.sliderOpacityRightLowerLobe, 
                         LungLobeModel.RightLowerLobeSegments
                     )
                 ]
@@ -826,6 +826,10 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             print(EvoSegWidget.PROCESSING_IDLE,"PROCESSING_IDLE")
             self.ui.bt_seg_airway.setEnabled(True)
             self.ui.bt_seg_artery.setEnabled(True)
+            self.ui.btn_seg_vein.setEnabled(True)
+            self.ui.btn_seg_lobe.setEnabled(True)
+            self.ui.btn_seg_rib.setEnabled(True)
+            self.ui.btn_seg_nodule.setEnabled(True)
             self.ui.bt_cancel_run.setEnabled(False)
             self.ui.bt_batch.setEnabled(True)
 
