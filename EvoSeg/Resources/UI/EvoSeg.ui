@@ -1432,7 +1432,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayoutLeftUpperLobe">
            <item row="0" column="0">
-            <widget class="QToolButton" name="apicoposteriorS1_2VisibilityButton">
+            <widget class="QToolButton" name="apicoposteriorLB1_2VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1459,14 +1459,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="labelApicoposteriorS1_2">
+            <widget class="QLabel" name="labelApicoposteriorLB1_2">
              <property name="text">
               <string>Apicoposterior S1+2</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityApicoposteriorS1_2">
+            <widget class="ctkSliderWidget" name="sliderOpacityApicoposteriorLB1_2">
              <property name="toolTip">
               <string>Opacity of Apicoposterior S1+2</string>
              </property>
@@ -1485,7 +1485,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QToolButton" name="anteriorS3LeftVisibilityButton">
+            <widget class="QToolButton" name="anteriorLB3VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1512,14 +1512,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="labelAnteriorS3Left">
+            <widget class="QLabel" name="labelAnteriorLB3">
              <property name="text">
               <string>Anterior S3 (Left)</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorS3Left">
+            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorLB3">
              <property name="toolTip">
               <string>Opacity of Anterior S3 (Left)</string>
              </property>
@@ -1538,7 +1538,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QToolButton" name="superiorLingularS4VisibilityButton">
+            <widget class="QToolButton" name="superiorLingularLB4VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1565,14 +1565,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLabel" name="labelSuperiorLingularS4">
+            <widget class="QLabel" name="labelSuperiorLingularLB4">
              <property name="text">
               <string>Superior lingular S4</string>
              </property>
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLingularS4">
+            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLingularLB4">
              <property name="toolTip">
               <string>Opacity of Superior lingular S4</string>
              </property>
@@ -1591,7 +1591,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QToolButton" name="inferiorLingularS5VisibilityButton">
+            <widget class="QToolButton" name="inferiorLingularLB5VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1618,14 +1618,14 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLabel" name="labelInferiorLingularS5">
+            <widget class="QLabel" name="labelInferiorLingularLB5">
              <property name="text">
               <string>Inferior lingular S5</string>
              </property>
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityInferiorLingularS5">
+            <widget class="ctkSliderWidget" name="sliderOpacityInferiorLingularLB5">
              <property name="toolTip">
               <string>Opacity of Inferior lingular S5</string>
              </property>
@@ -1723,7 +1723,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayoutLeftLowerLobe">
            <item row="0" column="0">
-            <widget class="QToolButton" name="superiorS6LeftVisibilityButton">
+            <widget class="QToolButton" name="superiorLB6VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1750,14 +1750,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="labelSuperiorS6Left">
+            <widget class="QLabel" name="labelSuperiorLB6">
              <property name="text">
               <string>Superior S6 (Left)</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorS6Left">
+            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorLB6">
              <property name="toolTip">
               <string>Opacity of Superior S6 (Left)</string>
              </property>
@@ -1776,7 +1776,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QToolButton" name="anteriorBasalS8LeftVisibilityButton">
+            <widget class="QToolButton" name="anteriorBasalLB8VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1803,14 +1803,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="labelAnteriorBasalS8Left">
+            <widget class="QLabel" name="labelAnteriorBasalLB8">
              <property name="text">
               <string>Anterior basal S8 (Left)</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalS8Left">
+            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalLB8">
              <property name="toolTip">
               <string>Opacity of Anterior basal S8 (Left)</string>
              </property>
@@ -1829,7 +1829,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QToolButton" name="lateralBasalS9LeftVisibilityButton">
+            <widget class="QToolButton" name="lateralBasalLB9VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1856,14 +1856,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLabel" name="labelLateralBasalS9Left">
+            <widget class="QLabel" name="labelLateralBasalLB9">
              <property name="text">
               <string>Lateral basal S9 (Left)</string>
              </property>
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalS9Left">
+            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalLB9">
              <property name="toolTip">
               <string>Opacity of Lateral basal S9 (Left)</string>
              </property>
@@ -1882,7 +1882,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QToolButton" name="posteriorBasalS10LeftVisibilityButton">
+            <widget class="QToolButton" name="posteriorBasalLB10VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -1909,14 +1909,14 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLabel" name="labelPosteriorBasalS10Left">
+            <widget class="QLabel" name="labelPosteriorBasalLB10">
              <property name="text">
               <string>Posterior basal S10 (Left)</string>
              </property>
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalS10Left">
+            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalLB10">
              <property name="toolTip">
               <string>Opacity of Posterior basal S10 (Left)</string>
              </property>
@@ -2014,7 +2014,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayoutRightUpperLobe">
            <item row="0" column="0">
-            <widget class="QToolButton" name="apicalS1VisibilityButton">
+            <widget class="QToolButton" name="apicalRB1VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2041,14 +2041,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="labelApicalS1">
+            <widget class="QLabel" name="labelApicalRB1">
              <property name="text">
               <string>Apical S1</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityApicalS1">
+            <widget class="ctkSliderWidget" name="sliderOpacityApicalRB1">
              <property name="toolTip">
               <string>Opacity of Apical S1</string>
              </property>
@@ -2067,7 +2067,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QToolButton" name="posteriorS2VisibilityButton">
+            <widget class="QToolButton" name="posteriorRB2VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2094,14 +2094,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="labelPosteriorS2">
+            <widget class="QLabel" name="labelPosteriorRB2">
              <property name="text">
               <string>Posterior S2</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorS2">
+            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorRB2">
              <property name="toolTip">
               <string>Opacity of Posterior S2</string>
              </property>
@@ -2120,7 +2120,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QToolButton" name="anteriorS3VisibilityButton">
+            <widget class="QToolButton" name="anteriorRB3VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2147,14 +2147,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLabel" name="labelAnteriorS3">
+            <widget class="QLabel" name="labelAnteriorRB3">
              <property name="text">
               <string>Anterior S3</string>
              </property>
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorS3">
+            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorRB3">
              <property name="toolTip">
               <string>Opacity of Anterior S3</string>
              </property>
@@ -2252,7 +2252,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayoutRightMiddleLobe">
            <item row="0" column="0">
-            <widget class="QToolButton" name="lateralS4VisibilityButton">
+            <widget class="QToolButton" name="lateralRB4VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2279,14 +2279,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="labelLateralS4">
+            <widget class="QLabel" name="labelLateralRB4">
              <property name="text">
               <string>Lateral S4</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralS4">
+            <widget class="ctkSliderWidget" name="sliderOpacityLateralRB4">
              <property name="toolTip">
               <string>Opacity of Lateral S4</string>
              </property>
@@ -2305,7 +2305,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QToolButton" name="medialS5VisibilityButton">
+            <widget class="QToolButton" name="medialRB5VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2332,14 +2332,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="labelMedialS5">
+            <widget class="QLabel" name="labelMedialRB5">
              <property name="text">
               <string>Medial S5</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityMedialS5">
+            <widget class="ctkSliderWidget" name="sliderOpacityMedialRB5">
              <property name="toolTip">
               <string>Opacity of Medial S5</string>
              </property>
@@ -2437,7 +2437,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayoutRightLowerLobe">
            <item row="0" column="0">
-            <widget class="QToolButton" name="superiorS6VisibilityButton">
+            <widget class="QToolButton" name="superiorRB6VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2464,14 +2464,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="labelSuperiorS6">
+            <widget class="QLabel" name="labelSuperiorRB6">
              <property name="text">
               <string>Superior S6</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorS6">
+            <widget class="ctkSliderWidget" name="sliderOpacitySuperiorRB6">
              <property name="toolTip">
               <string>Opacity of Superior S6</string>
              </property>
@@ -2490,7 +2490,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QToolButton" name="medialBasalS7VisibilityButton">
+            <widget class="QToolButton" name="medialBasalRB7VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2517,14 +2517,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="labelMedialBasalS7">
+            <widget class="QLabel" name="labelMedialBasalRB7">
              <property name="text">
               <string>Medial basal S7</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityMedialBasalS7">
+            <widget class="ctkSliderWidget" name="sliderOpacityMedialBasalRB7">
              <property name="toolTip">
               <string>Opacity of Medial basal S7</string>
              </property>
@@ -2543,7 +2543,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QToolButton" name="anteriorBasalS8VisibilityButton">
+            <widget class="QToolButton" name="anteriorBasalRB8VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2570,14 +2570,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLabel" name="labelAnteriorBasalS8">
+            <widget class="QLabel" name="labelAnteriorBasalRB8">
              <property name="text">
               <string>Anterior basal S8</string>
              </property>
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalS8">
+            <widget class="ctkSliderWidget" name="sliderOpacityAnteriorBasalRB8">
              <property name="toolTip">
               <string>Opacity of Anterior basal S8</string>
              </property>
@@ -2596,7 +2596,7 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QToolButton" name="lateralBasalS9VisibilityButton">
+            <widget class="QToolButton" name="lateralBasalRB9VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2623,14 +2623,14 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QLabel" name="labelLateralBasalS9">
+            <widget class="QLabel" name="labelLateralBasalRB9">
              <property name="text">
               <string>Lateral basal S9</string>
              </property>
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalS9">
+            <widget class="ctkSliderWidget" name="sliderOpacityLateralBasalRB9">
              <property name="toolTip">
               <string>Opacity of Lateral basal S9</string>
              </property>
@@ -2649,7 +2649,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QToolButton" name="posteriorBasalS10VisibilityButton">
+            <widget class="QToolButton" name="posteriorBasalRB10VisibilityButton">
              <property name="minimumSize">
               <size>
                <width>32</width>
@@ -2676,14 +2676,14 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLabel" name="labelPosteriorBasalS10">
+            <widget class="QLabel" name="labelPosteriorBasalRB10">
              <property name="text">
               <string>Posterior basal S10</string>
              </property>
             </widget>
            </item>
            <item row="4" column="2">
-            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalS10">
+            <widget class="ctkSliderWidget" name="sliderOpacityPosteriorBasalRB10">
              <property name="toolTip">
               <string>Opacity of Posterior basal S10</string>
              </property>

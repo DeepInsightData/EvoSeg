@@ -70,232 +70,232 @@ class _ui_EvoSegSettingsPanel:
         
         lobeColorGroupBox = qt.QGroupBox(_('Lung Segments'))
         lobeColorGroupBoxGridLayout = qt.QGridLayout(lobeColorGroupBox)
-        self.apicalS1ColorPickerButton = ctk.ctkColorPickerButton()
-        self.apicalS1ColorPickerButton.objectName = 'apicalS1ColorPickerButton'
-        self.apicalS1ColorPickerButton.color = EvoSegModels.get('Lobe').apicalS1Color()
-        self.apicalS1ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.apicalS1ColorPickerButton.setMinimumSize(0, 0)
-        self.apicalS1ColorPickerButton.setMaximumSize(16777215, 16777215)
-        apicalS1Label = qt.QLabel(_("Apical S1 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(apicalS1Label, 0, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.apicalS1ColorPickerButton, 0, 1)
+        self.apicalRB1ColorPickerButton = ctk.ctkColorPickerButton()
+        self.apicalRB1ColorPickerButton.objectName = 'apicalRB1ColorPickerButton'
+        self.apicalRB1ColorPickerButton.color = EvoSegModels.get('Lobe').apicalRB1Color()
+        self.apicalRB1ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.apicalRB1ColorPickerButton.setMinimumSize(0, 0)
+        self.apicalRB1ColorPickerButton.setMaximumSize(16777215, 16777215)
+        apicalRB1Label = qt.QLabel(_("Apical S1 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(apicalRB1Label, 0, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.apicalRB1ColorPickerButton, 0, 1)
         
-        self.posteriorS2ColorPickerButton = ctk.ctkColorPickerButton()
-        self.posteriorS2ColorPickerButton.objectName = 'posteriorS2ColorPickerButton'
-        self.posteriorS2ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorS2Color()
-        self.posteriorS2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.posteriorS2ColorPickerButton.setMinimumSize(0, 0)
-        self.posteriorS2ColorPickerButton.setMaximumSize(16777215, 16777215)
-        posteriorS2Label = qt.QLabel(_("Posterior S2 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(posteriorS2Label, 0, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.posteriorS2ColorPickerButton, 0, 3)
-        self.anteriorS3ColorPickerButton = ctk.ctkColorPickerButton()
-        self.anteriorS3ColorPickerButton.objectName = 'anteriorS3ColorPickerButton'
-        self.anteriorS3ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorS3Color()
-        self.anteriorS3ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.anteriorS3ColorPickerButton.setMinimumSize(0, 0)
-        self.anteriorS3ColorPickerButton.setMaximumSize(16777215, 16777215)
-        anteriorS3Label = qt.QLabel(_("Anterior S3 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(anteriorS3Label, 1, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.anteriorS3ColorPickerButton, 1, 1)
+        self.posteriorRB2ColorPickerButton = ctk.ctkColorPickerButton()
+        self.posteriorRB2ColorPickerButton.objectName = 'posteriorRB2ColorPickerButton'
+        self.posteriorRB2ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorRB2Color()
+        self.posteriorRB2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.posteriorRB2ColorPickerButton.setMinimumSize(0, 0)
+        self.posteriorRB2ColorPickerButton.setMaximumSize(16777215, 16777215)
+        posteriorRB2Label = qt.QLabel(_("Posterior S2 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(posteriorRB2Label, 0, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.posteriorRB2ColorPickerButton, 0, 3)
+        self.anteriorRB3ColorPickerButton = ctk.ctkColorPickerButton()
+        self.anteriorRB3ColorPickerButton.objectName = 'anteriorRB3ColorPickerButton'
+        self.anteriorRB3ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorRB3Color()
+        self.anteriorRB3ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.anteriorRB3ColorPickerButton.setMinimumSize(0, 0)
+        self.anteriorRB3ColorPickerButton.setMaximumSize(16777215, 16777215)
+        anteriorRB3Label = qt.QLabel(_("Anterior S3 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(anteriorRB3Label, 1, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.anteriorRB3ColorPickerButton, 1, 1)
         
-        self.lateralS4ColorPickerButton = ctk.ctkColorPickerButton()
-        self.lateralS4ColorPickerButton.objectName = 'lateralS4ColorPickerButton'
-        self.lateralS4ColorPickerButton.color = EvoSegModels.get('Lobe').lateralS4Color()
-        self.lateralS4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.lateralS4ColorPickerButton.setMinimumSize(0, 0)
-        self.lateralS4ColorPickerButton.setMaximumSize(16777215, 16777215)
-        lateralS4Label = qt.QLabel(_("Lateral S4 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(lateralS4Label, 1, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.lateralS4ColorPickerButton, 1, 3)
-        self.medialS5ColorPickerButton = ctk.ctkColorPickerButton()
-        self.medialS5ColorPickerButton.objectName = 'medialS5ColorPickerButton'
-        self.medialS5ColorPickerButton.color = EvoSegModels.get('Lobe').medialS5Color()
-        self.medialS5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.medialS5ColorPickerButton.setMinimumSize(0, 0)
-        self.medialS5ColorPickerButton.setMaximumSize(16777215, 16777215)
-        medialS5Label = qt.QLabel(_("Medial S5 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(medialS5Label, 2, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.medialS5ColorPickerButton, 2, 1)
+        self.lateralRB4ColorPickerButton = ctk.ctkColorPickerButton()
+        self.lateralRB4ColorPickerButton.objectName = 'lateralRB4ColorPickerButton'
+        self.lateralRB4ColorPickerButton.color = EvoSegModels.get('Lobe').lateralRB4Color()
+        self.lateralRB4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.lateralRB4ColorPickerButton.setMinimumSize(0, 0)
+        self.lateralRB4ColorPickerButton.setMaximumSize(16777215, 16777215)
+        lateralRB4Label = qt.QLabel(_("Lateral S4 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(lateralRB4Label, 1, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.lateralRB4ColorPickerButton, 1, 3)
+        self.medialRB5ColorPickerButton = ctk.ctkColorPickerButton()
+        self.medialRB5ColorPickerButton.objectName = 'medialRB5ColorPickerButton'
+        self.medialRB5ColorPickerButton.color = EvoSegModels.get('Lobe').medialRB5Color()
+        self.medialRB5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.medialRB5ColorPickerButton.setMinimumSize(0, 0)
+        self.medialRB5ColorPickerButton.setMaximumSize(16777215, 16777215)
+        medialRB5Label = qt.QLabel(_("Medial S5 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(medialRB5Label, 2, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.medialRB5ColorPickerButton, 2, 1)
         
-        self.superiorS6ColorPickerButton = ctk.ctkColorPickerButton()
-        self.superiorS6ColorPickerButton.objectName = 'superiorS6ColorPickerButton'
-        self.superiorS6ColorPickerButton.color = EvoSegModels.get('Lobe').superiorS6Color()
-        self.superiorS6ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.superiorS6ColorPickerButton.setMinimumSize(0, 0)
-        self.superiorS6ColorPickerButton.setMaximumSize(16777215, 16777215)
-        superiorS6Label = qt.QLabel(_("Superior S6 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(superiorS6Label, 2, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.superiorS6ColorPickerButton, 2, 3)
+        self.superiorRB6ColorPickerButton = ctk.ctkColorPickerButton()
+        self.superiorRB6ColorPickerButton.objectName = 'superiorRB6ColorPickerButton'
+        self.superiorRB6ColorPickerButton.color = EvoSegModels.get('Lobe').superiorRB6Color()
+        self.superiorRB6ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.superiorRB6ColorPickerButton.setMinimumSize(0, 0)
+        self.superiorRB6ColorPickerButton.setMaximumSize(16777215, 16777215)
+        superiorRB6Label = qt.QLabel(_("Superior S6 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(superiorRB6Label, 2, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.superiorRB6ColorPickerButton, 2, 3)
         
-        self.medialBasalS7ColorPickerButton = ctk.ctkColorPickerButton()
-        self.medialBasalS7ColorPickerButton.objectName = 'medialBasalS7ColorPickerButton'
-        self.medialBasalS7ColorPickerButton.color = EvoSegModels.get('Lobe').medialBasalS7Color()
-        self.medialBasalS7ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.medialBasalS7ColorPickerButton.setMinimumSize(0, 0)
-        self.medialBasalS7ColorPickerButton.setMaximumSize(16777215, 16777215)
-        medialBasalS7Label = qt.QLabel(_("Medial basal S7 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(medialBasalS7Label, 3, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.medialBasalS7ColorPickerButton, 3, 1)
+        self.medialBasalRB7ColorPickerButton = ctk.ctkColorPickerButton()
+        self.medialBasalRB7ColorPickerButton.objectName = 'medialBasalRB7ColorPickerButton'
+        self.medialBasalRB7ColorPickerButton.color = EvoSegModels.get('Lobe').medialBasalRB7Color()
+        self.medialBasalRB7ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.medialBasalRB7ColorPickerButton.setMinimumSize(0, 0)
+        self.medialBasalRB7ColorPickerButton.setMaximumSize(16777215, 16777215)
+        medialBasalRB7Label = qt.QLabel(_("Medial basal S7 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(medialBasalRB7Label, 3, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.medialBasalRB7ColorPickerButton, 3, 1)
         
-        self.anteriorBasalS8ColorPickerButton = ctk.ctkColorPickerButton()
-        self.anteriorBasalS8ColorPickerButton.objectName = 'anteriorBasalS8ColorPickerButton'
-        self.anteriorBasalS8ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalS8Color()
-        self.anteriorBasalS8ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.anteriorBasalS8ColorPickerButton.setMinimumSize(0, 0)
-        self.anteriorBasalS8ColorPickerButton.setMaximumSize(16777215, 16777215)
-        anteriorBasalS8Label = qt.QLabel(_("Anterior basal S8 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(anteriorBasalS8Label, 3, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalS8ColorPickerButton, 3, 3)
-        self.lateralBasalS9ColorPickerButton = ctk.ctkColorPickerButton()
-        self.lateralBasalS9ColorPickerButton.objectName = 'lateralBasalS9ColorPickerButton'
-        self.lateralBasalS9ColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalS9Color()
-        self.lateralBasalS9ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.lateralBasalS9ColorPickerButton.setMinimumSize(0, 0)
-        self.lateralBasalS9ColorPickerButton.setMaximumSize(16777215, 16777215)
-        lateralBasalS9Label = qt.QLabel(_("Lateral basal S9 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(lateralBasalS9Label, 4, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.lateralBasalS9ColorPickerButton, 4, 1)
+        self.anteriorBasalRB8ColorPickerButton = ctk.ctkColorPickerButton()
+        self.anteriorBasalRB8ColorPickerButton.objectName = 'anteriorBasalRB8ColorPickerButton'
+        self.anteriorBasalRB8ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalRB8Color()
+        self.anteriorBasalRB8ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.anteriorBasalRB8ColorPickerButton.setMinimumSize(0, 0)
+        self.anteriorBasalRB8ColorPickerButton.setMaximumSize(16777215, 16777215)
+        anteriorBasalRB8Label = qt.QLabel(_("Anterior basal S8 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(anteriorBasalRB8Label, 3, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalRB8ColorPickerButton, 3, 3)
+        self.lateralBasalRB9ColorPickerButton = ctk.ctkColorPickerButton()
+        self.lateralBasalRB9ColorPickerButton.objectName = 'lateralBasalRB9ColorPickerButton'
+        self.lateralBasalRB9ColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalRB9Color()
+        self.lateralBasalRB9ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.lateralBasalRB9ColorPickerButton.setMinimumSize(0, 0)
+        self.lateralBasalRB9ColorPickerButton.setMaximumSize(16777215, 16777215)
+        lateralBasalRB9Label = qt.QLabel(_("Lateral basal S9 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(lateralBasalRB9Label, 4, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.lateralBasalRB9ColorPickerButton, 4, 1)
         
-        self.posteriorBasalS10ColorPickerButton = ctk.ctkColorPickerButton()
-        self.posteriorBasalS10ColorPickerButton.objectName = 'posteriorBasalS10ColorPickerButton'
-        self.posteriorBasalS10ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalS10Color()
-        self.posteriorBasalS10ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.posteriorBasalS10ColorPickerButton.setMinimumSize(0, 0)
-        self.posteriorBasalS10ColorPickerButton.setMaximumSize(16777215, 16777215)
-        posteriorBasalS10Label = qt.QLabel(_("Posterior basal S10 (Right)"))
-        lobeColorGroupBoxGridLayout.addWidget(posteriorBasalS10Label, 4, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.posteriorBasalS10ColorPickerButton, 4, 3)
-        self.apicoposteriorS1_2ColorPickerButton = ctk.ctkColorPickerButton()
-        self.apicoposteriorS1_2ColorPickerButton.objectName = 'apicoposteriorS1_2ColorPickerButton'
-        self.apicoposteriorS1_2ColorPickerButton.color = EvoSegModels.get('Lobe').apicoposteriorS1_2Color()
-        self.apicoposteriorS1_2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.apicoposteriorS1_2ColorPickerButton.setMinimumSize(0, 0)
-        self.apicoposteriorS1_2ColorPickerButton.setMaximumSize(16777215, 16777215)
-        apicoposteriorS1_2Label = qt.QLabel(_("Apicoposterior S1+2 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(apicoposteriorS1_2Label, 5, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.apicoposteriorS1_2ColorPickerButton, 5, 1)
+        self.posteriorBasalRB10ColorPickerButton = ctk.ctkColorPickerButton()
+        self.posteriorBasalRB10ColorPickerButton.objectName = 'posteriorBasalRB10ColorPickerButton'
+        self.posteriorBasalRB10ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalRB10Color()
+        self.posteriorBasalRB10ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.posteriorBasalRB10ColorPickerButton.setMinimumSize(0, 0)
+        self.posteriorBasalRB10ColorPickerButton.setMaximumSize(16777215, 16777215)
+        posteriorBasalRB10Label = qt.QLabel(_("Posterior basal S10 (Right)"))
+        lobeColorGroupBoxGridLayout.addWidget(posteriorBasalRB10Label, 4, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.posteriorBasalRB10ColorPickerButton, 4, 3)
+        self.apicoposteriorLB1_2ColorPickerButton = ctk.ctkColorPickerButton()
+        self.apicoposteriorLB1_2ColorPickerButton.objectName = 'apicoposteriorLB1_2ColorPickerButton'
+        self.apicoposteriorLB1_2ColorPickerButton.color = EvoSegModels.get('Lobe').apicoposteriorLB1_2Color()
+        self.apicoposteriorLB1_2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.apicoposteriorLB1_2ColorPickerButton.setMinimumSize(0, 0)
+        self.apicoposteriorLB1_2ColorPickerButton.setMaximumSize(16777215, 16777215)
+        apicoposteriorLB1_2Label = qt.QLabel(_("Apicoposterior S1+2 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(apicoposteriorLB1_2Label, 5, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.apicoposteriorLB1_2ColorPickerButton, 5, 1)
         
-        self.anteriorS3LeftColorPickerButton = ctk.ctkColorPickerButton()
-        self.anteriorS3LeftColorPickerButton.objectName = 'anteriorS3LeftColorPickerButton'
-        self.anteriorS3LeftColorPickerButton.color = EvoSegModels.get('Lobe').anteriorS3LeftColor()
-        self.anteriorS3LeftColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.anteriorS3LeftColorPickerButton.setMinimumSize(0, 0)
-        self.anteriorS3LeftColorPickerButton.setMaximumSize(16777215, 16777215)
-        anteriorS3LeftLabel = qt.QLabel(_("Anterior S3 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(anteriorS3LeftLabel, 5, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.anteriorS3LeftColorPickerButton, 5, 3)
-        self.superiorLingularS4ColorPickerButton = ctk.ctkColorPickerButton()
-        self.superiorLingularS4ColorPickerButton.objectName = 'superiorLingularS4ColorPickerButton'
-        self.superiorLingularS4ColorPickerButton.color = EvoSegModels.get('Lobe').superiorLingularS4Color()
-        self.superiorLingularS4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.superiorLingularS4ColorPickerButton.setMinimumSize(0, 0)
-        self.superiorLingularS4ColorPickerButton.setMaximumSize(16777215, 16777215)
-        superiorLingularS4Label = qt.QLabel(_("Superior lingular S4 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(superiorLingularS4Label, 6, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.superiorLingularS4ColorPickerButton, 6, 1)
+        self.anteriorLB3ColorPickerButton = ctk.ctkColorPickerButton()
+        self.anteriorLB3ColorPickerButton.objectName = 'anteriorLB3ColorPickerButton'
+        self.anteriorLB3ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorLB3Color()
+        self.anteriorLB3ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.anteriorLB3ColorPickerButton.setMinimumSize(0, 0)
+        self.anteriorLB3ColorPickerButton.setMaximumSize(16777215, 16777215)
+        anteriorLB3Label = qt.QLabel(_("Anterior S3 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(anteriorLB3Label, 5, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.anteriorLB3ColorPickerButton, 5, 3)
+        self.superiorLingularLB4ColorPickerButton = ctk.ctkColorPickerButton()
+        self.superiorLingularLB4ColorPickerButton.objectName = 'superiorLingularLB4ColorPickerButton'
+        self.superiorLingularLB4ColorPickerButton.color = EvoSegModels.get('Lobe').superiorLingularLB4Color()
+        self.superiorLingularLB4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.superiorLingularLB4ColorPickerButton.setMinimumSize(0, 0)
+        self.superiorLingularLB4ColorPickerButton.setMaximumSize(16777215, 16777215)
+        superiorLingularLB4Label = qt.QLabel(_("Superior lingular S4 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(superiorLingularLB4Label, 6, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.superiorLingularLB4ColorPickerButton, 6, 1)
         
-        self.inferiorLingularS5ColorPickerButton = ctk.ctkColorPickerButton()
-        self.inferiorLingularS5ColorPickerButton.objectName = 'inferiorLingularS5ColorPickerButton'
-        self.inferiorLingularS5ColorPickerButton.color = EvoSegModels.get('Lobe').inferiorLingularS5Color()
-        self.inferiorLingularS5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.inferiorLingularS5ColorPickerButton.setMinimumSize(0, 0)
-        self.inferiorLingularS5ColorPickerButton.setMaximumSize(16777215, 16777215)
-        inferiorLingularS5Label = qt.QLabel(_("Inferior lingular S5 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(inferiorLingularS5Label, 6, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.inferiorLingularS5ColorPickerButton, 6, 3)
-        self.superiorS6LeftColorPickerButton = ctk.ctkColorPickerButton()
-        self.superiorS6LeftColorPickerButton.objectName = 'superiorS6LeftColorPickerButton'
-        self.superiorS6LeftColorPickerButton.color = EvoSegModels.get('Lobe').superiorS6LeftColor()
-        self.superiorS6LeftColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.superiorS6LeftColorPickerButton.setMinimumSize(0, 0)
-        self.superiorS6LeftColorPickerButton.setMaximumSize(16777215, 16777215)
-        superiorS6LeftLabel = qt.QLabel(_("Superior S6 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(superiorS6LeftLabel, 7, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.superiorS6LeftColorPickerButton, 7, 1)
+        self.inferiorLingularLB5ColorPickerButton = ctk.ctkColorPickerButton()
+        self.inferiorLingularLB5ColorPickerButton.objectName = 'inferiorLingularLB5ColorPickerButton'
+        self.inferiorLingularLB5ColorPickerButton.color = EvoSegModels.get('Lobe').inferiorLingularLB5Color()
+        self.inferiorLingularLB5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.inferiorLingularLB5ColorPickerButton.setMinimumSize(0, 0)
+        self.inferiorLingularLB5ColorPickerButton.setMaximumSize(16777215, 16777215)
+        inferiorLingularLB5Label = qt.QLabel(_("Inferior lingular S5 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(inferiorLingularLB5Label, 6, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.inferiorLingularLB5ColorPickerButton, 6, 3)
+        self.superiorLB6ColorPickerButton = ctk.ctkColorPickerButton()
+        self.superiorLB6ColorPickerButton.objectName = 'superiorLB6ColorPickerButton'
+        self.superiorLB6ColorPickerButton.color = EvoSegModels.get('Lobe').superiorLB6Color()
+        self.superiorLB6ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.superiorLB6ColorPickerButton.setMinimumSize(0, 0)
+        self.superiorLB6ColorPickerButton.setMaximumSize(16777215, 16777215)
+        superiorLB6Label = qt.QLabel(_("Superior S6 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(superiorLB6Label, 7, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.superiorLB6ColorPickerButton, 7, 1)
         
-        self.anteriorBasalS8LeftColorPickerButton = ctk.ctkColorPickerButton()
-        self.anteriorBasalS8LeftColorPickerButton.objectName = 'anteriorBasalS8LeftColorPickerButton'
-        self.anteriorBasalS8LeftColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalS8LeftColor()
-        self.anteriorBasalS8LeftColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.anteriorBasalS8LeftColorPickerButton.setMinimumSize(0, 0)
-        self.anteriorBasalS8LeftColorPickerButton.setMaximumSize(16777215, 16777215)
-        anteriorBasalS8LeftLabel = qt.QLabel(_("Anterior basal S8 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(anteriorBasalS8LeftLabel, 7, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalS8LeftColorPickerButton, 7, 3)
-        self.lateralBasalS9LeftColorPickerButton = ctk.ctkColorPickerButton()
-        self.lateralBasalS9LeftColorPickerButton.objectName = 'lateralBasalS9LeftColorPickerButton'
-        self.lateralBasalS9LeftColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalS9LeftColor()
-        self.lateralBasalS9LeftColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.lateralBasalS9LeftColorPickerButton.setMinimumSize(0, 0)
-        self.lateralBasalS9LeftColorPickerButton.setMaximumSize(16777215, 16777215)
-        lateralBasalS9LeftLabel = qt.QLabel(_("Lateral basal S9 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(lateralBasalS9LeftLabel, 8, 0)
-        lobeColorGroupBoxGridLayout.addWidget(self.lateralBasalS9LeftColorPickerButton, 8, 1)
+        self.anteriorBasalLB8ColorPickerButton = ctk.ctkColorPickerButton()
+        self.anteriorBasalLB8ColorPickerButton.objectName = 'anteriorBasalLB8ColorPickerButton'
+        self.anteriorBasalLB8ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalLB8Color()
+        self.anteriorBasalLB8ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.anteriorBasalLB8ColorPickerButton.setMinimumSize(0, 0)
+        self.anteriorBasalLB8ColorPickerButton.setMaximumSize(16777215, 16777215)
+        anteriorBasalLB8Label = qt.QLabel(_("Anterior basal S8 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(anteriorBasalLB8Label, 7, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalLB8ColorPickerButton, 7, 3)
+        self.lateralBasalLB9ColorPickerButton = ctk.ctkColorPickerButton()
+        self.lateralBasalLB9ColorPickerButton.objectName = 'lateralBasalLB9ColorPickerButton'
+        self.lateralBasalLB9ColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalLB9Color()
+        self.lateralBasalLB9ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.lateralBasalLB9ColorPickerButton.setMinimumSize(0, 0)
+        self.lateralBasalLB9ColorPickerButton.setMaximumSize(16777215, 16777215)
+        lateralBasalLB9Label = qt.QLabel(_("Lateral basal S9 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(lateralBasalLB9Label, 8, 0)
+        lobeColorGroupBoxGridLayout.addWidget(self.lateralBasalLB9ColorPickerButton, 8, 1)
         
-        self.posteriorBasalS10LeftColorPickerButton = ctk.ctkColorPickerButton()
-        self.posteriorBasalS10LeftColorPickerButton.objectName = 'posteriorBasalS10LeftColorPickerButton'
-        self.posteriorBasalS10LeftColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalS10LeftColor()
-        self.posteriorBasalS10LeftColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
-        self.posteriorBasalS10LeftColorPickerButton.setMinimumSize(0, 0)
-        self.posteriorBasalS10LeftColorPickerButton.setMaximumSize(16777215, 16777215)
-        posteriorBasalS10LeftLabel = qt.QLabel(_("Posterior basal S10 (Left)"))
-        lobeColorGroupBoxGridLayout.addWidget(posteriorBasalS10LeftLabel, 8, 2)
-        lobeColorGroupBoxGridLayout.addWidget(self.posteriorBasalS10LeftColorPickerButton, 8, 3)
+        self.posteriorBasalLB10ColorPickerButton = ctk.ctkColorPickerButton()
+        self.posteriorBasalLB10ColorPickerButton.objectName = 'posteriorBasalLB10ColorPickerButton'
+        self.posteriorBasalLB10ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalLB10Color()
+        self.posteriorBasalLB10ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
+        self.posteriorBasalLB10ColorPickerButton.setMinimumSize(0, 0)
+        self.posteriorBasalLB10ColorPickerButton.setMaximumSize(16777215, 16777215)
+        posteriorBasalLB10Label = qt.QLabel(_("Posterior basal S10 (Left)"))
+        lobeColorGroupBoxGridLayout.addWidget(posteriorBasalLB10Label, 8, 2)
+        lobeColorGroupBoxGridLayout.addWidget(self.posteriorBasalLB10ColorPickerButton, 8, 3)
         
         vBoxLayout.addWidget(lobeColorGroupBox)
-        parent.registerProperty('EvoSeg/ApicalS1Color', self.apicalS1ColorPickerButton,
+        parent.registerProperty('EvoSeg/ApicalRB1Color', self.apicalRB1ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Apical S1 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/PosteriorS2Color', self.posteriorS2ColorPickerButton,
+        parent.registerProperty('EvoSeg/PosteriorRB2Color', self.posteriorRB2ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Posterior S2 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/AnteriorS3Color', self.anteriorS3ColorPickerButton,
+        parent.registerProperty('EvoSeg/AnteriorRB3Color', self.anteriorRB3ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Anterior S3 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/LateralS4Color', self.lateralS4ColorPickerButton,
+        parent.registerProperty('EvoSeg/LateralRB4Color', self.lateralRB4ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Lateral S4 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/MedialS5Color', self.medialS5ColorPickerButton,
+        parent.registerProperty('EvoSeg/MedialRB5Color', self.medialRB5ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Medial S5 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/SuperiorS6Color', self.superiorS6ColorPickerButton,
+        parent.registerProperty('EvoSeg/SuperiorRB6Color', self.superiorRB6ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Superior S6 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/MedialBasalS7Color', self.medialBasalS7ColorPickerButton,
+        parent.registerProperty('EvoSeg/MedialBasalRB7Color', self.medialBasalRB7ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Medial Basal S7 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/AnteriorBasalS8Color', self.anteriorBasalS8ColorPickerButton,
+        parent.registerProperty('EvoSeg/AnteriorBasalRB8Color', self.anteriorBasalRB8ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Anterior Basal S8 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/LateralBasalS9Color', self.lateralBasalS9ColorPickerButton,
+        parent.registerProperty('EvoSeg/LateralBasalRB9Color', self.lateralBasalRB9ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Lateral Basal S9 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/PosteriorBasalS10Color', self.posteriorBasalS10ColorPickerButton,
+        parent.registerProperty('EvoSeg/PosteriorBasalRB10Color', self.posteriorBasalRB10ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Posterior Basal S10 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/ApicoposteriorS1_2Color', self.apicoposteriorS1_2ColorPickerButton,
+        parent.registerProperty('EvoSeg/ApicoposteriorLB1_2Color', self.apicoposteriorLB1_2ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Apicoposterior S1+2 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/AnteriorS3LeftColor', self.anteriorS3LeftColorPickerButton,
+        parent.registerProperty('EvoSeg/AnteriorLB3Color', self.anteriorLB3ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Anterior S3 Left Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/SuperiorLingularS4Color', self.superiorLingularS4ColorPickerButton,
+        parent.registerProperty('EvoSeg/SuperiorLingularLB4Color', self.superiorLingularLB4ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Superior Lingular S4 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/InferiorLingularS5Color', self.inferiorLingularS5ColorPickerButton,
+        parent.registerProperty('EvoSeg/InferiorLingularLB5Color', self.inferiorLingularLB5ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Inferior Lingular S5 Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/SuperiorS6LeftColor', self.superiorS6LeftColorPickerButton,
+        parent.registerProperty('EvoSeg/SuperiorLB6Color', self.superiorLB6ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Superior S6 Left Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/AnteriorBasalS8LeftColor', self.anteriorBasalS8LeftColorPickerButton,
+        parent.registerProperty('EvoSeg/AnteriorBasalLB8Color', self.anteriorBasalLB8ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Anterior Basal S8 Left Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/LateralBasalS9LeftColor', self.lateralBasalS9LeftColorPickerButton,
+        parent.registerProperty('EvoSeg/LateralBasalLB9Color', self.lateralBasalLB9ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Lateral Basal S9 Left Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
-        parent.registerProperty('EvoSeg/PosteriorBasalS10LeftColor', self.posteriorBasalS10LeftColorPickerButton,
+        parent.registerProperty('EvoSeg/PosteriorBasalLB10Color', self.posteriorBasalLB10ColorPickerButton,
             "color", str(qt.SIGNAL("colorChanged(QColor)")),
             _("Posterior Basal S10 Left Color"), ctk.ctkSettingsPanel.OptionRequireRestart)
         

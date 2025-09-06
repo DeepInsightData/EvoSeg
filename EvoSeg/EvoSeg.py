@@ -247,26 +247,26 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         
         # 新增肺段控件的可见性信号连接 (31-48)
         # 右肺段 (31-40)
-        self.ui.apicalS1VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.apicalS1VisibilityButton))
-        self.ui.posteriorS2VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorS2VisibilityButton))
-        self.ui.anteriorS3VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorS3VisibilityButton))
-        self.ui.lateralS4VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralS4VisibilityButton))
-        self.ui.medialS5VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.medialS5VisibilityButton))
-        self.ui.superiorS6VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorS6VisibilityButton))
-        self.ui.medialBasalS7VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.medialBasalS7VisibilityButton))
-        self.ui.anteriorBasalS8VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorBasalS8VisibilityButton))
-        self.ui.lateralBasalS9VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralBasalS9VisibilityButton))
-        self.ui.posteriorBasalS10VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorBasalS10VisibilityButton))
+        self.ui.apicalRB1VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.apicalRB1VisibilityButton))
+        self.ui.posteriorRB2VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorRB2VisibilityButton))
+        self.ui.anteriorRB3VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorRB3VisibilityButton))
+        self.ui.lateralRB4VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralRB4VisibilityButton))
+        self.ui.medialRB5VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.medialRB5VisibilityButton))
+        self.ui.superiorRB6VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorRB6VisibilityButton))
+        self.ui.medialBasalRB7VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.medialBasalRB7VisibilityButton))
+        self.ui.anteriorBasalRB8VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorBasalRB8VisibilityButton))
+        self.ui.lateralBasalRB9VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralBasalRB9VisibilityButton))
+        self.ui.posteriorBasalRB10VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorBasalRB10VisibilityButton))
         
         # 左肺段 (41-48)
-        self.ui.apicoposteriorS1_2VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.apicoposteriorS1_2VisibilityButton))
-        self.ui.anteriorS3LeftVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorS3LeftVisibilityButton))
-        self.ui.superiorLingularS4VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorLingularS4VisibilityButton))
-        self.ui.inferiorLingularS5VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.inferiorLingularS5VisibilityButton))
-        self.ui.superiorS6LeftVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorS6LeftVisibilityButton))
-        self.ui.anteriorBasalS8LeftVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorBasalS8LeftVisibilityButton))
-        self.ui.lateralBasalS9LeftVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralBasalS9LeftVisibilityButton))
-        self.ui.posteriorBasalS10LeftVisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorBasalS10LeftVisibilityButton))
+        self.ui.apicoposteriorLB1_2VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.apicoposteriorLB1_2VisibilityButton))
+        self.ui.anteriorLB3VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorLB3VisibilityButton))
+        self.ui.superiorLingularLB4VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorLingularLB4VisibilityButton))
+        self.ui.inferiorLingularLB5VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.inferiorLingularLB5VisibilityButton))
+        self.ui.superiorLB6VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.superiorLB6VisibilityButton))
+        self.ui.anteriorBasalLB8VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.anteriorBasalLB8VisibilityButton))
+        self.ui.lateralBasalLB9VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.lateralBasalLB9VisibilityButton))
+        self.ui.posteriorBasalLB10VisibilityButton.toggled.connect(lambda toggled: self.onVisibilityButtonToggled(toggled, self.ui.posteriorBasalLB10VisibilityButton))
 
         self.ui.sliderOpacityAirway.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityAirway))
         self.ui.sliderOpacityLeftAirway.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLeftAirway))
@@ -289,25 +289,25 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.sliderOpacityRibs.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityRibs))
         self.ui.sliderOpacityNodule.connect("valueChanged(double)", lambda value: self.onSegmentationOpacityChanged(value, self.ui.sliderOpacityNodule))
         
-        self.ui.sliderOpacityApicalS1.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityApicalS1))
-        self.ui.sliderOpacityPosteriorS2.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorS2))
-        self.ui.sliderOpacityAnteriorS3.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorS3))
-        self.ui.sliderOpacityLateralS4.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralS4))
-        self.ui.sliderOpacityMedialS5.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityMedialS5))
-        self.ui.sliderOpacitySuperiorS6.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorS6))
-        self.ui.sliderOpacityMedialBasalS7.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityMedialBasalS7))
-        self.ui.sliderOpacityAnteriorBasalS8.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorBasalS8))
-        self.ui.sliderOpacityLateralBasalS9.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralBasalS9))
-        self.ui.sliderOpacityPosteriorBasalS10.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorBasalS10))
+        self.ui.sliderOpacityApicalRB1.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityApicalRB1))
+        self.ui.sliderOpacityPosteriorRB2.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorRB2))
+        self.ui.sliderOpacityAnteriorRB3.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorRB3))
+        self.ui.sliderOpacityLateralRB4.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralRB4))
+        self.ui.sliderOpacityMedialRB5.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityMedialRB5))
+        self.ui.sliderOpacitySuperiorRB6.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorRB6))
+        self.ui.sliderOpacityMedialBasalRB7.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityMedialBasalRB7))
+        self.ui.sliderOpacityAnteriorBasalRB8.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorBasalRB8))
+        self.ui.sliderOpacityLateralBasalRB9.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralBasalRB9))
+        self.ui.sliderOpacityPosteriorBasalRB10.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorBasalRB10))
         
-        self.ui.sliderOpacityApicoposteriorS1_2.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityApicoposteriorS1_2))
-        self.ui.sliderOpacityAnteriorS3Left.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorS3Left))
-        self.ui.sliderOpacitySuperiorLingularS4.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorLingularS4))
-        self.ui.sliderOpacityInferiorLingularS5.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityInferiorLingularS5))
-        self.ui.sliderOpacitySuperiorS6Left.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorS6Left))
-        self.ui.sliderOpacityAnteriorBasalS8Left.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorBasalS8Left))
-        self.ui.sliderOpacityLateralBasalS9Left.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralBasalS9Left))
-        self.ui.sliderOpacityPosteriorBasalS10Left.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorBasalS10Left))
+        self.ui.sliderOpacityApicoposteriorLB1_2.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityApicoposteriorLB1_2))
+        self.ui.sliderOpacityAnteriorLB3.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorLB3))
+        self.ui.sliderOpacitySuperiorLingularLB4.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorLingularLB4))
+        self.ui.sliderOpacityInferiorLingularLB5.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityInferiorLingularLB5))
+        self.ui.sliderOpacitySuperiorLB6.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacitySuperiorLB6))
+        self.ui.sliderOpacityAnteriorBasalLB8.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityAnteriorBasalLB8))
+        self.ui.sliderOpacityLateralBasalLB9.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityLateralBasalLB9))
+        self.ui.sliderOpacityPosteriorBasalLB10.connect("valueChanged(double)", lambda value: self.onSegmentOpacityChanged(value, self.ui.sliderOpacityPosteriorBasalLB10))
         
         self._process = {
             "Airway_nnUnet" : EvoSegProcess(
@@ -363,25 +363,25 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 model = lambda: EvoSegModels.get('Lobe'),
                 segments=[
                     # right lung segments 
-                    EvoSegProcess.Segment("Apical S1", self.ui.apicalS1VisibilityButton, self.ui.sliderOpacityApicalS1),  # Right apical segment
-                    EvoSegProcess.Segment("Posterior S2", self.ui.posteriorS2VisibilityButton, self.ui.sliderOpacityPosteriorS2),  # Right posterior segment
-                    EvoSegProcess.Segment("Anterior S3", self.ui.anteriorS3VisibilityButton, self.ui.sliderOpacityAnteriorS3),  # Right anterior segment
-                    EvoSegProcess.Segment("Lateral S4", self.ui.lateralS4VisibilityButton, self.ui.sliderOpacityLateralS4),  # Right lateral segment
-                    EvoSegProcess.Segment("Medial S5", self.ui.medialS5VisibilityButton, self.ui.sliderOpacityMedialS5),  # Right medial segment
-                    EvoSegProcess.Segment("Superior S6", self.ui.superiorS6VisibilityButton, self.ui.sliderOpacitySuperiorS6),  # Right superior segment
-                    EvoSegProcess.Segment("Medial basal S7", self.ui.medialBasalS7VisibilityButton, self.ui.sliderOpacityMedialBasalS7),  # Right medial basal segment
-                    EvoSegProcess.Segment("Anterior basal S8", self.ui.anteriorBasalS8VisibilityButton, self.ui.sliderOpacityAnteriorBasalS8),  # Right anterior basal segment
-                    EvoSegProcess.Segment("Lateral basal S9", self.ui.lateralBasalS9VisibilityButton, self.ui.sliderOpacityLateralBasalS9),  # Right lateral basal segment
-                    EvoSegProcess.Segment("Posterior basal S10", self.ui.posteriorBasalS10VisibilityButton, self.ui.sliderOpacityPosteriorBasalS10),  # Right posterior basal segment
+                    EvoSegProcess.Segment("Apical RB1", self.ui.apicalRB1VisibilityButton, self.ui.sliderOpacityApicalRB1),  # Right apical segment
+                    EvoSegProcess.Segment("Posterior RB2", self.ui.posteriorRB2VisibilityButton, self.ui.sliderOpacityPosteriorRB2),  # Right posterior segment
+                    EvoSegProcess.Segment("Anterior RB3", self.ui.anteriorRB3VisibilityButton, self.ui.sliderOpacityAnteriorRB3),  # Right anterior segment
+                    EvoSegProcess.Segment("Lateral RB4", self.ui.lateralRB4VisibilityButton, self.ui.sliderOpacityLateralRB4),  # Right lateral segment
+                    EvoSegProcess.Segment("Medial RB5", self.ui.medialRB5VisibilityButton, self.ui.sliderOpacityMedialRB5),  # Right medial segment
+                    EvoSegProcess.Segment("Superior RB6", self.ui.superiorRB6VisibilityButton, self.ui.sliderOpacitySuperiorRB6),  # Right superior segment
+                    EvoSegProcess.Segment("Medial basal RB7", self.ui.medialBasalRB7VisibilityButton, self.ui.sliderOpacityMedialBasalRB7),  # Right medial basal segment
+                    EvoSegProcess.Segment("Anterior basal RB8", self.ui.anteriorBasalRB8VisibilityButton, self.ui.sliderOpacityAnteriorBasalRB8),  # Right anterior basal segment
+                    EvoSegProcess.Segment("Lateral basal RB9", self.ui.lateralBasalRB9VisibilityButton, self.ui.sliderOpacityLateralBasalRB9),  # Right lateral basal segment
+                    EvoSegProcess.Segment("Posterior basal RB10", self.ui.posteriorBasalRB10VisibilityButton, self.ui.sliderOpacityPosteriorBasalRB10),  # Right posterior basal segment
                     # Left lung segments
-                    EvoSegProcess.Segment("Apicoposterior S1+2", self.ui.apicoposteriorS1_2VisibilityButton, self.ui.sliderOpacityApicoposteriorS1_2),  # Left apicoposterior segment
-                    EvoSegProcess.Segment("Anterior S3", self.ui.anteriorS3LeftVisibilityButton, self.ui.sliderOpacityAnteriorS3Left),  # Left anterior segment
-                    EvoSegProcess.Segment("Superior lingular S4", self.ui.superiorLingularS4VisibilityButton, self.ui.sliderOpacitySuperiorLingularS4),  # Left superior lingular segment
-                    EvoSegProcess.Segment("Inferior lingular S5", self.ui.inferiorLingularS5VisibilityButton, self.ui.sliderOpacityInferiorLingularS5),  # Left inferior lingular segment
-                    EvoSegProcess.Segment("Superior S6", self.ui.superiorS6LeftVisibilityButton, self.ui.sliderOpacitySuperiorS6Left),  # Left superior segment
-                    EvoSegProcess.Segment("Anterior basal S8", self.ui.anteriorBasalS8LeftVisibilityButton, self.ui.sliderOpacityAnteriorBasalS8Left),  # Left anterior basal segment
-                    EvoSegProcess.Segment("Lateral basal S9", self.ui.lateralBasalS9LeftVisibilityButton, self.ui.sliderOpacityLateralBasalS9Left),  # Left lateral basal segment
-                    EvoSegProcess.Segment("Posterior basal S10", self.ui.posteriorBasalS10LeftVisibilityButton, self.ui.sliderOpacityPosteriorBasalS10Left),  # Left posterior basal segment
+                    EvoSegProcess.Segment("Apicoposterior LB1/2", self.ui.apicoposteriorLB1_2VisibilityButton, self.ui.sliderOpacityApicoposteriorLB1_2),  # Left apicoposterior segment
+                    EvoSegProcess.Segment("Anterior LB3", self.ui.anteriorLB3VisibilityButton, self.ui.sliderOpacityAnteriorLB3),  # Left anterior segment
+                    EvoSegProcess.Segment("Superior lingular LB4", self.ui.superiorLingularLB4VisibilityButton, self.ui.sliderOpacitySuperiorLingularLB4),  # Left superior lingular segment
+                    EvoSegProcess.Segment("Inferior lingular LB5", self.ui.inferiorLingularLB5VisibilityButton, self.ui.sliderOpacityInferiorLingularLB5),  # Left inferior lingular segment
+                    EvoSegProcess.Segment("Superior LB6", self.ui.superiorLB6VisibilityButton, self.ui.sliderOpacitySuperiorLB6),  # Left superior segment
+                    EvoSegProcess.Segment("Anterior basal LB8", self.ui.anteriorBasalLB8VisibilityButton, self.ui.sliderOpacityAnteriorBasalLB8),  # Left anterior basal segment
+                    EvoSegProcess.Segment("Lateral basal LB9", self.ui.lateralBasalLB9VisibilityButton, self.ui.sliderOpacityLateralBasalLB9),  # Left lateral basal segment
+                    EvoSegProcess.Segment("Posterior basal LB10", self.ui.posteriorBasalLB10VisibilityButton, self.ui.sliderOpacityPosteriorBasalLB10),  # Left posterior basal segment
                 ],
                 segmentGroups=[
                     EvoSegProcess.SegmentGroup(
@@ -1323,24 +1323,24 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                     "right middle lobe": data[:, :, :] == 13,
                     "right lower lobe": data[:, :, :] == 14,
                     "rib": data[:, :, :] == 20,
-                    "Apical S1": data[:, :, :] == 31,
-                    "Posterior S2": data[:, :, :] == 32,
-                    "Anterior S3": data[:, :, :] == 33,
-                    "Lateral S4": data[:, :, :] == 34,
-                    "Medial S5": data[:, :, :] == 35,
-                    "Superior S6": data[:, :, :] == 36,
-                    "Medial basal S7": data[:, :, :] == 37,
-                    "Anterior basal S8": data[:, :, :] == 38,
-                    "Lateral basal S9": data[:, :, :] == 39,
-                    "Posterior basal S10": data[:, :, :] == 40,
-                    "Apicoposterior S1+2": data[:, :, :] == 41,
-                    "Anterior S3": data[:, :, :] == 42,
-                    "Superior lingular S4": data[:, :, :] == 43,
-                    "Inferior lingular S5": data[:, :, :] == 44,
-                    "Superior S6": data[:, :, :] == 45,
-                    "Anterior basal S8": data[:, :, :] == 46,
-                    "Lateral basal S9": data[:, :, :] == 47,
-                    "Posterior basal S10": data[:, :, :] == 48,
+                    "Apical RB1": data[:, :, :] == 31,
+                    "Posterior RB2": data[:, :, :] == 32,
+                    "Anterior RB3": data[:, :, :] == 33,
+                    "Lateral RB4": data[:, :, :] == 34,
+                    "Medial RB5": data[:, :, :] == 35,
+                    "Superior RB6": data[:, :, :] == 36,
+                    "Medial basal RB7": data[:, :, :] == 37,
+                    "Anterior basal RB8": data[:, :, :] == 38,
+                    "Lateral basal RB9": data[:, :, :] == 39,
+                    "Posterior basal RB10": data[:, :, :] == 40,
+                    "Apicoposterior LB1/2": data[:, :, :] == 41,
+                    "Anterior LB3": data[:, :, :] == 42,
+                    "Superior lingular LB4": data[:, :, :] == 43,
+                    "Inferior lingular LB5": data[:, :, :] == 44,
+                    "Superior LB6": data[:, :, :] == 45,
+                    "Anterior basal LB8": data[:, :, :] == 46,
+                    "Lateral basal LB9": data[:, :, :] == 47,
+                    "Posterior basal LB10": data[:, :, :] == 48,
                     "nodule": data[:, :, :] == 201
                 }
 
@@ -1349,30 +1349,25 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
                 "artery": segmentation_masks["artery"].astype(np.float32),
                 "vein": segmentation_masks["vein"].astype(np.float32),
 
-                "left upper lobe": segmentation_masks["left upper lobe"].astype(np.float32),
-                "left lower lobe": segmentation_masks["left lower lobe"].astype(np.float32),
-                "right upper lobe": segmentation_masks["right upper lobe"].astype(np.float32),
-                "right middle lobe": segmentation_masks["right middle lobe"].astype(np.float32),
-                "right lower lobe": segmentation_masks["right lower lobe"].astype(np.float32),
                 "rib": segmentation_masks["rib"].astype(np.float32),
-                "Apical S1": segmentation_masks["Apical S1"].astype(np.float32),
-                "Posterior S2": segmentation_masks["Posterior S2"].astype(np.float32),
-                "Anterior S3": segmentation_masks["Anterior S3"].astype(np.float32),
-                "Lateral S4": segmentation_masks["Lateral S4"].astype(np.float32),
-                "Medial S5": segmentation_masks["Medial S5"].astype(np.float32),
-                "Superior S6": segmentation_masks["Superior S6"].astype(np.float32),
-                "Medial basal S7": segmentation_masks["Medial basal S7"].astype(np.float32),
-                "Anterior basal S8": segmentation_masks["Anterior basal S8"].astype(np.float32),
-                "Lateral basal S9": segmentation_masks["Lateral basal S9"].astype(np.float32),
-                "Posterior basal S10": segmentation_masks["Posterior basal S10"].astype(np.float32),
-                "Apicoposterior S1+2": segmentation_masks["Apicoposterior S1+2"].astype(np.float32),
-                "Anterior S3": segmentation_masks["Anterior S3"].astype(np.float32),
-                "Superior lingular S4": segmentation_masks["Superior lingular S4"].astype(np.float32),
-                "Inferior lingular S5": segmentation_masks["Inferior lingular S5"].astype(np.float32),
-                "Superior S6": segmentation_masks["Superior S6"].astype(np.float32),
-                "Anterior basal S8": segmentation_masks["Anterior basal S8"].astype(np.float32),
-                "Lateral basal S9": segmentation_masks["Lateral basal S9"].astype(np.float32),
-                "Posterior basal S10": segmentation_masks["Posterior basal S10"].astype(np.float32),
+                "Apical RB1": segmentation_masks["Apical RB1"].astype(np.float32),
+                "Posterior RB2": segmentation_masks["Posterior RB2"].astype(np.float32),
+                "Anterior RB3": segmentation_masks["Anterior RB3"].astype(np.float32),
+                "Lateral RB4": segmentation_masks["Lateral RB4"].astype(np.float32),
+                "Medial RB5": segmentation_masks["Medial RB5"].astype(np.float32),
+                "Superior RB6": segmentation_masks["Superior RB6"].astype(np.float32),
+                "Medial basal RB7": segmentation_masks["Medial basal RB7"].astype(np.float32),
+                "Anterior basal RB8": segmentation_masks["Anterior basal RB8"].astype(np.float32),
+                "Lateral basal RB9": segmentation_masks["Lateral basal RB9"].astype(np.float32),
+                "Posterior basal RB10": segmentation_masks["Posterior basal RB10"].astype(np.float32),
+                "Apicoposterior LB1/2": segmentation_masks["Apicoposterior LB1/2"].astype(np.float32),
+                "Anterior LB3": segmentation_masks["Anterior LB3"].astype(np.float32),
+                "Superior lingular LB4": segmentation_masks["Superior lingular LB4"].astype(np.float32),
+                "Inferior lingular LB5": segmentation_masks["Inferior lingular LB5"].astype(np.float32),
+                "Superior LB6": segmentation_masks["Superior LB6"].astype(np.float32),
+                "Anterior basal LB8": segmentation_masks["Anterior basal LB8"].astype(np.float32),
+                "Lateral basal LB9": segmentation_masks["Lateral basal LB9"].astype(np.float32),
+                "Posterior basal LB10": segmentation_masks["Posterior basal LB10"].astype(np.float32),
                 "nodule": segmentation_masks["nodule"].astype(np.float32),
             }
 
@@ -1540,24 +1535,24 @@ class EvoSegLogic(ScriptedLoadableModuleLogic):
             13:{"name": "right middle lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^72481006^Middle lobe of right lung~^^~Anatomic codes - DICOM master list~^^~^^"},
             14:{"name": "right lower lobe", "terminology":"Segmentation category and type - 3D Slicer General Anatomy list~SCT^123037004^Anatomical Structure~SCT^90572001^Lower lobe of lung~SCT^24028007^Right~Anatomic codes - DICOM master list~^^~^^"},
             20:{"name": "rib", "terminology":"None"},
-            31: {"name": "Apical S1", "terminology":"None"},
-            32: {"name": "Posterior S2", "terminology":"None"},
-            33: {"name": "Anterior S3", "terminology":"None"},
-            34: {"name": "Lateral S4", "terminology":"None"},
-            35: {"name": "Medial S5", "terminology":"None"},
-            36: {"name": "Superior S6", "terminology":"None"},
-            37: {"name": "Medial basal S7", "terminology":"None"},
-            38: {"name": "Anterior basal S8", "terminology":"None"},
-            39: {"name": "Lateral basal S9", "terminology":"None"},
-            40: {"name": "Posterior basal S10", "terminology":"None"},
-            41: {"name": "Apicoposterior S1+2", "terminology":"None"},
-            42: {"name": "Anterior S3", "terminology":"None"},
-            43: {"name": "Superior lingular S4", "terminology":"None"},
-            44: {"name": "Inferior lingular S5", "terminology":"None"},
-            45: {"name": "Superior S6", "terminology":"None"},
-            46: {"name": "Anterior basal S8", "terminology":"None"},
-            47: {"name": "Lateral basal S9", "terminology":"None"},
-            48: {"name": "Posterior basal S10", "terminology":"None"},
+            31: {"name": "Apical RB1", "terminology":"None"},
+            32: {"name": "Posterior RB2", "terminology":"None"},
+            33: {"name": "Anterior RB3", "terminology":"None"},
+            34: {"name": "Lateral RB4", "terminology":"None"},
+            35: {"name": "Medial RB5", "terminology":"None"},
+            36: {"name": "Superior RB6", "terminology":"None"},
+            37: {"name": "Medial basal RB7", "terminology":"None"},
+            38: {"name": "Anterior basal RB8", "terminology":"None"},
+            39: {"name": "Lateral basal RB9", "terminology":"None"},
+            40: {"name": "Posterior basal RB10", "terminology":"None"},
+            41: {"name": "Apicoposterior LB1/2", "terminology":"None"},
+            42: {"name": "Anterior LB3", "terminology":"None"},
+            43: {"name": "Superior lingular LB4", "terminology":"None"},
+            44: {"name": "Inferior lingular LB5", "terminology":"None"},
+            45: {"name": "Superior LB6", "terminology":"None"},
+            46: {"name": "Anterior basal LB8", "terminology":"None"},
+            47: {"name": "Lateral basal LB9", "terminology":"None"},
+            48: {"name": "Posterior basal LB10", "terminology":"None"},
             201:{"name": "nodule", "terminology":"None"}
         }
 
