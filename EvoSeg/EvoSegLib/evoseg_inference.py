@@ -185,6 +185,9 @@ class LungSegmentPredictor:
             nib.save(img, output_file)
             return
 
+        # map label value from 1~18 to 31~48
+        data[binary] = data[binary] + 30
+
         # 连通域标记（所有非零区域一起处理）
         labeled, num_components = ndimage.label(binary)
         if num_components <= 1:
