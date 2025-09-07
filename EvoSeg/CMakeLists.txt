@@ -15,7 +15,8 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}Lib/modify_total_nnunet.py
   ${MODULE_NAME}Lib/modify_total_python_api.py
   ${MODULE_NAME}Lib/utils.py
-  ${MODULE_NAME}Lib/task.py
+  ${MODULE_NAME}Lib/crop_lung_roi.py
+  ${MODULE_NAME}Lib/evoseg_inference.py
   )
 
 set(MODULE_PYTHON_RESOURCES
