@@ -631,13 +631,13 @@
          <widget class="QLabel" name="labelAirway">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -752,13 +752,13 @@
          <widget class="QLabel" name="labelLeftAirway">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -855,13 +855,13 @@
          <widget class="QLabel" name="labelArtery">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -949,13 +949,13 @@
          <widget class="QLabel" name="labelLeftArtery">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -1082,13 +1082,13 @@
          <widget class="QLabel" name="labelVein">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -1215,13 +1215,13 @@
          <widget class="QLabel" name="labelLeftVein">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -1315,13 +1315,13 @@
          <widget class="QLabel" name="labelLobe">
           <property name="minimumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>124</width>
+            <width>140</width>
             <height>32</height>
            </size>
           </property>
@@ -1360,7 +1360,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxLeftUpperLobe">
         <property name="title">
-         <string></string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -1405,13 +1405,13 @@
             <widget class="QLabel" name="labelLeftUpperLobe">
              <property name="minimumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
@@ -1447,7 +1447,7 @@
             <string>segments</string>
            </property>
            <property name="collapsed">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
@@ -1481,6 +1481,18 @@
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="labelApicoposteriorLB1_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Apicoposterior LB1/2</string>
                 </property>
@@ -1534,6 +1546,18 @@
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="labelAnteriorLB3">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Anterior LB3</string>
                 </property>
@@ -1587,6 +1611,18 @@
               </item>
               <item row="2" column="1">
                <widget class="QLabel" name="labelSuperiorLingularLB4">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Superior lingular LB4</string>
                 </property>
@@ -1640,6 +1676,18 @@
               </item>
               <item row="3" column="1">
                <widget class="QLabel" name="labelInferiorLingularLB5">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Inferior lingular LB5</string>
                 </property>
@@ -1675,7 +1723,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxLeftLowerLobe">
         <property name="title">
-         <string></string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -1720,13 +1768,13 @@
             <widget class="QLabel" name="labelLeftLowerLobe">
              <property name="minimumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
@@ -1762,7 +1810,7 @@
             <string>segments</string>
            </property>
            <property name="collapsed">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
@@ -1796,6 +1844,18 @@
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="labelSuperiorLB6">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Superior LB6</string>
                 </property>
@@ -1902,6 +1962,18 @@
               </item>
               <item row="2" column="1">
                <widget class="QLabel" name="labelLateralBasalLB9">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Lateral basal LB9</string>
                 </property>
@@ -1955,6 +2027,18 @@
               </item>
               <item row="3" column="1">
                <widget class="QLabel" name="labelPosteriorBasalLB10">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Posterior basal LB10</string>
                 </property>
@@ -1990,7 +2074,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightUpperLobe">
         <property name="title">
-         <string></string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -2035,13 +2119,13 @@
             <widget class="QLabel" name="labelRightUpperLobe">
              <property name="minimumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
@@ -2077,7 +2161,7 @@
             <string>segments</string>
            </property>
            <property name="collapsed">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
@@ -2111,6 +2195,18 @@
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="labelPosteriorRB2">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Posterior RB2</string>
                 </property>
@@ -2118,6 +2214,18 @@
               </item>
               <item row="2" column="1">
                <widget class="QLabel" name="labelAnteriorRB3">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Anterior RB3</string>
                 </property>
@@ -2198,6 +2306,18 @@
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="labelApicalRB1">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Apical RB1</string>
                 </property>
@@ -2252,7 +2372,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightMiddleLobe">
         <property name="title">
-         <string></string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -2297,13 +2417,13 @@
             <widget class="QLabel" name="labelRightMiddleLobe">
              <property name="minimumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
@@ -2339,7 +2459,7 @@
             <string>segments</string>
            </property>
            <property name="collapsed">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
@@ -2373,6 +2493,18 @@
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="labelLateralRB4">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Lateral RB4</string>
                 </property>
@@ -2426,6 +2558,18 @@
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="labelMedialRB5">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Medial RB5</string>
                 </property>
@@ -2461,7 +2605,7 @@
       <item>
        <widget class="QGroupBox" name="groupBoxRightLowerLobe">
         <property name="title">
-         <string></string>
+         <string/>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -2506,13 +2650,13 @@
             <widget class="QLabel" name="labelRightLowerLobe">
              <property name="minimumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>124</width>
+               <width>130</width>
                <height>32</height>
               </size>
              </property>
@@ -2548,7 +2692,7 @@
             <string>segments</string>
            </property>
            <property name="collapsed">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
@@ -2582,6 +2726,18 @@
               </item>
               <item row="0" column="1">
                <widget class="QLabel" name="labelSuperiorRB6">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Superior RB6</string>
                 </property>
@@ -2635,6 +2791,18 @@
               </item>
               <item row="1" column="1">
                <widget class="QLabel" name="labelMedialBasalRB7">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Medial basal RB7</string>
                 </property>
@@ -2688,6 +2856,18 @@
               </item>
               <item row="2" column="1">
                <widget class="QLabel" name="labelAnteriorBasalRB8">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Anterior basal RB8</string>
                 </property>
@@ -2741,6 +2921,18 @@
               </item>
               <item row="3" column="1">
                <widget class="QLabel" name="labelLateralBasalRB9">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Lateral basal RB9</string>
                 </property>
@@ -2794,6 +2986,18 @@
               </item>
               <item row="4" column="1">
                <widget class="QLabel" name="labelPosteriorBasalRB10">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Posterior basal RB10</string>
                 </property>
