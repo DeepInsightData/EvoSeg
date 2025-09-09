@@ -22,7 +22,6 @@ from post_process_shrink import *
 from scipy.ndimage import binary_closing, binary_erosion, gaussian_filter, binary_dilation
 
 from crop_lung_roi import *
-from lung_inference0825 import *
 from evoseg_inference import LungSegmentPredictor
 
 def write_prob_maps(seg: np.ndarray, output_fname: str, properties: dict) -> None:
