@@ -360,7 +360,7 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 groupBox=self.ui.groupBoxLobe,
                 visibilityButton=self.ui.lobeVisibilityButton,
                 opacitySlider=self.ui.sliderOpacityLobe,
-                model = lambda: EvoSegModels.get('Lobe'),
+                model = lambda: EvoSegModels.get('LungLobe'),
                 segments=[
                     # right lung segments 
                     EvoSegProcess.Segment("Apical RB1", self.ui.apicalRB1VisibilityButton, self.ui.sliderOpacityApicalRB1),  # Right apical segment
@@ -908,42 +908,22 @@ class EvoSegWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             display_node = node.GetDisplayNode()
             if display_node==None:
                 continue
-            display_node.SetOpacity3D(0.8)
+            display_node.SetOpacity3D(1)
+            model_name = name.split('_')[0]
 
-            for i in range(segmentation.GetNumberOfSegments()):
-                segment = segmentation.GetNthSegment(i)
-                
-                # import random
-                # segment.SetColor(random.random(), random.random(), random.random())
-                try:
-                    color = EvoSegModels.get(name.split('_')[0]).color()
+            if model_name in ["Airway","Artery","Vein", "Rib", "Nodule"]:
+                model_color = EvoSegModels.get(model_name).color()
+                for i in range(segmentation.GetNumberOfSegments()):
+                    segment = segmentation.GetNthSegment(i)
+                    segment.SetColor(model_color.redF(), model_color.greenF(), model_color.blueF())
+            elif model_name == "LungLobe":
+                model_settings = EvoSegModels.get(model_name)
+                for i in range(segmentation.GetNumberOfSegments()):
+                    segment = segmentation.GetNthSegment(i)
+                    segment_name = segment.GetName()
+                    color = model_settings.getSegmentColor(segment_name)
                     segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                except:
-                    seg_name=segment.GetName()
-                    #固定颜色参考：
-                    #https://github.com/Slicer/SlicerLungCTAnalyzer/blob/e2f23dafb6994421ad65606050979b10e8a932aa/LungCTSegmenter/LungCTSegmenter.py#L1266
-                    if seg_name=="right upper lobe":
-                        color = EvoSegModels.get('Lobe').rightUpperLobeColor()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="right middle lobe":
-                        color = EvoSegModels.get('Lobe').rightMiddleLobeColor()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="right lower lobe":
-                        color = EvoSegModels.get('Lobe').rightLowerLobeColor()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="left upper lobe":
-                        color = EvoSegModels.get('Lobe').leftUpperLobeColor()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if seg_name=="left lower lobe":
-                        color = EvoSegModels.get('Lobe').leftLowerLobeColor()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    if "nodule" in seg_name:
-                        color = EvoSegModels.get('Nodule').color()
-                        segment.SetColor(color.redF(), color.greenF(), color.blueF())
-                    # if seg_name=="rib": # 应该不需要这个if, TODO 待检查
-                    #     color = EvoSegModels.get('Rib').color()
-                    #     segment.SetColor(color.redF(), color.greenF(), color.blueF())
-            
+
             self.ui.statusLabel.appendPlainText("\n"+name+": Processing finished.")
             #segment_id = segment.GetName()
             # display_node.SetSegmentOpacity3D(segment_id, 0.2)

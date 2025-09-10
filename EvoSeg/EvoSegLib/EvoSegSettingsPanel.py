@@ -68,11 +68,12 @@ class _ui_EvoSegSettingsPanel:
             "checked", str(qt.SIGNAL("toggled(bool)")),
             _("Split By Middle Plane"), ctk.ctkSettingsPanel.OptionRequireRestart)
         
+        lungLobeModel = EvoSegModels.get('LungLobe')
         lobeColorGroupBox = qt.QGroupBox(_('Lung Segments'))
         lobeColorGroupBoxGridLayout = qt.QGridLayout(lobeColorGroupBox)
         self.apicalRB1ColorPickerButton = ctk.ctkColorPickerButton()
         self.apicalRB1ColorPickerButton.objectName = 'apicalRB1ColorPickerButton'
-        self.apicalRB1ColorPickerButton.color = EvoSegModels.get('Lobe').apicalRB1Color()
+        self.apicalRB1ColorPickerButton.color = lungLobeModel.apicalRB1Color()
         self.apicalRB1ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.apicalRB1ColorPickerButton.setMinimumSize(0, 0)
         self.apicalRB1ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -82,7 +83,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.posteriorRB2ColorPickerButton = ctk.ctkColorPickerButton()
         self.posteriorRB2ColorPickerButton.objectName = 'posteriorRB2ColorPickerButton'
-        self.posteriorRB2ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorRB2Color()
+        self.posteriorRB2ColorPickerButton.color = lungLobeModel.posteriorRB2Color()
         self.posteriorRB2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.posteriorRB2ColorPickerButton.setMinimumSize(0, 0)
         self.posteriorRB2ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -91,7 +92,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.posteriorRB2ColorPickerButton, 0, 3)
         self.anteriorRB3ColorPickerButton = ctk.ctkColorPickerButton()
         self.anteriorRB3ColorPickerButton.objectName = 'anteriorRB3ColorPickerButton'
-        self.anteriorRB3ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorRB3Color()
+        self.anteriorRB3ColorPickerButton.color = lungLobeModel.anteriorRB3Color()
         self.anteriorRB3ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.anteriorRB3ColorPickerButton.setMinimumSize(0, 0)
         self.anteriorRB3ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -101,7 +102,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.lateralRB4ColorPickerButton = ctk.ctkColorPickerButton()
         self.lateralRB4ColorPickerButton.objectName = 'lateralRB4ColorPickerButton'
-        self.lateralRB4ColorPickerButton.color = EvoSegModels.get('Lobe').lateralRB4Color()
+        self.lateralRB4ColorPickerButton.color = lungLobeModel.lateralRB4Color()
         self.lateralRB4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.lateralRB4ColorPickerButton.setMinimumSize(0, 0)
         self.lateralRB4ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -110,7 +111,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.lateralRB4ColorPickerButton, 1, 3)
         self.medialRB5ColorPickerButton = ctk.ctkColorPickerButton()
         self.medialRB5ColorPickerButton.objectName = 'medialRB5ColorPickerButton'
-        self.medialRB5ColorPickerButton.color = EvoSegModels.get('Lobe').medialRB5Color()
+        self.medialRB5ColorPickerButton.color = lungLobeModel.medialRB5Color()
         self.medialRB5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.medialRB5ColorPickerButton.setMinimumSize(0, 0)
         self.medialRB5ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -120,7 +121,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.superiorRB6ColorPickerButton = ctk.ctkColorPickerButton()
         self.superiorRB6ColorPickerButton.objectName = 'superiorRB6ColorPickerButton'
-        self.superiorRB6ColorPickerButton.color = EvoSegModels.get('Lobe').superiorRB6Color()
+        self.superiorRB6ColorPickerButton.color = lungLobeModel.superiorRB6Color()
         self.superiorRB6ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.superiorRB6ColorPickerButton.setMinimumSize(0, 0)
         self.superiorRB6ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -130,7 +131,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.medialBasalRB7ColorPickerButton = ctk.ctkColorPickerButton()
         self.medialBasalRB7ColorPickerButton.objectName = 'medialBasalRB7ColorPickerButton'
-        self.medialBasalRB7ColorPickerButton.color = EvoSegModels.get('Lobe').medialBasalRB7Color()
+        self.medialBasalRB7ColorPickerButton.color = lungLobeModel.medialBasalRB7Color()
         self.medialBasalRB7ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.medialBasalRB7ColorPickerButton.setMinimumSize(0, 0)
         self.medialBasalRB7ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -140,7 +141,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.anteriorBasalRB8ColorPickerButton = ctk.ctkColorPickerButton()
         self.anteriorBasalRB8ColorPickerButton.objectName = 'anteriorBasalRB8ColorPickerButton'
-        self.anteriorBasalRB8ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalRB8Color()
+        self.anteriorBasalRB8ColorPickerButton.color = lungLobeModel.anteriorBasalRB8Color()
         self.anteriorBasalRB8ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.anteriorBasalRB8ColorPickerButton.setMinimumSize(0, 0)
         self.anteriorBasalRB8ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -149,7 +150,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalRB8ColorPickerButton, 3, 3)
         self.lateralBasalRB9ColorPickerButton = ctk.ctkColorPickerButton()
         self.lateralBasalRB9ColorPickerButton.objectName = 'lateralBasalRB9ColorPickerButton'
-        self.lateralBasalRB9ColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalRB9Color()
+        self.lateralBasalRB9ColorPickerButton.color = lungLobeModel.lateralBasalRB9Color()
         self.lateralBasalRB9ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.lateralBasalRB9ColorPickerButton.setMinimumSize(0, 0)
         self.lateralBasalRB9ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -159,7 +160,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.posteriorBasalRB10ColorPickerButton = ctk.ctkColorPickerButton()
         self.posteriorBasalRB10ColorPickerButton.objectName = 'posteriorBasalRB10ColorPickerButton'
-        self.posteriorBasalRB10ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalRB10Color()
+        self.posteriorBasalRB10ColorPickerButton.color = lungLobeModel.posteriorBasalRB10Color()
         self.posteriorBasalRB10ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.posteriorBasalRB10ColorPickerButton.setMinimumSize(0, 0)
         self.posteriorBasalRB10ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -168,7 +169,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.posteriorBasalRB10ColorPickerButton, 4, 3)
         self.apicoposteriorLB1_2ColorPickerButton = ctk.ctkColorPickerButton()
         self.apicoposteriorLB1_2ColorPickerButton.objectName = 'apicoposteriorLB1_2ColorPickerButton'
-        self.apicoposteriorLB1_2ColorPickerButton.color = EvoSegModels.get('Lobe').apicoposteriorLB1_2Color()
+        self.apicoposteriorLB1_2ColorPickerButton.color = lungLobeModel.apicoposteriorLB1_2Color()
         self.apicoposteriorLB1_2ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.apicoposteriorLB1_2ColorPickerButton.setMinimumSize(0, 0)
         self.apicoposteriorLB1_2ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -178,7 +179,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.anteriorLB3ColorPickerButton = ctk.ctkColorPickerButton()
         self.anteriorLB3ColorPickerButton.objectName = 'anteriorLB3ColorPickerButton'
-        self.anteriorLB3ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorLB3Color()
+        self.anteriorLB3ColorPickerButton.color = lungLobeModel.anteriorLB3Color()
         self.anteriorLB3ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.anteriorLB3ColorPickerButton.setMinimumSize(0, 0)
         self.anteriorLB3ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -187,7 +188,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.anteriorLB3ColorPickerButton, 5, 3)
         self.superiorLingularLB4ColorPickerButton = ctk.ctkColorPickerButton()
         self.superiorLingularLB4ColorPickerButton.objectName = 'superiorLingularLB4ColorPickerButton'
-        self.superiorLingularLB4ColorPickerButton.color = EvoSegModels.get('Lobe').superiorLingularLB4Color()
+        self.superiorLingularLB4ColorPickerButton.color = lungLobeModel.superiorLingularLB4Color()
         self.superiorLingularLB4ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.superiorLingularLB4ColorPickerButton.setMinimumSize(0, 0)
         self.superiorLingularLB4ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -197,7 +198,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.inferiorLingularLB5ColorPickerButton = ctk.ctkColorPickerButton()
         self.inferiorLingularLB5ColorPickerButton.objectName = 'inferiorLingularLB5ColorPickerButton'
-        self.inferiorLingularLB5ColorPickerButton.color = EvoSegModels.get('Lobe').inferiorLingularLB5Color()
+        self.inferiorLingularLB5ColorPickerButton.color = lungLobeModel.inferiorLingularLB5Color()
         self.inferiorLingularLB5ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.inferiorLingularLB5ColorPickerButton.setMinimumSize(0, 0)
         self.inferiorLingularLB5ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -206,7 +207,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.inferiorLingularLB5ColorPickerButton, 6, 3)
         self.superiorLB6ColorPickerButton = ctk.ctkColorPickerButton()
         self.superiorLB6ColorPickerButton.objectName = 'superiorLB6ColorPickerButton'
-        self.superiorLB6ColorPickerButton.color = EvoSegModels.get('Lobe').superiorLB6Color()
+        self.superiorLB6ColorPickerButton.color = lungLobeModel.superiorLB6Color()
         self.superiorLB6ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.superiorLB6ColorPickerButton.setMinimumSize(0, 0)
         self.superiorLB6ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -216,7 +217,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.anteriorBasalLB8ColorPickerButton = ctk.ctkColorPickerButton()
         self.anteriorBasalLB8ColorPickerButton.objectName = 'anteriorBasalLB8ColorPickerButton'
-        self.anteriorBasalLB8ColorPickerButton.color = EvoSegModels.get('Lobe').anteriorBasalLB8Color()
+        self.anteriorBasalLB8ColorPickerButton.color = lungLobeModel.anteriorBasalLB8Color()
         self.anteriorBasalLB8ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.anteriorBasalLB8ColorPickerButton.setMinimumSize(0, 0)
         self.anteriorBasalLB8ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -225,7 +226,7 @@ class _ui_EvoSegSettingsPanel:
         lobeColorGroupBoxGridLayout.addWidget(self.anteriorBasalLB8ColorPickerButton, 7, 3)
         self.lateralBasalLB9ColorPickerButton = ctk.ctkColorPickerButton()
         self.lateralBasalLB9ColorPickerButton.objectName = 'lateralBasalLB9ColorPickerButton'
-        self.lateralBasalLB9ColorPickerButton.color = EvoSegModels.get('Lobe').lateralBasalLB9Color()
+        self.lateralBasalLB9ColorPickerButton.color = lungLobeModel.lateralBasalLB9Color()
         self.lateralBasalLB9ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.lateralBasalLB9ColorPickerButton.setMinimumSize(0, 0)
         self.lateralBasalLB9ColorPickerButton.setMaximumSize(16777215, 16777215)
@@ -235,7 +236,7 @@ class _ui_EvoSegSettingsPanel:
         
         self.posteriorBasalLB10ColorPickerButton = ctk.ctkColorPickerButton()
         self.posteriorBasalLB10ColorPickerButton.objectName = 'posteriorBasalLB10ColorPickerButton'
-        self.posteriorBasalLB10ColorPickerButton.color = EvoSegModels.get('Lobe').posteriorBasalLB10Color()
+        self.posteriorBasalLB10ColorPickerButton.color = lungLobeModel.posteriorBasalLB10Color()
         self.posteriorBasalLB10ColorPickerButton.dialogOptions = qt.QColorDialog.DontUseNativeDialog
         self.posteriorBasalLB10ColorPickerButton.setMinimumSize(0, 0)
         self.posteriorBasalLB10ColorPickerButton.setMaximumSize(16777215, 16777215)
