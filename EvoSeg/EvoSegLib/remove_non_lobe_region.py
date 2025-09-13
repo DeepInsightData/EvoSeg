@@ -3,13 +3,13 @@ import numpy as np
 import os
 
 
-def mask_with_lobe_region(input_image_path, lobe_mask_path, output_path, preserve_labels=True):
+def mask_with_lobe_region(input_raw_mask_path, lobe_mask_path, output_path, preserve_labels=True, add_value=30):
     """
     使用肺叶mask来过滤输入图像，只保留肺叶区域内的部分。
     可以应用在任何需要去除肺外区域，气管、血管、肺段都可以用该函数来后处理
     Parameters:
     -----------
-    input_image_path : str
+    input_raw_mask_path : str
         输入的nifti图像路径
     lobe_mask_path : str
         肺叶mask路径（来自TotalSegmentator等）
@@ -25,9 +25,9 @@ def mask_with_lobe_region(input_image_path, lobe_mask_path, output_path, preserv
     """
     try:
         # 读取输入图像和肺叶mask
-        print(f"Reading input image: {input_image_path}")
-        input_image = sitk.ReadImage(input_image_path)
-        
+        print(f"Reading input image: {input_raw_mask_path}")
+        input_image = sitk.ReadImage(input_raw_mask_path)
+
         print(f"Reading lobe mask: {lobe_mask_path}")
         lobe_mask = sitk.ReadImage(lobe_mask_path)
         
@@ -65,6 +65,9 @@ def mask_with_lobe_region(input_image_path, lobe_mask_path, output_path, preserv
         
         print(f"Number of non-zero voxels in output: {np.sum(output_array != 0)}")
         
+        # 让output_array非零部分+30
+        output_array[output_array != 0] += add_value
+
         # 转换回SimpleITK图像，保持原始图像的空间信息
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
@@ -193,7 +196,7 @@ if __name__ == "__main__":
     mode_group.add_argument(
         '-i', '--input',
         type=str,
-        help='输入的nifti图像路径'
+        help='输入的nifti格式Raw Mask路径'
     )
     mode_group.add_argument(
         '--batch',
@@ -256,7 +259,7 @@ if __name__ == "__main__":
         
         print("=== 单文件处理模式 ===")
         success = mask_with_lobe_region(
-            input_image_path=args.input,
+            input_raw_mask_path=args.input,
             lobe_mask_path=args.lobe_mask,
             output_path=args.output,
             preserve_labels=not args.no_preserve_labels
