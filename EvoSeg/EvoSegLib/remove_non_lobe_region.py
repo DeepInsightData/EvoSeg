@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 
-def mask_with_lobe_region(input_raw_mask_path, lobe_mask_path, output_path, preserve_labels=True, add_value=30):
+def mask_with_lobe_region(input_raw_mask_path, lobe_mask_path, output_path, preserve_labels=True, add_value=0):
     """
     使用肺叶mask来过滤输入图像，只保留肺叶区域内的部分。
     可以应用在任何需要去除肺外区域，气管、血管、肺段都可以用该函数来后处理
@@ -64,8 +64,8 @@ def mask_with_lobe_region(input_raw_mask_path, lobe_mask_path, output_path, pres
             output_array = np.where(binary_lobe_mask & (input_array != 0), 1, 0)
         
         print(f"Number of non-zero voxels in output: {np.sum(output_array != 0)}")
-        
-        # 让output_array非零部分+30
+
+        # 让output_array非零部分+add_value
         output_array[output_array != 0] += add_value
 
         # 转换回SimpleITK图像，保持原始图像的空间信息
