@@ -17,7 +17,8 @@ def mask_with_lobe_region(input_raw_mask_path, lobe_mask_path, output_path, pres
         输出文件路径
     preserve_labels : bool, default=True
         是否保留原始标签值。如果为False，则将所有非零区域设为1
-    
+    add_value : int, default=0
+        对保留的非零区域加上该值，常用于调整标签范围
     Returns:
     --------
     bool
